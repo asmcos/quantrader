@@ -1,0 +1,8 @@
+TA-Lib
+baostock
+backtrader
+numpy
+pandas
+matplotlib
+tushare
+
