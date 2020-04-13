@@ -10,7 +10,7 @@ pip3 install -r requirements.txt
 ```
 .
 ├── README.md
-├── bs_to_csv.py # baostock 内容存到csv文件,有些数据有问题，可能是代码问题
+├── bs_to_csv.py # baostock 内容存到csv文件
 ├── btr1.py #backtrader 代码例子
 ├── btr2.py #backtrader 代码的sma例子
 ├── btrmacd.py # btr macd 例子，还在迭代中

@@ -16,7 +16,7 @@ today = datetime.now().strftime('%Y-%m-%d')
 @click.option("--code", default="sh.600000", help="baostock股票/指数代码，如sh.600000")
 @click.option("--start", default="2010-01-01", help="开始日期, 格式如：2010-01-01")
 @click.option("--end", default=today, help="结束日期, 格式如：2010-01-01")
-@click.option("--adj", default="1", help="复权类型(只针对股票)：3: 未复权 2:前复权 1:后复权 , 默认1")
+@click.option("--adj", default="3", help="复权类型(只针对股票)：3: 未复权 2:前复权 1:后复权 , 默认1")
 def get_data(code, start, end, adj):
     lg = bs.login()
     print('login respond error_code:' + lg.error_code)
