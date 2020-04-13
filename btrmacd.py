@@ -37,7 +37,7 @@ class LongOnly(bt.Sizer):
 	params = (('stake', 1),)
 	def _getsizing(self, comminfo, cash, data, isbuy):
         # buy 1/2
-		cash = math.floor(cash * 9 / 10 )
+		cash = math.floor(cash * 95 / 100 )
 
 		if isbuy:
 			divide = math.floor(cash/data.close[0])
