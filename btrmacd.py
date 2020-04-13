@@ -37,7 +37,7 @@ class LongOnly(bt.Sizer):
 	params = (('stake', 1),)
 	def _getsizing(self, comminfo, cash, data, isbuy):
         # buy 1/2
-		cash = math.floor(cash / 2)
+		cash = math.floor(cash * 9 / 10 )
 
 		if isbuy:
 			divide = math.floor(cash/data.close[0])
@@ -141,13 +141,13 @@ class TheStrategy(bt.Strategy):
             return  # pending order execution
 
         if not self.position:  # not in the market
-            if self.mcross[0] > 0.0 :
+            if self.mcross[0] > 0.0 and self.macd.macd > 0.0:
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
 
 
         else:  # in the market
-            if self.mcross[0] < 0.0 :
+            if self.mcross[0] < 0.0 and self.macd.macd < 0.0:
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
