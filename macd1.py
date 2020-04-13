@@ -42,7 +42,7 @@ def computeMACD(code,startdate,enddate):
 
  
 if __name__ == '__main__':
-    code = 'sh.600000'
+    code = 'sh.600004'
     startdate = '2017-03-01'
-    enddate = '2017-12-01'
+    enddate = '2020-04-13'
     (dif,dea,hist) = computeMACD(code,startdate,enddate)
