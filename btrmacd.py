@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function,
 import argparse
 import datetime
 import random
-
+import math
 import backtrader as bt
 
 BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
@@ -32,6 +32,22 @@ class FixedPerc(bt.Sizer):
         else:
             size = cashtouse // data.close[0]
         return size
+
+class LongOnly(bt.Sizer):
+	params = (('stake', 1),)
+	def _getsizing(self, comminfo, cash, data, isbuy):
+        # buy 1/2
+		cash = math.floor(cash / 2)
+
+		if isbuy:
+			divide = math.floor(cash/data.close[0])
+			self.p.stake = divide
+			return self.p.stake
+		# Sell situation
+		position = self.broker.getposition(data)
+		if not position.size:
+			return 0  # do not sell if nothing is open
+		return self.p.stake
 
 
 class TheStrategy(bt.Strategy):
@@ -81,11 +97,21 @@ class TheStrategy(bt.Strategy):
             # Buy/Sell order submitted/accepted to/by broker - Nothing to do
             return
 
-        if order.status in [order.Completed]:
+        if order.status in [order.Completed, order.Canceled, order.Margin]:
             if order.isbuy():
-                self.log('BUY EXECUTED, %.2f' % order.executed.price)
-            elif order.issell():
-                self.log('SELL EXECUTED, %.2f' % order.executed.price)
+                self.log(
+					'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+					(order.executed.price,
+					 order.executed.value,
+					 order.executed.comm))
+
+                self.buyprice = order.executed.price
+                self.buycomm = order.executed.comm
+            else:  # Sell
+                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+						 (order.executed.price,
+						  order.executed.value,
+						  order.executed.comm))
 
         self.order = None
 
@@ -142,6 +168,7 @@ def runstrat(args=None):
                                                    percabs=True)
 
     cerebro.broker.addcommissioninfo(comminfo)
+    #cerebro.broker.setcommission(commission=0.0)
 
     dkwargs = dict()
     if args.fromdate is not None:
@@ -179,8 +206,7 @@ def runstrat(args=None):
                         dirperiod=args.dirperiod)
 
     #cerebro.addsizer(FixedPerc, perc=args.cashalloc)
-    cerebro.addsizer(bt.sizers.FixedSize, stake=1)
-
+    cerebro.addsizer(LongOnly)
 
 
 
