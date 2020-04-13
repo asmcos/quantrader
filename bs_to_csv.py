@@ -6,12 +6,16 @@
 import baostock as bs
 import pandas as pd
 import click
+from datetime import datetime
+
+today = datetime.now().strftime('%Y-%m-%d')
+
 
 """ 函数参数装饰器 """
 @click.command()
 @click.option("--code", default="sh.600000", help="baostock股票/指数代码，如sh.600000")
 @click.option("--start", default="2010-01-01", help="开始日期, 格式如：2010-01-01")
-@click.option("--end", default="2020-03-01", help="结束日期, 格式如：2010-01-01")
+@click.option("--end", default=today, help="结束日期, 格式如：2010-01-01")
 @click.option("--adj", default="1", help="复权类型(只针对股票)：3: 未复权 2:前复权 1:后复权 , 默认1")
 def get_data(code, start, end, adj):
     lg = bs.login()
@@ -27,6 +31,7 @@ def get_data(code, start, end, adj):
     while (rs.error_code == '0') & rs.next():
         # 获取一条记录，将记录合并在一起
         data_list.append(rs.get_row_data())
+
     data = pd.DataFrame(data_list, columns=rs.fields)
 
     columns = ['date', 'open', 'high', 'low', 'close', 'volume']
