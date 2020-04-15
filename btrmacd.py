@@ -14,6 +14,25 @@ import backtrader as bt
 BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
 
+class Histodiff(bt.Indicator):
+    lines = ('histog',)
+    plotlines = dict(histog=dict(_method='bar', alpha=0.50, width=1.0))
+
+
+
+    def once(self, start, end):
+        dst = self.line.array
+        src = self.data.array
+
+        #0-33 is none ,start = 34
+        for i in range(start, end):
+            dst[i] = src[i] - src[i-1]
+            print(dst[i])
+
+    def __init__(self):
+
+        self.lines.histog = self.data0
+
 class FixedPerc(bt.Sizer):
     '''This sizer simply returns a fixed size for any operation
 
@@ -22,7 +41,7 @@ class FixedPerc(bt.Sizer):
     '''
 
     params = (
-        ('perc', 0.20),  # perc of cash to use for operation
+        ('perc', 0.95),  # perc of cash to use for operation
     )
 
     def _getsizing(self, comminfo, cash, data, isbuy):
@@ -118,12 +137,16 @@ class TheStrategy(bt.Strategy):
     def __init__(self):
         self.dataclose = self.datas[0].close
 
-        self.macd = bt.indicators.MACD(self.data,
+        self.macd = bt.indicators.MACDHisto(self.data,
                                        period_me1=self.p.macd1,
                                        period_me2=self.p.macd2,
                                        period_signal=self.p.macdsig)
 
+
         # Cross of macd.macd and macd.signal
+        # macd is dif， signal is dea
+        # mcross 1 上冲，0 无变化，-1下冲
+
         self.mcross = bt.indicators.CrossOver(self.macd.macd, self.macd.signal)
 
         # To set the stop price
@@ -133,6 +156,9 @@ class TheStrategy(bt.Strategy):
         self.sma = bt.indicators.SMA(self.data, period=self.p.smaperiod)
         self.smadir = self.sma - self.sma(-self.p.dirperiod)
 
+        self.h = Histodiff(self.macd.histo)
+
+
     def start(self):
         self.order = None  # sentinel to avoid operrations on pending order
 
@@ -140,14 +166,23 @@ class TheStrategy(bt.Strategy):
         if self.order:
             return  # pending order execution
 
+        # 昨天
+        #print("-1",self.macd.macd.get(-1),self.macd.signal.get(-1))
+        # 今天
+        print("00",self.macd.histo.get()[0] - self.macd.histo.get(-1)[0])
+
+
         if not self.position:  # not in the market
-            if self.mcross[0] > 0.0 and self.macd.macd > 0.0:
+            # mcross > 0 是金叉穿越线,此时 macd （dif） >0
+
+            if self.mcross[0] > 0.0 :
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
 
 
         else:  # in the market
-            if self.mcross[0] < 0.0 and self.macd.macd < 0.0:
+            # mcross < 0 ,死叉 穿越，此时macd(dif) < 0
+            if self.mcross[0] < 0.0 :
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
@@ -205,7 +240,7 @@ def runstrat(args=None):
                         smaperiod=args.smaperiod,
                         dirperiod=args.dirperiod)
 
-    #cerebro.addsizer(FixedPerc, perc=args.cashalloc)
+    #cerebro.addsizer(FixedPerc, perc=0.96)
     cerebro.addsizer(LongOnly)
 
 
