@@ -27,30 +27,13 @@ class Histodiff(bt.Indicator):
         #0-33 is none ,start = 34
         for i in range(start, end):
             dst[i] = src[i] - src[i-1]
-            print(dst[i])
+
 
     def __init__(self):
 
         self.lines.histog = self.data0
 
-class FixedPerc(bt.Sizer):
-    '''This sizer simply returns a fixed size for any operation
 
-    Params:
-      - ``perc`` (default: ``0.20``) Perc of cash to allocate for operation
-    '''
-
-    params = (
-        ('perc', 0.95),  # perc of cash to use for operation
-    )
-
-    def _getsizing(self, comminfo, cash, data, isbuy):
-        cashtouse = self.p.perc * cash
-        if BTVERSION > (1, 7, 1, 93):
-            size = comminfo.getsize(data.close[0], cashtouse)
-        else:
-            size = cashtouse // data.close[0]
-        return size
 
 class LongOnly(bt.Sizer):
 	params = (('stake', 1),)
@@ -169,7 +152,7 @@ class TheStrategy(bt.Strategy):
         # 昨天
         #print("-1",self.macd.macd.get(-1),self.macd.signal.get(-1))
         # 今天
-        print("00",self.macd.histo.get()[0] - self.macd.histo.get(-1)[0])
+        print("00",self.h.get())
 
 
         if not self.position:  # not in the market
