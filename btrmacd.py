@@ -16,8 +16,7 @@ BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
 class Histodiff(bt.Indicator):
     lines = ('histog',)
-    plotlines = dict(histog=dict(_method='bar', alpha=0.50, width=1.0))
-
+    plotlines = dict(histog=dict(color='grey', _fill_lt=(0, 'green'), _fill_gt=(0, 'red')))
 
 
     def once(self, start, end):
@@ -26,7 +25,7 @@ class Histodiff(bt.Indicator):
 
         #0-33 is none ,start = 34
         for i in range(start, end):
-            dst[i] = src[i] - src[i-1]
+            dst[i] = src[i] * 2
 
 
     def __init__(self):
@@ -126,6 +125,7 @@ class TheStrategy(bt.Strategy):
                                        period_signal=self.p.macdsig)
 
 
+        
         # Cross of macd.macd and macd.signal
         # macd is dif， signal is dea
         # mcross 1 上冲，0 无变化，-1下冲
@@ -140,6 +140,7 @@ class TheStrategy(bt.Strategy):
         self.smadir = self.sma - self.sma(-self.p.dirperiod)
 
         self.h = Histodiff(self.macd.histo)
+
 
 
     def start(self):
@@ -322,7 +323,7 @@ def parse_args(pargs=None):
                               'the Sharpe Ratio'))
     # Plot options
     parser.add_argument('--plot', '-p', nargs='?', required=False,
-                        metavar='kwargs', const=True,
+                        metavar='kwargs', const=True, default=True,
                         help=('Plot the read data applying any kwargs passed\n'
                               '\n'
                               'For example:\n'
