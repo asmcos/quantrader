@@ -93,13 +93,8 @@ class TheRSIStrategy(bt.Strategy):
 
     def __init__(self):
         self.dataclose = self.datas[0].close
+        # 21,14
         self.rsi = bt.indicators.RSI_SMA(self.data.close, period=14)
-
-
-
-
-
-
 
 
     def start(self):
