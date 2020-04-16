@@ -14,23 +14,20 @@ import backtrader as bt
 BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
 
-class Histodiff(bt.Indicator):
-    lines = ('histog',)
-    plotlines = dict(histog=dict(color='grey', _fill_lt=(0, 'green'), _fill_gt=(0, 'red')))
+class nMACDHisto(bt.indicators.MACDHisto):
+    lines = ('histo',)
+    plotlines = dict(histo=dict(color='grey', _fill_lt=(0, 'green'), _fill_gt=(0, 'red')),
+    macd=dict(color="red"),
+    signal=dict(color="blue"))
 
 
     def once(self, start, end):
-        dst = self.line.array
-        src = self.data.array
-
-        #0-33 is none ,start = 34
-        for i in range(start, end):
-            dst[i] = src[i] * 2
-
+        pass
 
     def __init__(self):
+        super(nMACDHisto, self).__init__()
+        self.lines.histo = self.lines.histo  * 2
 
-        self.lines.histog = self.data0
 
 
 
@@ -119,13 +116,14 @@ class TheStrategy(bt.Strategy):
     def __init__(self):
         self.dataclose = self.datas[0].close
 
-        self.macd = bt.indicators.MACDHisto(self.data,
+        self.macd = nMACDHisto(self.data,
                                        period_me1=self.p.macd1,
                                        period_me2=self.p.macd2,
                                        period_signal=self.p.macdsig)
 
 
-        
+
+
         # Cross of macd.macd and macd.signal
         # macd is dif， signal is dea
         # mcross 1 上冲，0 无变化，-1下冲
@@ -139,7 +137,7 @@ class TheStrategy(bt.Strategy):
         self.sma = bt.indicators.SMA(self.data, period=self.p.smaperiod)
         self.smadir = self.sma - self.sma(-self.p.dirperiod)
 
-        self.h = Histodiff(self.macd.histo)
+        
 
 
 
@@ -153,7 +151,7 @@ class TheStrategy(bt.Strategy):
         # 昨天
         #print("-1",self.macd.macd.get(-1),self.macd.signal.get(-1))
         # 今天
-        print("00",self.h.get())
+        #print("00",self.h.get())
 
 
         if not self.position:  # not in the market
