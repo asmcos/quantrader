@@ -15,10 +15,12 @@ BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
 
 class nMACDHisto(bt.indicators.MACDHisto):
-    lines = ('histo',)
+    lines = ('histo','abshisto','mahisto')
     plotlines = dict(histo=dict(color='grey', _fill_lt=(0, 'green'), _fill_gt=(0, 'red')),
     macd=dict(color="red"),
-    signal=dict(color="blue"))
+    signal=dict(color="blue"),
+    abshisto=dict(alpha=0.0),
+    mahisto=dict(alpha=0.0))
 
 
     def once(self, start, end):
@@ -27,6 +29,9 @@ class nMACDHisto(bt.indicators.MACDHisto):
     def __init__(self):
         super(nMACDHisto, self).__init__()
         self.lines.histo = self.lines.histo  * 2
+        self.lines.abshisto = abs(self.lines.histo)
+        self.lines.mahisto = bt.indicators.MovAv.SMA(self.lines.abshisto,period=20)
+
 
 
 
@@ -137,7 +142,7 @@ class TheStrategy(bt.Strategy):
         self.sma = bt.indicators.SMA(self.data, period=self.p.smaperiod)
         self.smadir = self.sma - self.sma(-self.p.dirperiod)
 
-        
+
 
 
 
@@ -151,20 +156,21 @@ class TheStrategy(bt.Strategy):
         # 昨天
         #print("-1",self.macd.macd.get(-1),self.macd.signal.get(-1))
         # 今天
-        #print("00",self.h.get())
+        print("00",self.macd.histo.get(),self.macd.abshisto.get(),self.macd.mahisto.get())
 
 
         if not self.position:  # not in the market
             # mcross > 0 是金叉穿越线,此时 macd （dif） >0
 
-            if self.mcross[0] > 0.0 :
+
+            if self.macd.histo > 0.0 and self.macd.abshisto > self.macd.mahisto:
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
 
 
         else:  # in the market
             # mcross < 0 ,死叉 穿越，此时macd(dif) < 0
-            if self.mcross[0] < 0.0 :
+            if self.macd.histo < 0.0 and self.macd.abshisto > self.macd.mahisto:
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
@@ -242,6 +248,7 @@ def runstrat(args=None):
 
     if args.plot:
         pkwargs = dict(style='bar')
+        pkwargs = dict()
         if args.plot is not True:  # evals to True but is not True
             npkwargs = eval('dict(' + args.plot + ')')  # args were passed
             pkwargs.update(npkwargs)
