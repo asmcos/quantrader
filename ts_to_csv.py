@@ -3,7 +3,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--code", help="股票代码",default='000856')
-parser.add_argument("--start", help="开始日期",default='2019-01-01')
+parser.add_argument("--start", help="开始日期",default='2019-06-01')
 
 args = parser.parse_args()
 

@@ -7,10 +7,11 @@ code = '600600'
 if len(sys.argv) > 1:
 	code = sys.argv[1]
 
-def macd(code):
+def macd(code,name):
 	os.system('rm -f ./datas/ts_' + code+'.csv')
 	os.system('python3 ts_to_csv.py --code '+code+' --start 2019-10-01')
-	os.system('python3 btrmacd.py --datafile ./datas/ts_'+code+'.csv')
+	os.system('python3 btrmacd.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
+	+' --name ' + name + ' --savedb 1')
 
 
 #python3 btrstoch.py --datafile ./datas/ts_$code.csv
@@ -31,4 +32,4 @@ stocklist = stocklist[1:] #删除第一行
 for stock in stocklist:
 	code ,name = getstockinfo(stock)
 	print('正在分析',name,'代码',code)
-	macd(code)
+	macd(code,name)

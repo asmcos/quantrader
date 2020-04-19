@@ -10,6 +10,7 @@ import datetime
 import random
 import math
 import backtrader as bt
+import dbmongo
 
 BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
@@ -82,6 +83,9 @@ class TheStrategy(bt.Strategy):
         ('atrdist', 3.0),   # ATR distance for stop price
         ('smaperiod', 30),  # SMA Period (pretty standard)
         ('dirperiod', 10),  # Lookback period to consider SMA trend direction
+        ('code',1),
+        ('name','zhanluejia'),
+        ('savedb',0)
     )
 
     def log(self, txt, dt=None):
@@ -158,6 +162,12 @@ class TheStrategy(bt.Strategy):
         # 今天
         #print("00",self.macd.histo.get(),self.macd.abshisto.get(),self.macd.mahisto.get())
 
+        if self.p.savedb != 0: #存数据库
+            if self.macd.histo > 0.0 and self.macd.macd > 0:
+                dbmongo.insertMarket(1,self.datas[0].datetime.date(0).isoformat(),
+                "1",self.macd.abshisto.get()[0],
+                self.p.code,self.p.name)
+
 
         if not self.position:  # not in the market
             # mcross > 0 是金叉穿越线,此时 macd （dif） >0
@@ -226,7 +236,10 @@ def runstrat(args=None):
                         atrperiod=args.atrperiod,
                         atrdist=args.atrdist,
                         smaperiod=args.smaperiod,
-                        dirperiod=args.dirperiod)
+                        dirperiod=args.dirperiod,
+                        code=args.code,
+                        name=args.name,
+                        savedb=args.savedb)
 
     #cerebro.addsizer(FixedPerc, perc=0.96)
     cerebro.addsizer(LongOnly)
@@ -328,12 +341,24 @@ def parse_args(pargs=None):
                               'the Sharpe Ratio'))
     # Plot options
     parser.add_argument('--plot', '-p', nargs='?', required=False,
-                        metavar='kwargs', const=True, 
+                        metavar='kwargs', const=True,
                         help=('Plot the read data applying any kwargs passed\n'
                               '\n'
                               'For example:\n'
                               '\n'
                               '  --plot style="candle" (to plot candles)\n'))
+
+
+    parser.add_argument('--savedb', required=False,
+                            type=int, default=0,
+                            help=('是否存到数据'))
+
+    parser.add_argument('--code', required=False,
+                                 default=0,
+                                help=('股票代码'))
+    parser.add_argument('--name', required=False,
+                                     default='战略家',
+                                    help=('股票名称'))
 
     if pargs is not None:
         return parser.parse_args(pargs)
