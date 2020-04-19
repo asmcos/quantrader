@@ -5,4 +5,5 @@ numpy
 pandas
 matplotlib
 tushare
-
+sh
+pymongo

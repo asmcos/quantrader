@@ -156,21 +156,21 @@ class TheStrategy(bt.Strategy):
         # 昨天
         #print("-1",self.macd.macd.get(-1),self.macd.signal.get(-1))
         # 今天
-        print("00",self.macd.histo.get(),self.macd.abshisto.get(),self.macd.mahisto.get())
+        #print("00",self.macd.histo.get(),self.macd.abshisto.get(),self.macd.mahisto.get())
 
 
         if not self.position:  # not in the market
             # mcross > 0 是金叉穿越线,此时 macd （dif） >0
 
 
-            if self.macd.histo > 0.0 and self.macd.abshisto > self.macd.mahisto:
+            if self.macd.histo > 0.0 and self.macd.macd > 0:
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
 
 
         else:  # in the market
             # mcross < 0 ,死叉 穿越，此时macd(dif) < 0
-            if self.macd.histo < 0.0 and self.macd.abshisto > self.macd.mahisto:
+            if self.macd.histo < 0.0 :
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
@@ -328,7 +328,7 @@ def parse_args(pargs=None):
                               'the Sharpe Ratio'))
     # Plot options
     parser.add_argument('--plot', '-p', nargs='?', required=False,
-                        metavar='kwargs', const=True, default=True,
+                        metavar='kwargs', const=True, 
                         help=('Plot the read data applying any kwargs passed\n'
                               '\n'
                               'For example:\n'
