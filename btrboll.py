@@ -32,7 +32,7 @@ class LongOnly(bt.Sizer):
 		return self.p.stake
 
 
-class TheRSIStrategy(bt.Strategy):
+class TheBollStrategy(bt.Strategy):
     '''
     This strategy is loosely based on some of the examples from the Van
     K. Tharp book: *Trade Your Way To Financial Freedom*. The logic:
@@ -52,10 +52,13 @@ class TheRSIStrategy(bt.Strategy):
          than the current
     '''
 
+
     params = (
-		('safediv',True),
-        ('period', 14)
-    )
+        ("period", 20),
+        ("devfactor", 2),
+        ("size", 20),
+
+        )
 
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
@@ -94,7 +97,7 @@ class TheRSIStrategy(bt.Strategy):
     def __init__(self):
         self.dataclose = self.datas[0].close
         # 21,14
-        self.rsi = bt.indicators.RSI(self.data.close)
+        self.boll = bt.indicators.BollingerBands(period=self.p.period, devfactor=self.p.devfactor)
 
 
     def start(self):
@@ -110,7 +113,7 @@ class TheRSIStrategy(bt.Strategy):
         if not self.position:  # not in the market
             # mcross > 0 是金叉穿越线,此时 macd （dif） >0
 
-            if self.rsi < 30:
+            if self.data.close < self.boll.lines.bot:
 
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
@@ -118,7 +121,7 @@ class TheRSIStrategy(bt.Strategy):
 
         else:  # in the market
             # mcross < 0 ,死叉 穿越，此时macd(dif) < 0
-            if self.rsi > 70:
+            if self.data.close > self.boll.lines.top:
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
@@ -168,7 +171,7 @@ def runstrat(args=None):
 
     cerebro.adddata(data0)
 
-    cerebro.addstrategy(TheRSIStrategy)
+    cerebro.addstrategy(TheBollStrategy)
 
     #cerebro.addsizer(FixedPerc, perc=0.96)
     cerebro.addsizer(LongOnly)

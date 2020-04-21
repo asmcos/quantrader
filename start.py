@@ -2,18 +2,40 @@
 # exec script
 import os
 import sys
+import signal
+
 code = '600600'
+
+def handler(signum, frame):
+	print("是不是想让我退出啊")
+
+
+signal.signal(signal.SIGINT, handler)
+signal.signal(signal.SIGHUP, handler)
+signal.signal(signal.SIGTERM, handler)
+
 
 if len(sys.argv) > 1:
 	code = sys.argv[1]
 
 def macd(code,name):
-	os.system('rm -f ./datas/ts_' + code+'.csv')
-	os.system('python3 ts_to_csv.py --code '+code+' --start 2019-10-01')
-	os.system('python3 btrmacd.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
+
+    os.system('rm -f ./datas/ts_' + code+'.csv')
+    y1 = os.system('python3 ts_to_csv.py --code '+code+' --start 2019-10-01')
+    y2 = os.system('python3 btrmacd.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
 	+' --name ' + name + ' --savedb 1')
 
 
+
+def mrk(code,name):
+	os.system('rm -f ./datas/ts_' + code+'.csv')
+	y1 = os.system('python3 ts_to_csv.py --code '+code+' --start 2019-10-01')
+	y2 = os.system('python3 btrmrk.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
+	+' --name ' + name + ' --savedb 1')
+	if y1 == 2 or y2 == 2: #ctrl+c
+	    print(y1,y2)
+	    sys.exit()
+		
 #python3 btrstoch.py --datafile ./datas/ts_$code.csv
 #python3 btrrsi.py --datafile ./datas/ts_$code.csv
 
@@ -32,4 +54,4 @@ stocklist = stocklist[1:] #删除第一行
 for stock in stocklist:
 	code ,name = getstockinfo(stock)
 	print('正在分析',name,'代码',code)
-	macd(code,name)
+	mrk(code,name)

@@ -1,5 +1,5 @@
-### python3 btrmacd.py --data ./datas/bs_sh.600600.csv  ###
-### python3 btrmacd.py --dataset orcl  ###
+### python3 btrmsk.py --datafile ./datas/bs_sh.600600.csv  ###
+### 根据股票数据计算金叉 和RSI，KDJ数据  ###
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -10,10 +10,26 @@ import datetime
 import random
 import math
 import backtrader as bt
+import dbmongo
 
 BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
 
+class nMACDHisto(bt.indicators.MACDHisto):
+    lines = ('histo','abshisto','mahisto')
+    plotlines = dict(histo=dict(color='grey', _fill_lt=(0, 'green'), _fill_gt=(0, 'red')),
+    macd=dict(color="red"),
+    signal=dict(color="blue"),
+    abshisto=dict(alpha=0.0))
+
+
+    def once(self, start, end):
+        pass
+
+    def __init__(self):
+        super(nMACDHisto, self).__init__()
+        self.lines.histo = self.lines.histo  * 2
+        self.lines.abshisto = abs(self.lines.histo)
 
 class LongOnly(bt.Sizer):
 	params = (('stake', 1),)
@@ -32,7 +48,8 @@ class LongOnly(bt.Sizer):
 		return self.p.stake
 
 
-class TheRSIStrategy(bt.Strategy):
+### MACD ，RSI， KDJ
+class TheMRKStrategy(bt.Strategy):
     '''
     This strategy is loosely based on some of the examples from the Van
     K. Tharp book: *Trade Your Way To Financial Freedom*. The logic:
@@ -53,8 +70,22 @@ class TheRSIStrategy(bt.Strategy):
     '''
 
     params = (
-		('safediv',True),
-        ('period', 14)
+        # Standard MACD Parameters
+        ('macd1', 12),
+        ('macd2', 26),
+        ('macdsig', 9),
+        ('atrperiod', 14),  # ATR Period (standard)
+        ('atrdist', 3.0),   # ATR distance for stop price
+        ('smaperiod', 30),  # SMA Period (pretty standard)
+        ('dirperiod', 10),  # Lookback period to consider SMA trend direction
+        ('code',1),
+        ('name','zhanluejia'),
+        ('savedb',0),
+        # rsi
+        ('safediv',True),
+        ('period', 14),
+        #KDJ
+
     )
 
     def log(self, txt, dt=None):
@@ -66,8 +97,6 @@ class TheRSIStrategy(bt.Strategy):
         if order.status == order.Completed:
             pass
 
-        if not order.alive():
-            self.order = None  # indicate no order is pending
 
         if order.status in [order.Submitted, order.Accepted]:
             # Buy/Sell order submitted/accepted to/by broker - Nothing to do
@@ -93,32 +122,83 @@ class TheRSIStrategy(bt.Strategy):
 
     def __init__(self):
         self.dataclose = self.datas[0].close
+
+        self.macd = nMACDHisto(self.data,
+                                       period_me1=self.p.macd1,
+                                       period_me2=self.p.macd2,
+                                       period_signal=self.p.macdsig)
+
+
+
+
+        # Cross of macd.macd and macd.signal
+        # macd is dif， signal is dea
+        # mcross 1 上冲，0 无变化，-1下冲
+
+        self.mcross = bt.indicators.CrossOver(self.macd.macd, self.macd.signal)
+
+        # To set the stop price
+        #self.atr = bt.indicators.ATR(self.data, period=self.p.atrperiod)
+
+        # Control market trend
+        #self.sma = bt.indicators.SMA(self.data, period=self.p.smaperiod)
+        #self.smadir = self.sma - self.sma(-self.p.dirperiod)
+
         # 21,14
         self.rsi = bt.indicators.RSI(self.data.close)
+
+        #TheKDJStrategy
+        self.stochastic = bt.indicators.StochasticFull(self.data0, safediv =True,period=5, period_dfast=3, period_dslow=3)
 
 
     def start(self):
         self.order = None  # sentinel to avoid operrations on pending order
 
+
+    def getRsiBuy(self):
+        if self.rsi > 50 and self.rsi < 80:
+            return True
+        else:
+            return False
+
+    def getMacdBuy(self):
+        if self.mcross[0] > 0.0  and self.macd.macd > 0.0:
+            return True
+        else:
+            return False
+
+    def getKdjBuy(self):
+        if self.stochastic.percK < 10 or self.stochastic.percD < 20:
+            return True
+        else:
+            return False
+
     def next(self):
         if self.order:
             return  # pending order execution
 
+        # 昨天
+        #print("-1",self.macd.macd.get(-1),self.macd.signal.get(-1))
+        # 今天
+        #print("00",self.macd.histo.get(),self.macd.abshisto.get(),self.macd.mahisto.get())
 
-
+        if self.p.savedb != 0: #存数据库
+            if self.getMacdBuy() and self.getRsiBuy() and self.getKdjBuy():
+                dbmongo.insertMarket(1,self.datas[0].datetime.date(0).isoformat(),
+                "1",self.rsi.get()[0],self.stochastic.percK.get()[0],
+                self.p.code,self.p.name)
 
         if not self.position:  # not in the market
             # mcross > 0 是金叉穿越线,此时 macd （dif） >0
 
-            if self.rsi < 30:
-
+            if self.macd.histo > 0.0 and self.macd.macd > 0:
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
 
 
         else:  # in the market
             # mcross < 0 ,死叉 穿越，此时macd(dif) < 0
-            if self.rsi > 70:
+            if self.macd.histo < 0.0 :
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
@@ -168,7 +248,16 @@ def runstrat(args=None):
 
     cerebro.adddata(data0)
 
-    cerebro.addstrategy(TheRSIStrategy)
+    cerebro.addstrategy(TheMRKStrategy,
+                        macd1=args.macd1, macd2=args.macd2,
+                        macdsig=args.macdsig,
+                        atrperiod=args.atrperiod,
+                        atrdist=args.atrdist,
+                        smaperiod=args.smaperiod,
+                        dirperiod=args.dirperiod,
+                        code=args.code,
+                        name=args.name,
+                        savedb=args.savedb)
 
     #cerebro.addsizer(FixedPerc, perc=0.96)
     cerebro.addsizer(LongOnly)
@@ -270,12 +359,24 @@ def parse_args(pargs=None):
                               'the Sharpe Ratio'))
     # Plot options
     parser.add_argument('--plot', '-p', nargs='?', required=False,
-                        metavar='kwargs', const=True, default=True,
+                        metavar='kwargs', const=True,
                         help=('Plot the read data applying any kwargs passed\n'
                               '\n'
                               'For example:\n'
                               '\n'
                               '  --plot style="candle" (to plot candles)\n'))
+
+
+    parser.add_argument('--savedb', required=False,
+                            type=int, default=0,
+                            help=('是否存到数据'))
+
+    parser.add_argument('--code', required=False,
+                                 default=0,
+                                help=('股票代码'))
+    parser.add_argument('--name', required=False,
+                                     default='战略家',
+                                    help=('股票名称'))
 
     if pargs is not None:
         return parser.parse_args(pargs)

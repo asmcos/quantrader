@@ -26,8 +26,8 @@ createdate:
 type: 1,macd,2rsi,3kdj,4 boll
 signaldate:
 signaltype:1.buy,2,sell
-score:0-100 分数 分数越大表面该信号越强， signaltype=1，100分 表示强买信号，金叉
-       signaltype=2，100分表示强卖信号。 死叉
+rsi:
+kdj:
 code:股票代码
 name:股票名称
 }
@@ -58,7 +58,7 @@ def getIndustrys():
     return db.industry.find()
 
 
-def insertMarket(indextype,signaldate,signaltype,score,code,name):
+def insertMarket(indextype,signaldate,signaltype,rsi,kdj,code,name):
     m = {
     'createdate':str(datetime.date.today()),
     'type':indextype,
@@ -66,7 +66,8 @@ def insertMarket(indextype,signaldate,signaltype,score,code,name):
     'signaltype':signaltype,
     'name':name,
     'code':code,
-    'score':score
+    'rsi':rsi,
+    'kdj':kdj
     }
     isExist = getMarket(0,indextype,signaldate,code)
     if isExist == None:
