@@ -141,8 +141,10 @@ class TheMRKStrategy(bt.Strategy):
         #self.atr = bt.indicators.ATR(self.data, period=self.p.atrperiod)
 
         # Control market trend
-        #self.sma = bt.indicators.SMA(self.data, period=self.p.smaperiod)
+        self.sma = bt.indicators.SMA(self.data, period=self.p.smaperiod)
         #self.smadir = self.sma - self.sma(-self.p.dirperiod)
+        self.smadir1 = self.sma - self.sma(-1)
+        self.smadir2 = self.sma(-1) - self.sma(-2)
 
         # 21,14
         self.rsi = bt.indicators.RSI(self.data.close)
@@ -162,7 +164,7 @@ class TheMRKStrategy(bt.Strategy):
             return False
 
     def getMacdBuy(self):
-        if self.mcross[0] > 0.0  and self.macd.macd > 0.0:
+        if self.mcross[0] > 0.0  and self.macd.macd > 0.0 and self.smadir1 >= 0 and self.smadir2 >=0:
             return True
         else:
             return False
