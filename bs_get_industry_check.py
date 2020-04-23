@@ -18,15 +18,20 @@ print('query_stock_industry respond  error_msg:'+rs.error_msg)
 industry_list = []
 while (rs.error_code == '0') & rs.next():
     # 获取一条记录，将记录合并在一起
-    industry_list.append(rs.get_row_data())
-    dbmongo.insertIndustry(industry_list[-1][0],
+	row = rs.get_row_data()
+	kdata = bs.query_history_k_data_plus(row[1], 'date,open,high,low,close,volume', start_date='2020-01-01', 
+                                      frequency='d')	
+	if len(kdata.get_row_data()) == 0:
+		continue
+	industry_list.append(row)	
+	dbmongo.insertIndustry(industry_list[-1][0],
     industry_list[-1][1],
     industry_list[-1][2],
     industry_list[-1][3],
     industry_list[-1][4])
 result = pd.DataFrame(industry_list, columns=rs.fields)
 # 结果集输出到csv文件
-result.to_csv("./datas/stock_industry.csv", index=False)
+result.to_csv("./datas/stock_industry_check.csv", index=False)
 print(result)
 
 # 登出系统

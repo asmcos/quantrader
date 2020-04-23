@@ -3,20 +3,15 @@
 import os
 import sys
 import signal
+import threading,time
+import queue
 
 code = '600600'
 
 def handler(signum, frame):
 	print("是不是想让我退出啊")
+	sys.exit()
 
-
-signal.signal(signal.SIGINT, handler)
-signal.signal(signal.SIGHUP, handler)
-signal.signal(signal.SIGTERM, handler)
-
-
-if len(sys.argv) > 1:
-	code = sys.argv[1]
 
 def macd(code,name):
 
@@ -28,20 +23,19 @@ def macd(code,name):
 
 
 def mrk(code,name):
+	y1 = os.system('python3 btrmrk.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
+	+' --name ' + name + ' --savedb 1')
+	if y1 == 2: #ctrl+c
+	    print(y1)
+	    sys.exit()
+
+def get_code_cvs(code):
 	os.system('rm -f ./datas/ts_' + code+'.csv')
 	y1 = os.system('python3 ts_to_csv.py --code '+code+' --start 2019-10-01')
-	y2 = os.system('python3 btrmrk.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
-	+' --name ' + name + ' --savedb 1')
-	if y1 == 2 or y2 == 2: #ctrl+c
-	    print(y1,y2)
+	if y1 == 2 : #ctrl+c
+	    print(y1)
 	    sys.exit()
 		
-#python3 btrstoch.py --datafile ./datas/ts_$code.csv
-#python3 btrrsi.py --datafile ./datas/ts_$code.csv
-
-if not os.path.exists('./datas/stock_industry.csv'):
-	print('正在下载股票库列表....')
-	os.system('python3 ts_get_industry.py')
 
 def getstockinfo(stock):
 	#2019-12-09,sz.002094,青岛金王,化工,申万一级行业
@@ -49,9 +43,35 @@ def getstockinfo(stock):
 	d,code,name,skip1,skip2 = stock.split(',')
 	code = code.split('.')[1]
 	return code,name
-stocklist = open('./datas/stock_industry.csv').readlines()
+
+def get_data_thread(n):
+	for stock in stocklist:
+		code ,name = getstockinfo(stock)
+		print('正在获取',name,'代码',code)
+		get_code_cvs(code)
+		q.put((code,name))
+	q.task_done()
+
+signal.signal(signal.SIGINT, handler)
+signal.signal(signal.SIGHUP, handler)
+signal.signal(signal.SIGTERM, handler)
+q = queue.Queue()
+
+if len(sys.argv) > 1:
+	code = sys.argv[1]
+
+if not os.path.exists('./datas/stock_industry_check.csv'):
+	print('正在下载股票库列表....')
+	os.system('python3 bs_get_industry_check.py')
+
+stocklist = open('./datas/stock_industry_check.csv').readlines()
 stocklist = stocklist[1:] #删除第一行
-for stock in stocklist:
-	code ,name = getstockinfo(stock)
+
+
+threading.Thread(target=get_data_thread,args=(1,)).start()
+
+
+while True:
+	code,name = q.get()
 	print('正在分析',name,'代码',code)
 	mrk(code,name)

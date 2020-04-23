@@ -158,19 +158,32 @@ class TheMRKStrategy(bt.Strategy):
 
 
     def getRsiBuy(self):
-        if self.rsi > 50 and self.rsi < 80:
+        if self.rsi :
             return True
         else:
             return False
 
     def getMacdBuy(self):
-        if self.mcross[0] > 0.0  and self.macd.macd > 0.0 and self.smadir1 >= 0 and self.smadir2 >=0:
+        if self.macd.histo > 0.0  and self.macd.macd > 0.0 and self.smadir1 >= 0 :
             return True
         else:
             return False
 
     def getKdjBuy(self):
-        if self.stochastic.percK < 10 or self.stochastic.percD < 20:
+        if self.stochastic.percK < 20 or self.stochastic.percD < 30:
+            return True
+        else:
+            return False
+
+
+    def getMacdSell(self):
+        if self.mcross < 0 :
+            return True
+        else:
+            return False
+
+    def getKdjSell(self):
+        if self.stochastic.percK > 80 or self.stochastic.percD > 80:
             return True
         else:
             return False
@@ -193,14 +206,15 @@ class TheMRKStrategy(bt.Strategy):
         if not self.position:  # not in the market
             # mcross > 0 是金叉穿越线,此时 macd （dif） >0
 
-            if self.macd.histo > 0.0 and self.macd.macd > 0:
+            #if self.macd.histo > 0.0 and self.macd.macd > 0:
+            if self.getMacdBuy() and self.getRsiBuy() and self.getKdjBuy():
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
 
 
         else:  # in the market
             # mcross < 0 ,死叉 穿越，此时macd(dif) < 0
-            if self.macd.histo < 0.0 :
+            if self.getMacdSell() or  self.getKdjSell():
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
 
