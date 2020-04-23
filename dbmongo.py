@@ -32,6 +32,16 @@ code:股票代码
 name:股票名称
 }
 
+backtest{
+code,
+name,
+startdate
+enddate
+testdate
+startvalue
+finalvalue
+}
+
 '''
 
 def insertIndustry(date,code,name,industry,industryclass):
@@ -81,3 +91,25 @@ def getMarket(Id,indextype=None,signaldate=None,code=None):
         'code':code
         })
     return db.market.find({'_id':Id})
+
+def Newbacktest(code,name,start,end,startvalue,finalvalue,testdate=None):
+    query = {'code':code,
+        'startdate':start,
+        'enddate':end,
+        }
+
+    if db.backtest.find_one(query) == None:
+        if testdate == None:
+            testdate = str(datetime.date.today())
+
+        db.backtest.insert_one(
+        {
+            'code':code,
+            'name':name,
+            'startdate':start,
+            'enddate':end,
+            'testdate':testdate,
+            'startvalue':startvalue,
+            'finalvalue':finalvalue
+        }
+        )

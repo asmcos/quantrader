@@ -284,11 +284,13 @@ def runstrat(args=None):
 
     # Print out the starting conditions
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    startvalue = cerebro.broker.getvalue()
 
     results = cerebro.run()
     st0 = results[0]
-
-
+    enddate = str(data0.lines.datetime.date(0))
+    startdate = str(data0.lines.datetime.date(-len(data0)+1))
+    dbmongo.Newbacktest(args.code,args.name,startdate,enddate,startvalue,cerebro.broker.getvalue())
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
