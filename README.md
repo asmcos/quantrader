@@ -14,11 +14,16 @@ pip3 install -r requirements.txt
 ├── btr1.py #backtrader 代码例子
 ├── btr2.py #backtrader 代码的sma例子
 ├── btrmacd.py # btr macd 例子，4.13调试第一版
+├── btrmrk.py  # btr MACD,KDJ,RSI三个维度判断买卖
+├── start.py   # 执行脚本
 ├── datas
 │   ├── bs_sh.600600.csv # 通过baostock网站存储的数据
 │   └── orcl-1995-2014.txt #数据来自backtrader 源代码
 ├── macd1.py # baostock + talib + macd 例子，
 ├── macd2.py # tushare + talib + macd 例子
+├── bs_get_industry.py #获取沪市、深市数据
+├── bs_get_industry_check.py #获取沪市、深市股票，并且有在线数据
+├── dbmongo.py # 数据 存储
 ├── requirements.txt # 安装一些python3依赖库
 └── ts_to_csv.py # tushare to csv 
 ```
