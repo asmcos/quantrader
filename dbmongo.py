@@ -113,3 +113,16 @@ def Newbacktest(code,name,start,end,startvalue,finalvalue,testdate=None):
             'finalvalue':finalvalue
         }
         )
+
+def get_all_backtest(start,end,testdate=None):
+    if testdate == None:
+        query = {
+                'startdate':start,
+                'enddate':end,
+                }
+    else :
+        query = {'testdate':testdate,
+                'startdate':start,
+                'enddate':end,
+                }
+    return db.backtest.find(query)
