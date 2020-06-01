@@ -57,5 +57,5 @@ Final Portfolio Value: 73601.29
 
 # AI图谱
 
-![](https://github.com/asmcos/quantrader/raw/master/AI%E5%9B%BE%E8%B0%B1.png)
+![](http://www.zhanluejia.net.cn/static/uploads/5b1dea78fd13d5f1869043d867906e0c.png)
   
