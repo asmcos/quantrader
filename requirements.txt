@@ -7,3 +7,7 @@ matplotlib
 tushare
 sh
 pymongo
+backtrader_plotting
+sklearn
+tensorflow
+yahoo_fin
