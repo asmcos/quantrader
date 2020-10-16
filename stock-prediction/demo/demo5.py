@@ -89,9 +89,10 @@ Xtest,ytest = processData(array_test,nsteps)
 Xtrain = model.predict(Xtrain)
 Xtrain = Xtrain.ravel()
 
-Xtest = model.predict(Xtest)
-Xtest = Xtest.ravel()
-
+Xpred = model.predict(Xtest)
+Xpred = Xpred.ravel()
+print(scl.inverse_transform(Xtest[-1].reshape(-1, 1)))
+print(scl.inverse_transform(Xpred.reshape(-1, 1)))
 y = np.concatenate((ytrain, ytest), axis=0)
 
 plt.figure(figsize = (15,10))
@@ -107,4 +108,4 @@ plt.plot([x for x in range(nsteps+leftover, nsteps+leftover+len(Xtrain)+len(Xtes
 
 """
 plt.legend(loc='best')
-plt.show()
+#plt.show()

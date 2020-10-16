@@ -1,10 +1,13 @@
 import tushare as ts
 import talib
 from sklearn import svm
-
+import sys
 # 获取上证指数数据
 #青岛啤酒
+
 code='600600'
+if len(sys.argv) > 1:
+	code =sys.argv[1]
 #df=ts.get_hist_data(code,start='2018-07-09',end='2020-10-10')
 df=ts.get_hist_data(code,start='2018-07-09')
 close_pri=df['close']
