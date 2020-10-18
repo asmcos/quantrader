@@ -1,6 +1,16 @@
 #https://github.com/ICEJM1020/LSTM_Stock/blob/master/Code/LSTM_stock.ipynb
 import tushare as ts
 import pandas as pd
+from matplotlib import pyplot as plt
+from datetime import datetime
+import sys
+
+today = datetime.now()
+end = str(today.year) + str(today.month) + str(today.day)
+# 茅台
+code = '600519'
+if len(sys.argv) > 1:
+	code = sys.argv[1]
 
 class StockData(object):
     def __init__(self):
@@ -16,29 +26,16 @@ class StockData(object):
         else:
             return code + '.SZ'
 
-from matplotlib import pyplot as plt
-from matplotlib.pyplot import MultipleLocator
-def plot_stock(stock_data):
-    temp_data = stock_data[['close','high','low','trade_date']]
-    temp_data = temp_data.iloc[-30:]
-    temp_data.set_index(['trade_date'], inplace=True)
-    plt.plot(temp_data['close'],color='orange', label='Close Price')
-    ax=plt.gca()
-    x_major_locator=MultipleLocator(5)
-    ax.xaxis.set_major_locator(x_major_locator)
-    plt.xticks(rotation=60)
-    plt.legend(loc='best')
-    plt.show()
 
 stock = StockData()
-data = stock.get_data("600519",start="20100101",end='20201021')
+data = stock.get_data(code,start="20100101",end=end)
 
 # 从
-data_test = stock.get_data("600519", start = '20190901',end = '20191201')
+data_test = stock.get_data(code, start = '20190901',end = '20191201')
+
 # 按照时间进行排序
 data.sort_values("trade_date", inplace=True)
 data = data.reset_index()
-#plot_stock(data)
 print(data.shape)
 data.tail()
 
@@ -52,13 +49,6 @@ X = data.loc[:,'open':'amount']
 X = X.values
 # y = data["close"].values
 print(X.shape)
-
-plt.plot(X.min(axis=0),'v',label='min')
-plt.plot(X.max(axis=0),'^',label='max')
-plt.yscale('log')
-plt.legend(loc='best', fontsize = 14)
-plt.xlabel('features', fontsize = 14)
-plt.ylabel('feature magnitude', fontsize = 14)
 
 
 # 训练集数据处理
@@ -74,15 +64,6 @@ y = pd.DataFrame(X_scalerd)[3].values
 temp_data = pd.DataFrame(X_scalerd)
 temp_data = temp_data.iloc[-30:]
 
-"""
-plt.plot(temp_data[3],color='orange', label='Close Price')
-ax=plt.gca()
-x_major_locator=MultipleLocator(5)
-ax.xaxis.set_major_locator(x_major_locator)
-plt.xticks(rotation=60)
-plt.legend(loc='best')
-plt.show()
-"""
 
 print(X_scalerd.shape, y.shape)
 
@@ -125,11 +106,6 @@ history = model.fit(X_train, y_train, epochs=100, verbose=2, shuffle=False)
 
 model.save("1-1.h5")
 
-# plot history
-plt.plot(history.history['loss'], label='loss')
-#plt.plot(history.history['accuracy'], label='train')
-plt.legend()
-plt.show()
 
 model = load_model('1-1.h5')
 
