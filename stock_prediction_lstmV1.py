@@ -55,9 +55,18 @@ def create_dataset(dataset, time_step=1):
         dataY.append(dataset[i + time_step:i+time_step+pred_days, 0])
     return np.array(dataX), np.array(dataY)
 
+def create_dataset_pred(dataset, time_step=1):
+    dataX = []
+    for i in range(len(dataset)-time_step):
+        a = dataset[i:(i+time_step), 0]   ###i=0, 0,1,2,3-----99   100 
+        dataX.append(a)        
+    return np.array(dataX)
+
+
 # reshape into X=t,t+1,t+2,t+3 and Y=t+4
 X, y = create_dataset(df1, time_step)
-X_test, ytest = create_dataset(test_data, time_step)
+
+X_test = create_dataset_pred(test_data, time_step)
 
 # 数据乱序
 #
@@ -68,7 +77,7 @@ X_train, X_validate, y_train, y_validate = train_test_split(X, y, test_size=0.20
 # reshape input to be [samples, time steps, features] which is required for LSTM
 X_test = X_test.reshape(X_test.shape[0],X_test.shape[1] , 1)
 X_train = X_train.reshape(X_train.shape[0],X_train.shape[1] , 1)
-
+X_validate = X_validate.reshape(X_validate.shape[0],X_validate.shape[1] , 1)
 ### Create the Stacked LSTM model
 # 3. 建立LSTM 模型
 ###########################
@@ -90,7 +99,7 @@ model.compile(loss='mean_squared_error',optimizer='adam')
 #############
 # 4. 训练
 #############
-model.fit(X_train,y_train,validation_data=(X_test,ytest),epochs=epochs,batch_size=64,verbose=1)
+model.fit(X_train,y_train,validation_data=(X_validate,y_validate),epochs=epochs,batch_size=64,verbose=1)
 
 
 ### Lets Do the prediction and check performance metrics
