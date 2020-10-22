@@ -58,4 +58,16 @@ Final Portfolio Value: 73601.29
 # AI图谱
 
 ![](http://www.zhanluejia.net.cn/static/uploads/5b1dea78fd13d5f1869043d867906e0c.png)
-  
+
+#使用LSTM 预测股票
+
+```bash
+python3 stock_prediction_lstmV1.py 600600
+```
+最后一行数据就是未来5天的预测。
+
+代码说明
+ * 使用的是 tensorflow 的keras LSTM算法,tf是2.x版本
+ * 股票数据接口来自tushare,建议切换成tushare pro版本
+ * 例子代码是30为一个数据周期预测未来5天。
+ * 股票预测仅仅是一个趋势，不是很准，大家不能用来炒股，仅仅用来学习
