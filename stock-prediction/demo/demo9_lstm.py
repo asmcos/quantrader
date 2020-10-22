@@ -27,6 +27,9 @@ print(df1)
 #######################
 # 2. 处理数据
 #######################
+time_step = 100
+epochs = 500
+pred_days = 5
 
 from sklearn.preprocessing import MinMaxScaler
 scaler=MinMaxScaler(feature_range=(0,1))
@@ -41,14 +44,13 @@ train_data,test_data=df1[0:training_size,:],df1[training_size:,:1]
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, time_step=1):
     dataX, dataY = [], []
-    for i in range(len(dataset)-time_step):
+    for i in range(len(dataset)-time_step-pred_days):
         a = dataset[i:(i+time_step), 0]   ###i=0, 0,1,2,3-----99   100 
         dataX.append(a)
-        dataY.append(dataset[i + time_step, 0])
+        dataY.append(dataset[i + time_step:i+time_step+pred_days, 0])
     return np.array(dataX), np.array(dataY)
 
 # reshape into X=t,t+1,t+2,t+3 and Y=t+4
-time_step = 100
 X, y = create_dataset(df1, time_step)
 X_test, ytest = create_dataset(test_data, time_step)
 
@@ -74,7 +76,7 @@ model=Sequential()
 model.add(LSTM(50,return_sequences=True,input_shape=(time_step,1)))
 model.add(LSTM(50,return_sequences=True))
 model.add(LSTM(50))
-model.add(Dense(1))
+model.add(Dense(pred_days))
 model.compile(loss='mean_squared_error',optimizer='adam')
 
 #model.summary()
@@ -82,7 +84,7 @@ model.compile(loss='mean_squared_error',optimizer='adam')
 #############
 # 4. 训练
 #############
-model.fit(X_train,y_train,validation_data=(X_test,ytest),epochs=500,batch_size=64,verbose=1)
+model.fit(X_train,y_train,validation_data=(X_test,ytest),epochs=epochs,batch_size=64,verbose=1)
 
 
 ### Lets Do the prediction and check performance metrics
@@ -90,12 +92,10 @@ model.fit(X_train,y_train,validation_data=(X_test,ytest),epochs=500,batch_size=6
 # 5. 预测
 ##############
 
-train_predict=model.predict(X_train)
 test_predict=model.predict(X_test)
 
 ##Transformback to original form
-train_predict=scaler.inverse_transform(train_predict)
 test_predict=scaler.inverse_transform(test_predict)
 
-print(train_predict,test_predict)
+print(test_predict)
 
