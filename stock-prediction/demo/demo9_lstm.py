@@ -27,8 +27,8 @@ print(df1)
 #######################
 # 2. 处理数据
 #######################
-time_step = 100
-epochs = 500
+time_step = 30
+epochs = 200
 pred_days = 5
 
 from sklearn.preprocessing import MinMaxScaler
