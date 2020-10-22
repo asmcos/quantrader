@@ -96,6 +96,8 @@ test_predict=model.predict(X_test)
 
 ##Transformback to original form
 test_predict=scaler.inverse_transform(test_predict)
-
+print("原始数据:")
+print(scaler.inverse_transform( test_data))
+print("预测数据")
 print(test_predict)
 
