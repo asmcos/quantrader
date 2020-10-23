@@ -21,7 +21,8 @@ if len(sys.argv) > 1:
 df=ts.get_hist_data(code,start='2018-01-01')
 df1 = df['close']
 df1 = df1.sort_index(ascending=True)
-
+#for i in range(0,len(df1)):  #test data
+#    df1[i] = i 
 print(df1)
 
 #######################
@@ -50,9 +51,9 @@ train_data,test_data=df1[0:training_size,:],df1[training_size:,:1]
 def create_dataset(dataset, time_step=1):
     dataX, dataY = [], []
     for i in range(len(dataset)-time_step-pred_days):
-        a = dataset[i:(i+time_step), 0]   ###i=0, 0,1,2,3-----99   100 
+        a = dataset[i:(i+time_step),0]   ###i=0, 0,1,2,3-----99   100 
         dataX.append(a)
-        dataY.append(dataset[i + time_step:i+time_step+pred_days, 0])
+        dataY.append(dataset[i + time_step:i+time_step+pred_days,0])
     return np.array(dataX), np.array(dataY)
 
 def create_dataset_pred(dataset, time_step=1):
