@@ -55,9 +55,7 @@ class LongOnly(bt.Sizer):
 
 class TheStrategy(bt.Strategy):
     '''
-
     '''
-
     params = ( 
         ('name','zhanluejia'),
         ('savedb',0)
@@ -99,7 +97,7 @@ class TheStrategy(bt.Strategy):
 
     def __init__(self):
         self.dataclose = self.datas[0].close
-        print(self.datas)
+
     def start(self):
         self.order = None  # sentinel to avoid operrations on pending order
 
@@ -141,6 +139,7 @@ def runstrat(args=None):
     df300 = bt.feeds.PandasData(dataname=df300)
 
     cerebro.adddata(df500)
+    cerebro.adddata(df300)
 
     cerebro.addstrategy(TheStrategy,
                         name=args.name,
