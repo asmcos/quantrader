@@ -1,4 +1,4 @@
 jqauth = {
-	name:'',
-	passwd:'',
+	'name':'',
+	'passwd':'',
 }
