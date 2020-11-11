@@ -1,4 +1,4 @@
-### python3 btr28.py 
+### python3 btr28.py
 ### 源自二八轮动策略 张翼轸
 
 from __future__ import (absolute_import, division, print_function,
@@ -14,7 +14,7 @@ import dbmongo
 import config
 import jqdatasdk as jq
 import pandas as pd
- 
+
 
 #默认结束日期是今天
 today = datetime.datetime.now()
@@ -22,18 +22,59 @@ default_end = "-".join([str(today.year) , str(today.month) , str(today.day)])
 
 BTVERSION = tuple(int(x) for x in bt.__version__.split('.'))
 
+class PandasData(bt.feeds.PandasData):
+    lines = ('d4w',)
+    params = (
+        ('datetime', None),
+        ('open','open'),
+        ('high','high'),
+        ('low','low'),
+        ('close','close'),
+        ('volume','volume'),
+        ('openinterest',None),
+        ('d4w','d4w'),
 
+    )
+
+# 计算涨幅比率
+#（本周-4周前）/4周前
+
+def delta4w(df):
+    df['d4w'] = 0.0
+    for i in range(4,len(df)):
+        df['d4w'][i] = (df['close'][i] - df['close'][i-4]) / df['close'][i-4]
+    return df
+
+#比较2个指数的最大涨幅
+#返回值1含义，谁是涨幅最大的指数 0表示d0涨幅大，1表示d1涨幅大
+#返回值2含义，买卖信号， False 卖信号，True 买信号
+#BTW：头四周内容都是0，返回值2为也是0，不发会生交易
+# 二八轮动时，d0，d1 表示沪深300，和中证500
+def compare28(d0,d1):
+    maxval = 0  #默认选择d0为交易股票
+    buy = False # 默认卖信号
+
+    if d1 > d0 : #如果d1大，改d1为交易股票
+        maxval = 1
+
+    # 如果最大值大于0，视为买信号，否则是卖信号
+    if max(d0,d1) > 0:
+        buy = True
+
+    return maxval,buy
+
+#通过聚宽网络获取 指数的周数据，并计算 本周和4周前的增长比率
 class jqData():
     def __init__(self):
         jq.auth(config.jqauth['name'],config.jqauth['passwd'])
 
-    def week(self,stock_code,count=400,end=default_end):
+    def week(self,stock_code,count=380,end=default_end):
         fields=['date','open','high','low','close','volume']
         df = jq.get_bars(stock_code,count,end_dt=end,unit='1w',fields=fields)
         df.index=pd.to_datetime(df.date)
         df['openinterest']=0
-        df=df[['open','high','low','close','volume','openinterest']]
-
+        df= df[['open','high','low','close','volume','openinterest']]
+        df = delta4w(df)
         return df
 
 class LongOnly(bt.Sizer):
@@ -56,9 +97,8 @@ class LongOnly(bt.Sizer):
 class TheStrategy(bt.Strategy):
     '''
     '''
-    params = ( 
+    params = (
         ('name','zhanluejia'),
-        ('savedb',0)
     )
 
     def log(self, txt, dt=None):
@@ -96,16 +136,37 @@ class TheStrategy(bt.Strategy):
         self.order = None
 
     def __init__(self):
-        self.dataclose = self.datas[0].close
+        self.dataclose0 = self.datas[0].close
+        self.dataclose1 = self.datas[1].close
+        self.stockname=['中证500','沪深300']
+
 
     def start(self):
         self.order = None  # sentinel to avoid operrations on pending order
+        self.b = 0
 
     def next(self):
         if self.order:
             return  # pending order execution
+        #每周比较 哪个指数涨幅大，更适合买卖，
+        d,buy =  compare28(self.datas[0].d4w,self.datas[1].d4w)
+        #d 代表谁最大，buy表示买卖信号
+        if buy: #买信号
+            if self.b == 1 and self.d != d: #切换股票
+                self.sell(price=self.datas[self.d].close[0])
+                self.log("switch sell: %s price %2f " % (self.stockname[self.d],
+                    self.datas[self.d].close[0]))
+            self.d = d
+            self.buy(price=self.datas[d].close[0])
+            self.log("buy: %s price %2f " % (self.stockname[self.d],
+                self.datas[d].close[0]))
+            self.b = 1 # 已经购买了股票设置为买过标志
 
-
+        elif self.b == 1 : #卖信号时判断是否买过
+            self.b = 0
+            self.sell(price=self.datas[self.d].close[0])
+            self.log("sell: %s price %2f " % (self.stockname[self.d],
+                self.datas[self.d].close[0]))
 
 def runstrat(args=None):
     args = parse_args(args)
@@ -134,16 +195,17 @@ def runstrat(args=None):
 
     df500 = data.week("510500.XSHG")
     df300 = data.week("000300.XSHG")
-    
-    df500 = bt.feeds.PandasData(dataname=df500)
-    df300 = bt.feeds.PandasData(dataname=df300)
+    print(df500)
+    print(df300)
+    df500 = PandasData(dataname=df500)
+    df300 = PandasData(dataname=df300)
 
     cerebro.adddata(df500)
     cerebro.adddata(df300)
 
     cerebro.addstrategy(TheStrategy,
                         name=args.name,
-                        savedb=args.savedb)
+                        )
 
     #cerebro.addsizer(FixedPerc, perc=0.96)
     cerebro.addsizer(LongOnly)
