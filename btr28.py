@@ -120,18 +120,18 @@ class TheStrategy(bt.Strategy):
         if order.status in [order.Completed, order.Canceled, order.Margin]:
             if order.isbuy():
                 self.log(
-					'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+					'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f,value %.2f' %
 					(order.executed.price,
 					 order.executed.value,
-					 order.executed.comm))
+					 order.executed.comm,self.broker.getvalue()))
 
                 self.buyprice = order.executed.price
                 self.buycomm = order.executed.comm
             else:  # Sell
-                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f,value %.2f' %
 						 (order.executed.price,
 						  order.executed.value,
-						  order.executed.comm))
+						  order.executed.comm,self.broker.getvalue()))
 
         self.order = None
 
@@ -153,18 +153,18 @@ class TheStrategy(bt.Strategy):
         #d 代表谁最大，buy表示买卖信号
         if buy: #买信号
             if self.b == 1 and self.d != d: #切换股票
-                self.sell(price=self.datas[self.d].close[0])
+                self.close(data=self.datas[self.d],price=self.datas[self.d].close[0])
                 self.log("switch sell: %s price %2f " % (self.stockname[self.d],
                     self.datas[self.d].close[0]))
             self.d = d
-            self.buy(price=self.datas[d].close[0])
+            self.buy(data=self.datas[d],price=self.datas[d].close[0])
             self.log("buy: %s price %2f " % (self.stockname[self.d],
                 self.datas[d].close[0]))
             self.b = 1 # 已经购买了股票设置为买过标志
 
         elif self.b == 1 : #卖信号时判断是否买过
             self.b = 0
-            self.sell(price=self.datas[self.d].close[0])
+            self.close(data=self.datas[self.d],price=self.datas[self.d].close[0])
             self.log("sell: %s price %2f " % (self.stockname[self.d],
                 self.datas[self.d].close[0]))
 
