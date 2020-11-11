@@ -25,7 +25,7 @@ pip3 install -r requirements.txt
 ├── bs_get_industry_check.py #获取沪市、深市股票，并且有在线数据
 ├── dbmongo.py # 数据 存储
 ├── requirements.txt # 安装一些python3依赖库
-└── ts_to_csv.py # tushare to csv 
+└── ts_to_csv.py # tushare to csv
 ```
 
 ## 运行其中一个例子
@@ -33,9 +33,9 @@ pip3 install -r requirements.txt
 
 ```
 # 获取青岛啤酒的数据
-python3 ts_to_csv.py --code 600600 
+python3 ts_to_csv.py --code 600600
 # 使用macd策略
-python3 btrmacd.py --datafile ./datas/ts_600600.csv 
+python3 btrmacd.py --datafile ./datas/ts_600600.csv
 ```
 
 ### 结果如下：
@@ -71,3 +71,15 @@ python3 stock_prediction_lstmV1.py 600600
  * 股票数据接口来自tushare,建议切换成tushare pro版本
  * 例子代码是30为一个数据周期预测未来5天。
  * 股票预测仅仅是一个趋势，不是很准，大家不能用来炒股，仅仅用来学习
+
+ # 二八轮动例子
+
+ ```bash
+ python3 btr28.py
+ ```
+
+代码说明
+ * 采用沪深300，中证500作为轮动
+ * 交易框架使用backtrader
+ * 采用聚宽获取数据接口，其中切换了几个其他的数据接口没有完整的中证500周数据
+ * 在原始数据里增加了计算好的4周增长率数据
