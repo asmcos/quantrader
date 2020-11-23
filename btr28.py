@@ -179,6 +179,9 @@ def runstrat(args=None):
     cerebro.broker.addcommissioninfo(comminfo)
     #cerebro.broker.setcommission(commission=0.0)
 
+	#设置购买为当日收盘价
+    cerebro.broker.set_coc(True)
+
     dkwargs = dict()
     if args.fromdate is not None:
         fromdate = datetime.datetime.strptime(args.fromdate, '%Y-%m-%d')
