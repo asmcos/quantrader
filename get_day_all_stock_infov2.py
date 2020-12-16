@@ -9,6 +9,13 @@ import pandas as pd
 from datetime import datetime
 import baostock as bs
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--display", help="显示本地数据",default='0')
+args = parser.parse_args()
+
+display = args.display
 ####################
 #1. 获取股票数据
 ####################
@@ -30,11 +37,13 @@ UNDERLINE = '\033[4m'
 
 all_up_down_list=[]
 
+# 处理异常，在出现异常的时候存盘
 def handler(signum, frame):
 	print("是不是想让我退出啊")
 	make_save_data()	
 	sys.exit()
 
+#存盘并且打印
 def make_save_data():
 	df = pd.DataFrame(all_up_down_list, columns = ['昨日收盘','前日收盘','百日收盘','昨日涨跌','百日涨跌','名称','代码'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
@@ -44,6 +53,16 @@ def make_save_data():
 
 	df = df.sort_values(by="百日涨跌",ascending=False)
 	print(df.iloc[0:50])
+#仅仅显示
+def display_save_data():
+	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
+
+	df = df.sort_values(by="昨日涨跌",ascending=False)
+	print(df.iloc[0:50])
+
+	df = df.sort_values(by="百日涨跌",ascending=False)
+	print(df.iloc[0:50])
+
 
 def upordown(code,name):
 	kdata = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume', start_date='2020-05-01',
@@ -119,13 +138,17 @@ stocklist = open('./datas/stock_industry_check.csv').readlines()
 stocklist = stocklist[1:] #删除第一行
 
 
-threading.Thread(target=get_data_thread,args=(1,)).start()
 
+if display == '1':
 
-while True:
-	code,name = q.get()
-	print('正在分析',name,'代码',code)
-	upordown(code,name)
+    display_save_data()
 
-make_save_data()	
+else :
+    threading.Thread(target=get_data_thread,args=(1,)).start()
+    while True:
+        code,name = q.get()
+        print('正在分析',name,'代码',code)
+        upordown(code,name)
+
+    make_save_data()	
 
