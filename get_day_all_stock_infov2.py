@@ -36,15 +36,17 @@ def handler(signum, frame):
 	sys.exit()
 
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['昨日收盘','前日收盘','差价','百分比','名称','代码'])
-	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),)
-	print(df)
+	df = pd.DataFrame(all_up_down_list, columns = ['昨日收盘','前日收盘','百日收盘','昨日涨跌','百日涨跌','名称','代码'])
+	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
+	df = df.sort_values(by="昨日涨跌",ascending=False)
+	print(df.iloc[0:50])
 
-
+	df = df.sort_values(by="百日涨跌",ascending=False)
+	print(df.iloc[0:50])
 
 def upordown(code,name):
-	kdata = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume', start_date='2020-12-01',
+	kdata = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume', start_date='2020-05-01',
                                      frequency='d')
 	df = kdata.get_data()
 	if len(df) < 2:
@@ -53,17 +55,25 @@ def upordown(code,name):
 	lastday2 = df.index[-2]
 	closeld = float(df.close[lastday])
 	closeld2 = float(df.close[lastday2])
+
+	closeld100 = 0.0
+	delta100 = 0.0
+	if len(df) > 99:
+		closeld100 = float(df.close[df.index[-100]]) 
+		delta100 = float((closeld-closeld100) / closeld100 ) * 100.0	
 	print(OKBLUE)
-	print("%.2f %.2f %.2f %.3f %s %s" %(closeld,closeld2,
-		closeld-closeld2,
-		(closeld-closeld2)/closeld2,
+	print("%.2f %.2f %.2f %.2f %.2f %s %s" %(closeld,closeld2,
+		closeld100,
+		(closeld-closeld2)/closeld2 * 100.0,
+		delta100,
 		name,code)
 		) 
 	print(ENDC)
 	all_up_down_list.append([
 		closeld,closeld2,
-        closeld-closeld2,
-        (closeld-closeld2)/closeld2,
+		closeld100,
+        (closeld-closeld2)/closeld2  * 100.0,
+		delta100,
         name,code
 	])	
 
