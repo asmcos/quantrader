@@ -11,3 +11,4 @@ backtrader_plotting
 sklearn
 tensorflow
 yahoo_fin
+jqdatasdk

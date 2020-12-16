@@ -19,7 +19,8 @@ industry_list = []
 while (rs.error_code == '0') & rs.next():
     # 获取一条记录，将记录合并在一起
 	row = rs.get_row_data()
-	kdata = bs.query_history_k_data_plus(row[1], 'date,open,high,low,close,volume', start_date='2020-01-01', 
+	print(row)
+	kdata = bs.query_history_k_data_plus(row[1], 'date,open,high,low,close,volume', start_date='2020-12-01', 
                                       frequency='d')	
 	if len(kdata.get_row_data()) == 0:
 		continue

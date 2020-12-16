@@ -29,6 +29,13 @@ def mrk(code,name):
 	    print(y1)
 	    sys.exit()
 
+def atr(code,name):
+	y1 = os.system('python3 btratr.py --datafile ./datas/ts_'+code+'.csv' + ' --code ' + code
+	+' --name ' + name + ' --savedb 1')
+	if y1 == 2: #ctrl+c
+	    print(y1)
+	    sys.exit()
+
 def get_code_cvs(code):
 	os.system('rm -f ./datas/ts_' + code+'.csv')
 	y1 = os.system('python3 ts_to_csv.py --code '+code+' --start 2019-10-01')
@@ -74,4 +81,4 @@ threading.Thread(target=get_data_thread,args=(1,)).start()
 while True:
 	code,name = q.get()
 	print('正在分析',name,'代码',code)
-	mrk(code,name)
+	atr(code,name)
