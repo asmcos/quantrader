@@ -25,11 +25,13 @@ while (rs.error_code == '0') & rs.next():
 	if len(kdata.get_row_data()) == 0:
 		continue
 	industry_list.append(row)	
+	""" default don't save to mongodb
 	dbmongo.insertIndustry(industry_list[-1][0],
     industry_list[-1][1],
     industry_list[-1][2],
     industry_list[-1][3],
     industry_list[-1][4])
+	"""
 result = pd.DataFrame(industry_list, columns=rs.fields)
 # 结果集输出到csv文件
 result.to_csv("./datas/stock_industry_check.csv", index=False)
