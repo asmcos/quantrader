@@ -65,38 +65,31 @@ def display_save_data():
 	df = df.sort_values(by="百日涨跌",ascending=False)
 	print(df.iloc[0:50])
 
-
-def upordown(code,name):
+def get_day_data(code,name):
 	kdata = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume', start_date='2020-05-01',
                                      frequency='d')
 	df = kdata.get_data()
-	if len(df) < 2:
-		return 
-	lastday = df.index[-1]
-	lastday2 = df.index[-2]
-	closeld = float(df.close[lastday])
-	closeld2 = float(df.close[lastday2])
+	return df 
 
-	closeld100 = 0.0
-	delta100 = 0.0
-	if len(df) > 99:
-		closeld100 = float(df.close[df.index[-100]]) 
-		delta100 = float((closeld-closeld100) / closeld100 ) * 100.0	
-
+def upordown(code,name,lastday,lastday1,lastday100):
+	lastday = float(lastday)
+	lastday1 = float(lastday1)
+	lastday100 = float(lastday100)
+	
 	print(OKBLUE)
-	print("%.2f %.2f %.2f %.2f %.2f %s %s" %(closeld,closeld2,
-		closeld100,
-		(closeld-closeld2)/closeld2 * 100.0,
-		delta100,
+	print("%.2f %.2f %.2f %.2f %.2f %s %s" %(lastday,lastday1,
+		lastday100,
+		(lastday-lastday1)/lastday1 * 100.0,
+		(lastday-lastday100)/lastday100 * 100.0,
 		name,code)
 		) 
 	print(ENDC)
 
 	all_up_down_list.append([
-		closeld,closeld2,
-		closeld100,
-        (closeld-closeld2)/closeld2  * 100.0,
-		delta100,
+		lastday,lastday1,
+		lastday100,
+		(lastday-lastday1)/lastday1 * 100.0,
+		(lastday-lastday100)/lastday100 * 100.0,
         name,code
 	])	
 
@@ -113,7 +106,12 @@ def get_data_thread(n):
 	for stock in stocklist:
 		code ,name = getstockinfo(stock)
 		print('正在获取',name,'代码',code)
-		q.put((code,name))
+		df = get_day_data(code,name)
+		if len(df) > 99:
+			lastday  = df.close[df.index[-1]]
+			lastday1 = df.close[df.index[-2]]
+			lastday100 = df.close[df.index[-100]] 
+			q.put((code,name,lastday,lastday1,lastday100))
 	q.task_done()
 
 
@@ -140,9 +138,9 @@ if display == '1':
 else :
     threading.Thread(target=get_data_thread,args=(1,)).start()
     while True:
-        code,name = q.get()
+        code,name,lastday,lastday1,lastday100 = q.get()
         print('正在分析',name,'代码',code)
-        upordown(code,name)
+        upordown(code,name,lastday,lastday1,lastday100)
 
     make_save_data()	
 
