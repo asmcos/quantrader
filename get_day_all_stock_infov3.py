@@ -10,7 +10,7 @@ import queue
 import pandas as pd
 from datetime import datetime
 import tushare as ts
-
+import config
 import argparse
 
 # 判断是否 是显示，还是重新下载数据计算
@@ -25,7 +25,7 @@ display = args.display
 ####################
 #1. 获取股票数据
 ####################
-
+tspro = ts.pro_api(config.tspro['passwd'])
 today = datetime.now()
 endday = str(today.year) + str(today.month) + str(today.day)
 
@@ -66,8 +66,8 @@ def display_save_data():
 
 
 def upordown(code,name):
-	df = ts.get_hist_data(code,start='2020-05-01')
-
+	#df = ts.get_hist_data(code,start='2020-05-01')
+	df = tspro.daily(ts_code=code, start_date='20200501')
 	if len(df) < 2:
 		return 
 	lastday = df.index[0]
@@ -104,8 +104,14 @@ def getstockinfo(stock):
 	#2019-12-09,sz.002094,青岛金王,化工,申万一级行业
 	# 时间，股票代码，名称，类别
 	d,code,name,skip1,skip2 = stock.split(',')
+
+	shsz = code.split('.')[0]
 	code = code.split('.')[1]
-	return code,name
+	if shsz == 'sh':
+		shsz = '.SH'
+	if shsz == 'sz':
+		shsz = '.SZ'
+	return code+shsz,name
 
 #获取所有的股票并下载数据
 def get_data_thread(n):
