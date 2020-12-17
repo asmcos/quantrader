@@ -18,9 +18,11 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--display", help="显示本地数据",default='0')
+parser.add_argument("--ishtml", help="生成html格式",default='0')
 args = parser.parse_args()
 
 display = args.display
+ishtml = args.ishtml
 
 ####################
 #1. 获取股票数据
@@ -55,15 +57,27 @@ def make_save_data():
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
+def create_clickable_code(code):
+    code = code.replace(".","")
+    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank">{code}</a>'''.format(code=code)
+    return url_template
+
 #仅仅显示
 def display_save_data():
 	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
-
+	if ishtml == "1":
+		df['代码'] = df['代码'].apply(create_clickable_code)
 	df = df.sort_values(by="昨日涨跌",ascending=False)
-	print(df.iloc[0:50])
+	if ishtml == "1":
+		print(df.iloc[0:50].to_html(escape=False))
+	else:
+		print(df.iloc[0:50])
 
 	df = df.sort_values(by="百日涨跌",ascending=False)
-	print(df.iloc[0:50])
+	if ishtml == "1":
+		print(df.iloc[0:50].to_html(escape=False))
+	else:
+		print(df.iloc[0:50])
 
 def get_day_data(code,name):
 	kdata = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume', start_date='2020-05-01',
@@ -75,6 +89,8 @@ def upordown(code,name,lastday,lastday1,lastday100):
 	lastday = float(lastday)
 	lastday1 = float(lastday1)
 	lastday100 = float(lastday100)
+
+	code = code.replace(".","")
 	
 	print(OKBLUE)
 	print("%.2f %.2f %.2f %.2f %.2f %s %s" %(lastday,lastday1,
