@@ -89,14 +89,18 @@ def upordown(code,name,lastday,lastday1,lastday100):
 	lastday = float(lastday)
 	lastday1 = float(lastday1)
 	lastday100 = float(lastday100)
+	delta1 = (lastday-lastday1)/lastday1 * 100.0
 
+	delta100 = 0
+	if lastday100 > 0:
+		delta100 = (lastday-lastday100)/lastday100 * 100.0
 	code = code.replace(".","")
 	
 	print(OKBLUE)
 	print("%.2f %.2f %.2f %.2f %.2f %s %s" %(lastday,lastday1,
 		lastday100,
-		(lastday-lastday1)/lastday1 * 100.0,
-		(lastday-lastday100)/lastday100 * 100.0,
+		delta1,
+		delta100,
 		name,code)
 		) 
 	print(ENDC)
@@ -104,8 +108,8 @@ def upordown(code,name,lastday,lastday1,lastday100):
 	all_up_down_list.append([
 		lastday,lastday1,
 		lastday100,
-		(lastday-lastday1)/lastday1 * 100.0,
-		(lastday-lastday100)/lastday100 * 100.0,
+		delta1,
+		delta100,
         name,code
 	])	
 
@@ -123,9 +127,11 @@ def get_data_thread(n):
 		code ,name = getstockinfo(stock)
 		print('正在获取',name,'代码',code)
 		df = get_day_data(code,name)
-		if len(df) > 99:
+		if len(df) > 2:
 			lastday  = df.close[df.index[-1]]
 			lastday1 = df.close[df.index[-2]]
+		lastday100 = 0
+		if len(df) > 99:
 			lastday100 = df.close[df.index[-100]] 
 			q.put((code,name,lastday,lastday1,lastday100))
 	q.task_done()
