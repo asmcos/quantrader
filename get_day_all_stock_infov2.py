@@ -53,7 +53,7 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['昨日收盘','前日收盘','百日收盘','昨日涨跌','百日涨跌','名称','代码'])
+	df = pd.DataFrame(all_up_down_list, columns = ['昨日收盘','前日收盘','百日收盘','昨日涨跌','百日涨跌','名称','代码','行业'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
@@ -85,7 +85,7 @@ def get_day_data(code,name):
 	df = kdata.get_data()
 	return df 
 
-def upordown(code,name,lastday,lastday1,lastday100):
+def upordown(code,name,industry,lastday,lastday1,lastday100):
 	lastday = float(lastday)
 	lastday1 = float(lastday1)
 	lastday100 = float(lastday100)
@@ -110,7 +110,7 @@ def upordown(code,name,lastday,lastday1,lastday100):
 		lastday100,
 		delta1,
 		delta100,
-        name,code
+        name,code,industry
 	])	
 
 		
@@ -118,13 +118,13 @@ def upordown(code,name,lastday,lastday1,lastday100):
 def getstockinfo(stock):
 	#2019-12-09,sz.002094,青岛金王,化工,申万一级行业
 	# 时间，股票代码，名称，类别
-	d,code,name,skip1,skip2 = stock.split(',')
-	return code,name
+	d,code,name,industry,skip2 = stock.split(',')
+	return code,name,industry
 
 #获取所有的股票并下载数据
 def get_data_thread(n):
 	for stock in stocklist:
-		code ,name = getstockinfo(stock)
+		code ,name,industry = getstockinfo(stock)
 		print('正在获取',name,'代码',code)
 		df = get_day_data(code,name)
 		if len(df) > 2:
@@ -133,7 +133,7 @@ def get_data_thread(n):
 		lastday100 = 0
 		if len(df) > 99:
 			lastday100 = df.close[df.index[-100]] 
-			q.put((code,name,lastday,lastday1,lastday100))
+			q.put((code,name,industry,lastday,lastday1,lastday100))
 	q.task_done()
 
 
@@ -160,9 +160,9 @@ if display == '1':
 else :
     threading.Thread(target=get_data_thread,args=(1,)).start()
     while True:
-        code,name,lastday,lastday1,lastday100 = q.get()
+        code,name,industry,lastday,lastday1,lastday100 = q.get()
         print('正在分析',name,'代码',code)
-        upordown(code,name,lastday,lastday1,lastday100)
+        upordown(code,name,industry,lastday,lastday1,lastday100)
 
     make_save_data()	
 
