@@ -2,6 +2,7 @@
 # exec script
 # 计算股票昨日涨跌 前50，和100日之前的涨跌对比
 
+
 import os
 import sys
 import signal
