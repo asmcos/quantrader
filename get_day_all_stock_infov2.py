@@ -11,19 +11,21 @@ import queue
 import pandas as pd
 from datetime import datetime
 import baostock as bs
-
+import json
 import argparse
-
+import requests
 # 判断是否 是显示，还是重新下载数据计算
 # 数据每天只需要下载一次
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--display", help="显示本地数据",default='0')
 parser.add_argument("--ishtml", help="生成html格式",default='0')
+parser.add_argument("--save_db", help="存储到远程数据库",default='0')
 args = parser.parse_args()
 
 display = args.display
 ishtml = args.ishtml
+save_db = args.save_db
 
 ####################
 #1. 获取股票数据
@@ -54,7 +56,7 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['昨日收盘','前日收盘','百日收盘','昨日涨跌','百日涨跌','名称','代码','行业'])
+	df = pd.DataFrame(all_up_down_list, columns = ['当日日收盘','前日收盘','21日收盘','百日收盘','昨日涨跌','21日涨跌','百日涨跌','名称','date','代码','行业'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
@@ -62,6 +64,41 @@ def create_clickable_code(code):
     code = code.replace(".","")
     url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank">{code}</a>'''.format(code=code)
     return url_template
+
+"""
+    name: String,
+    code: String,
+    date: String,
+    industry: String,
+    close: Number,
+    close1: Number,
+    close21: Number,
+    close100: Number,
+    rise1: Number,
+    rise21: Number,
+    rise100: Number,
+"""
+def save_db_server():
+	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
+	df = df.sort_values(by="昨日涨跌",ascending=False)
+	df = df.iloc[0:50]
+	df.rename(columns={'当日日收盘':'close', 
+						'前日收盘':'close1',
+						'21日收盘':'close21',
+						'百日收盘':'close100',
+						'昨日涨跌':'rise1',
+						'21日涨跌':'rise21',
+						'百日涨跌':'rise100',
+						'名称':'name',
+						'代码':'code',
+						'行业':'industry',
+						}, inplace = True)
+	del df['序号']
+	df = df.set_index('date')
+	df = df.to_json(orient='table')
+	jsondatas = json.loads(df)['data']
+
+	requests.post("http://127.0.0.1:3000/stock/updaterisek",json=jsondatas)
 
 #仅仅显示
 def display_save_data():
@@ -86,21 +123,27 @@ def get_day_data(code,name):
 	df = kdata.get_data()
 	return df 
 
-def upordown(code,name,industry,lastday,lastday1,lastday100):
+def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100):
 	lastday = float(lastday)
 	lastday1 = float(lastday1)
+	lastday21 = float(lastday21)
 	lastday100 = float(lastday100)
 	delta1 = (lastday-lastday1)/lastday1 * 100.0
 
+	delta21 = 0
 	delta100 = 0
+	if lastday21 > 0:
+		delta21 = (lastday-lastday21)/lastday21 * 100.0
 	if lastday100 > 0:
 		delta100 = (lastday-lastday100)/lastday100 * 100.0
 	code = code.replace(".","")
 	
 	print(OKBLUE)
-	print("%.2f %.2f %.2f %.2f %.2f %s %s" %(lastday,lastday1,
+	print("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %s %s" %(lastday,lastday1,
+		lastday21,
 		lastday100,
 		delta1,
+		delta21,
 		delta100,
 		name,code)
 		) 
@@ -108,10 +151,12 @@ def upordown(code,name,industry,lastday,lastday1,lastday100):
 
 	all_up_down_list.append([
 		lastday,lastday1,
+		lastday21,
 		lastday100,
 		delta1,
+		delta21,
 		delta100,
-        name,code,industry
+        name,date,code,industry
 	])	
 
 		
@@ -129,12 +174,16 @@ def get_data_thread(n):
 		print('正在获取',name,'代码',code)
 		df = get_day_data(code,name)
 		if len(df) > 2:
+			date = df.close[df.index[-1]]
 			lastday  = df.close[df.index[-1]]
 			lastday1 = df.close[df.index[-2]]
+		lastday21 = 0
+		if len(df) > 21:
+			lastday21 = df.close[df.index[-21]] 
 		lastday100 = 0
 		if len(df) > 99:
 			lastday100 = df.close[df.index[-100]] 
-			q.put((code,name,industry,lastday,lastday1,lastday100))
+		q.put((code,date,name,industry,lastday,lastday1,lastday21,lastday100))
 	q.task_done()
 
 
@@ -158,12 +207,14 @@ stocklist = stocklist[1:] #删除第一行
 # 判断是仅仅显示，还是需要下载数据计算
 if display == '1':
     display_save_data()
-else :
+elif save_db == '1':
+	save_db_server()
+else:
     threading.Thread(target=get_data_thread,args=(1,)).start()
     while True:
-        code,name,industry,lastday,lastday1,lastday100 = q.get()
+        code,date,name,industry,lastday,lastday1,lastday21,lastday100 = q.get()
         print('正在分析',name,'代码',code)
-        upordown(code,name,industry,lastday,lastday1,lastday100)
+        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100)
 
     make_save_data()	
 
