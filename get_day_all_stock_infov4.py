@@ -56,13 +56,20 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['当日日收盘','前日收盘','21日收盘','百日收盘','昨日涨跌','21日涨跌','百日涨跌','名称','date','代码','行业'])
+	df = pd.DataFrame(all_up_down_list, columns = ['当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','名称','date','代码','行业'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
 def create_clickable_code(code):
     code = code.replace(".","")
-    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank">{code}</a>'''.format(code=code)
+    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
+def create_clickable_name(name):
+    url_template= '''<a href="http://so.eastmoney.com/News/s?keyword={name}" target="_blank"><font color="blue">{name}</font></a>'''.format(name=name)
+    return url_template
+
+def create_color_rise1(rise):
+    url_template= '''<font color="#ef4136">{rise}</font></a>'''.format(rise=rise)
     return url_template
 
 """
@@ -80,13 +87,13 @@ def create_clickable_code(code):
 """
 def save_db_server():
 	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
-	df = df.sort_values(by="昨日涨跌",ascending=False)
+	df = df.sort_values(by="当日涨跌",ascending=False)
 	df = df.iloc[0:50]
-	df.rename(columns={'当日日收盘':'close', 
+	df.rename(columns={'当日收盘':'close', 
 						'前日收盘':'close1',
 						'21日收盘':'close21',
 						'百日收盘':'close100',
-						'昨日涨跌':'rise1',
+						'当日涨跌':'rise1',
 						'21日涨跌':'rise21',
 						'百日涨跌':'rise100',
 						'名称':'name',
@@ -98,19 +105,24 @@ def save_db_server():
 	df = df.to_json(orient='table')
 	jsondatas = json.loads(df)['data']
 
-	requests.post("http://127.0.0.1:3000/stock/updaterisek",json=jsondatas)
+	requests.post("http://zhanluejia.net.cn/stock/updaterisek",json=jsondatas)
 
 #仅仅显示
 def display_save_data():
 	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
+	
+	del df['序号']
+	df = df.set_index('date')
+
+	df = df.sort_values(by="当日涨跌",ascending=False)
 	if ishtml == "1":
 		df['代码'] = df['代码'].apply(create_clickable_code)
-	df = df.sort_values(by="昨日涨跌",ascending=False)
-	if ishtml == "1":
+		df['名称'] = df['名称'].apply(create_clickable_name)
+		df['当日涨跌'] = df['当日涨跌'].apply(create_color_rise1)
 		print(df.iloc[0:50].to_html(escape=False))
 	else:
 		print(df.iloc[0:50])
-
+	print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")
 	df = df.sort_values(by="百日涨跌",ascending=False)
 	if ishtml == "1":
 		print(df.iloc[0:50].to_html(escape=False))
@@ -118,8 +130,8 @@ def display_save_data():
 		print(df.iloc[0:50])
 
 def get_day_data(code,name):
-    json = requests.get("http://127.0.0.1:3000/stock/getdayK",
-        params={"code":code,"end":"2020-12-18","limit":150}).json()
+    json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        params={"code":code,"end":"2020-12-22","limit":150}).json()
     df = pd.io.json.json_normalize(json)
 
     df = df.drop(columns=['_id','codedate'])
@@ -172,7 +184,14 @@ def getstockinfo(stock):
 	return code,name,industry
 
 #获取所有的股票并下载数据
-def get_data_thread(n):
+def handler_data_thread(n):
+    while True:
+        code,date,name,industry,lastday,lastday1,lastday21,lastday100 = q.get()
+        print('正在分析',name,'代码',code)
+        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100)
+        q.task_done() #每次做完任务就通知 join，jion收到最后一条通知就主程序退出
+
+def get_data():
 	for stock in stocklist:
 		code ,name,industry = getstockinfo(stock)
 		print('正在获取',name,'代码',code)
@@ -188,7 +207,6 @@ def get_data_thread(n):
 		if len(df) > 99:
 			lastday100 = df.close[df.index[-100]] 
 		q.put((code,date,name,industry,lastday,lastday1,lastday21,lastday100))
-	q.task_done()
 
 
 #
@@ -214,11 +232,12 @@ if display == '1':
 elif save_db == '1':
 	save_db_server()
 else:
-    threading.Thread(target=get_data_thread,args=(1,)).start()
-    while True:
-        code,date,name,industry,lastday,lastday1,lastday21,lastday100 = q.get()
-        print('正在分析',name,'代码',code)
-        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100)
+    t = threading.Thread(target=handler_data_thread,args=(1,))
+    t.start()
 
+    get_data()
+
+    q.join() #等待任务完成
     make_save_data()	
-
+    display_save_data()
+    
