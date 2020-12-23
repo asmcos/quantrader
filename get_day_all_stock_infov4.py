@@ -21,11 +21,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--display", help="显示本地数据",default='0')
 parser.add_argument("--ishtml", help="生成html格式",default='0')
 parser.add_argument("--save_db", help="存储到远程数据库",default='0')
+parser.add_argument("--endday", help="日期",default='0')
 args = parser.parse_args()
 
 display = args.display
 ishtml = args.ishtml
 save_db = args.save_db
+endday = args.endday
 
 ####################
 #1. 获取股票数据
@@ -33,8 +35,9 @@ save_db = args.save_db
 
 lg = bs.login()
 today = datetime.now()
-endday = str(today.year) + str(today.month) + str(today.day)
-
+if endday== '0':
+	endday = str(today.year) + str(today.month) + str(today.day)
+	
 # print 打印color 表
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
@@ -131,7 +134,7 @@ def display_save_data():
 
 def get_day_data(code,name):
     json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
-        params={"code":code,"end":"2020-12-22","limit":150}).json()
+        params={"code":code,"end":endday,"limit":150}).json()
     df = pd.io.json.json_normalize(json)
 
     df = df.drop(columns=['_id','codedate'])
