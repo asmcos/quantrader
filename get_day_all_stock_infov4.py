@@ -136,7 +136,9 @@ def get_day_data(code,name):
     json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
         params={"code":code,"end":endday,"limit":150}).json()
     df = pd.io.json.json_normalize(json)
-
+	
+    if len(df) < 2:
+       return df
     df = df.drop(columns=['_id','codedate'])
     df = df.sort_values(by="date",ascending=True)
 	
@@ -203,6 +205,8 @@ def get_data():
 			date = df.date[df.index[-1]]
 			lastday  = df.close[df.index[-1]]
 			lastday1 = df.close[df.index[-2]]
+		else:
+			continue
 		lastday21 = 0
 		if len(df) > 21:
 			lastday21 = df.close[df.index[-21]] 
