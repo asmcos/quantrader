@@ -34,7 +34,6 @@ def create_color_rise(rise):
 
 
 def getonebkinfo(bkcode,bkname):
-	print(bkname)
 	resp = requests.get(urlbk%(bkcode,int(time.time()*1000)))
 	data = re.findall("var hqa=(.+);",resp.text,re.M|re.S)
 	if(len(data) > 0):
@@ -53,4 +52,6 @@ print(bkdf.to_html(escape=False))
 for i in range(len(bkdf)):
 	bkcode = bkdf[1][i]
 	bkname = bkdf[2][i]
+	rise =   bkdf[10][i]
+	print(bkname,rise)
 	getonebkinfo(bkcode,bkname)
