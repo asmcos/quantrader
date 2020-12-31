@@ -12,3 +12,5 @@ sklearn
 tensorflow
 yahoo_fin
 jqdatasdk
+demjson
+click
