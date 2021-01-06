@@ -1,6 +1,6 @@
 #
 # exec script
-# 计算股票昨日涨跌 前50，和100日之前的涨跌对比
+# 计算股票昨日涨跌 前200，和100日之前的涨跌对比
 
 
 import os
@@ -91,7 +91,7 @@ def create_color_rise1(rise):
 def save_db_server():
 	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
 	df = df.sort_values(by="当日涨跌",ascending=False)
-	df = df.iloc[0:50]
+	df = df.iloc[0:200]
 	df.rename(columns={'当日收盘':'close', 
 						'前日收盘':'close1',
 						'21日收盘':'close21',
@@ -122,15 +122,10 @@ def display_save_data():
 		df['代码'] = df['代码'].apply(create_clickable_code)
 		df['名称'] = df['名称'].apply(create_clickable_name)
 		df['当日涨跌'] = df['当日涨跌'].apply(create_color_rise1)
-		print(df.iloc[0:50].to_html(escape=False))
+		print(df.iloc[0:200].to_html(escape=False))
 	else:
-		print(df.iloc[0:50])
+		print(df.iloc[0:200])
 	print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")
-	df = df.sort_values(by="百日涨跌",ascending=False)
-	if ishtml == "1":
-		print(df.iloc[0:50].to_html(escape=False))
-	else:
-		print(df.iloc[0:50])
 
 def get_day_data(code,name):
     json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
