@@ -54,7 +54,7 @@ def get_data_fromjs(text):
 	df = df.sort_values(by="涨跌",ascending=False)
 	df['code'] = df['code'].apply(create_clickable_code)
 	df['涨跌'] = df['涨跌'].apply(create_color_rise1)
-	print(df.iloc[:200].to_html(escape=False))
+	print(df.iloc[:200].reset_index(drop=True).to_html(escape=False))
 
 def get_min_kdata(code,end=0):
 	global code_list
