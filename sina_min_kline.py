@@ -50,10 +50,11 @@ def get_min_kdata(code,end=0):
 
 def get_min_kdata_tail( ):
 	global code_list
+	global csv_data 
 	if len(code_list) > 0:
 		codes = ",".join(code_list)	
 		resp = requests.get('https://hq.sinajs.cn/?list=%s'%codes)
-		print(resp.text)
+		csv_data.append(resp.text)
 		code_list = []
 
 #获取股票的名字和代码号
