@@ -46,15 +46,15 @@ def get_data_fromjs(text):
 		data = data.strip('"').split(",")
 		rise = 0
 		if float(data[2]) != 0:
-			rise = (float(data[6]) - float(data[2])) * 100 / float(data[2]) 
+			rise = (float(data[3]) - float(data[2])) * 100 / float(data[2]) 
 			rise = float2(rise)
-		datas.append([code,data[0],data[2],data[6],rise])
+		datas.append([code,data[0],data[2],data[3],rise])
 
 	df = pd.DataFrame(datas,columns=['code','name','昨日收盘','当前价','涨跌'])
 	df = df.sort_values(by="涨跌",ascending=False)
 	df['code'] = df['code'].apply(create_clickable_code)
 	df['涨跌'] = df['涨跌'].apply(create_color_rise1)
-	print(df.iloc[:200].reset_index(drop=True).to_html(escape=False))
+	print(df.iloc[:].reset_index(drop=True).to_html(escape=False))
 
 def get_min_kdata(code,end=0):
 	global code_list
