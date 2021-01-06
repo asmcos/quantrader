@@ -23,19 +23,38 @@ offset = args.offset
 resave = args.resave
 listlen = int(args.listlen)
 
-
+float2 = lambda a:float('%.2f' % a)
 
 today = datetime.now().strftime('%Y-%m-%d')
 
 code_list = []
 csv_data = []
 
+def create_clickable_code(code):
+    code = code.replace(".","")
+    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
+def create_color_rise1(rise):
+    url_template= '''<font color="#ef4136">{rise}</font></a>'''.format(rise=rise)
+    return url_template
+
 def get_data_fromjs(text):
+	datas = []
 	text_list = re.findall("var hq_str_(.+?);",text,re.S|re.M)
 	for i in text_list:
 		code,data = i.split("=")
 		data = data.strip('"').split(",")
-		print(code,data[0],data[7])
+		rise = 0
+		if float(data[2]) != 0:
+			rise = (float(data[7]) - float(data[2])) * 100 / float(data[2]) 
+			rise = float2(rise)
+		datas.append([code,data[0],data[2],data[7],rise])
+
+	df = pd.DataFrame(datas,columns=['code','name','昨日收盘','当前价','涨跌'])
+	df = df.sort_values(by="涨跌",ascending=False)
+	df['code'] = df['code'].apply(create_clickable_code)
+	df['涨跌'] = df['涨跌'].apply(create_color_rise1)
+	print(df.iloc[:200].to_html(escape=False))
 
 def get_min_kdata(code,end=0):
 	global code_list
@@ -62,7 +81,7 @@ def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
     d,code,name,skip1,skip2 = stock.split(',')
-    code=code.split('.')[0] + code.split('.')[1]
+    code=code.replace(".","")
     return code,name
 
 
