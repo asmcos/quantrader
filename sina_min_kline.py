@@ -46,9 +46,9 @@ def get_data_fromjs(text):
 		data = data.strip('"').split(",")
 		rise = 0
 		if float(data[2]) != 0:
-			rise = (float(data[7]) - float(data[2])) * 100 / float(data[2]) 
+			rise = (float(data[6]) - float(data[2])) * 100 / float(data[2]) 
 			rise = float2(rise)
-		datas.append([code,data[0],data[2],data[7],rise])
+		datas.append([code,data[0],data[2],data[6],rise])
 
 	df = pd.DataFrame(datas,columns=['code','name','昨日收盘','当前价','涨跌'])
 	df = df.sort_values(by="涨跌",ascending=False)
