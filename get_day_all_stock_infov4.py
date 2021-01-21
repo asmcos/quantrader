@@ -29,6 +29,7 @@ ishtml = args.ishtml
 save_db = args.save_db
 endday = args.endday
 
+requests.adapters.DEFAULT_RETRIES = 5
 ####################
 #1. 获取股票数据
 ####################
@@ -108,7 +109,7 @@ def save_db_server():
 	df = df.to_json(orient='table')
 	jsondatas = json.loads(df)['data']
 
-	requests.post("http://zhanluejia.net.cn/stock/updaterisek",json=jsondatas)
+	requests.post("http://zhanluejia.net.cn/stock/updaterisek",json=jsondatas,timeout=60)
 
 #仅仅显示
 def display_save_data():
@@ -128,15 +129,22 @@ def display_save_data():
 	print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")
 
 def get_day_data(code,name):
-    json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
-        params={"code":code,"end":endday,"limit":150}).json()
+    try:
+        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
+    except:
+        time.sleep(2)
+        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
+		
     df = pd.io.json.json_normalize(json)
 	
     if len(df) < 2:
        return df
     df = df.drop(columns=['_id','codedate'])
     df = df.sort_values(by="date",ascending=True)
-	
+
+
     return df
 
 def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100):
