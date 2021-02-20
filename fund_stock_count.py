@@ -4,11 +4,11 @@ import pandas as pd
 
 offset = 0
 result_list = [] 
-def get_stock_count(name):
+def get_stock_count(code,name):
     p = os.popen("cd datas/fund ; grep '"+name+"' * | wc -l")
     count = p.read()
-    print(name,count)
-    result_list.append([name,count])
+    print(code,name,count.strip('" \n'))
+    result_list.append([code,name,count])
 #获取股票的名字和代码号
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
@@ -28,7 +28,7 @@ stocklist = stocklist[1+int(offset):] #删除第一行
 
 for stock in stocklist:
     code,name = getstockinfo(stock) 
-    get_stock_count(name)   
+    get_stock_count(code,name)   
 
 print(result_list)
 
