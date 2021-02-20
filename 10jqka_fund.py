@@ -36,7 +36,7 @@ def get_fund_info(fund):
     order,code,jc,name,skip1,skip2 = fund.split(",")
     return code,name
 
-for fund in fundlist:
+for fund in fundlist[:2000]:
     code,name = get_fund_info(fund)
     print(code,name)
     get_fund_stock(code,name)
