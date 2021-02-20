@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import argparse
 import os
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--offset", help="开始执行的位置",default='0')
@@ -40,7 +41,7 @@ for fund in fundlist[:2000]:
     code,name = get_fund_info(fund)
     print(code,name)
     get_fund_stock(code,name)
-
+    time.sleep(0.2)
 df = pd.DataFrame(fund_ok_list)
 df.to_csv("./datas/fund_ok_list.csv")
 print(fund_ok_list)
