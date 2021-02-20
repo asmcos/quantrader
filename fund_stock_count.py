@@ -1,12 +1,14 @@
 #统计每只股票的基金数据
 import os
-
+import pandas as pd
 
 offset = 0
-
+result_list = [] 
 def get_stock_count(name):
-    os.system("echo '"+name+"'; cd datas/fund ; grep '"+name+"' * | wc")
-
+    p = os.popen("cd datas/fund ; grep '"+name+"' * | wc -l")
+    count = p.read()
+    print(name,count)
+    result_list.append([name,count])
 #获取股票的名字和代码号
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
@@ -27,3 +29,9 @@ stocklist = stocklist[1+int(offset):] #删除第一行
 for stock in stocklist:
     code,name = getstockinfo(stock) 
     get_stock_count(name)   
+
+print(result_list)
+
+df = pd.DataFrame(result_list)
+df.to_csv("./datas/stockcount.csv")
+
