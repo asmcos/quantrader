@@ -15,6 +15,8 @@ args = parser.parse_args()
 
 offset = args.offset
 
+result_list = []
+
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'}
 
 
@@ -37,13 +39,12 @@ def create_clickable_code(code):
     url_template= '''<a href="http://doctor.10jqka.com.cn/{code}/" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
-
-def get_stats_value(code,name,industry):
-    p = os.popen("cd datas/doctor/ ; grep '该股长期投资价值较高' stock_"+code+"_text.csv;cd ../../")
+def get_stats_value(code,name,industry,key):
+    p = os.popen("cd datas/doctor/ ; grep '"+key+"' stock_"+code+"_text.csv;cd ../../")
     count = p.read()
     if len(count) > 20:
         result_list.append([name,code,industry])
-result_list = []
+
 
 #获取股票的名字和代码号
 def getstockinfo(stock):
@@ -62,12 +63,15 @@ if not os.path.exists('./datas/stock_industry_check.csv'):
 stocklist = open('./datas/stock_industry_check.csv').readlines()
 stocklist = stocklist[1+int(offset):] #删除第一行
 
+key = "股价短线上涨概率较大"
+#key = "该股长期投资价值较高"
+
 for stock in stocklist:
     code,name,skip1 = getstockinfo(stock)
-    get_doctor_html(code,name)
-    time.sleep(0.5)
-    #get_stats_value(code,name,skip1)
+    #get_doctor_html(code,name)
+    #time.sleep(0.5)
+    get_stats_value(code,name,skip1,key)
 
-#df = pd.DataFrame(result_list,columns=['name','code','行业'])
-#df['code']=df['code'].apply(create_clickable_code)
-#print(df.to_html(escape=False))
+df = pd.DataFrame(result_list,columns=['name','code','行业'])
+df['code']=df['code'].apply(create_clickable_code)
+print(df.to_html(escape=False))
