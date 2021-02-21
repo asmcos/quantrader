@@ -85,7 +85,6 @@ for stock in stocklist:
     #get_doctor_html(code,name)
     #time.sleep(0.5)
     count = stockdict.get(code,"0")
-    print(code,count)
     get_stats_value(code,name,skip1,key,count)
 
 df = pd.DataFrame(result_list,columns=['name','code','行业','fund'])
