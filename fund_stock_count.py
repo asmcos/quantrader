@@ -13,8 +13,8 @@ def create_clickable_code(code):
 def get_stock_count(code,name,industry):
     p = os.popen("cd datas/fund ; grep '"+name+"' * | wc -l")
     count = p.read()
-    print(code,name,count.strip('" \n'))
-    result_list.append([code,name,count.strip('" \n'),industry])
+    #print(code,name,count.strip('" \n'))
+    result_list.append([code,name,int(count.strip('" \n')),industry])
 #获取股票的名字和代码号
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
@@ -38,8 +38,9 @@ for stock in stocklist:
 
 #print(result_list)
 
-df = pd.DataFrame(result_list,columns=['code','code','fund','行业'])
+df = pd.DataFrame(result_list,columns=['code','name','fund','行业'])
 df['code']=df['code'].apply(create_clickable_code)
+df = df.sort_values(by="fund",ascending=False)
 print(df.to_html(escape=False))
 
 #df = pd.DataFrame(result_list)

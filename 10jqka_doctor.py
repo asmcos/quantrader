@@ -23,10 +23,11 @@ def get_doctor_html(code,name):
     url="http://doctor.10jqka.com.cn/%s/"% code1
     resp = requests.get(url,headers=headers)
     info = re.findall('<p class="cnt showlevel2 hide">(.*?)</p>',resp.text,re.S|re.M|re.I)
+    info1 = re.findall('<div class="value_info">(.*?)</ul>',resp.text,re.S|re.M|re.I)
     if len(info) > 0:
         print(code,name,info[0])
-        result_list.append([code,name,info[0]])
-        df = pd.DataFrame([code,name,info[0]])
+        result_list.append([code,name,info[0],info1[0]])
+        df = pd.DataFrame([code,name,info[0],info1[0]])
         df.to_csv("./datas/doctor/stock_"+code+"_text.csv")
     else:
         print(resp.text)
@@ -63,10 +64,10 @@ stocklist = stocklist[1+int(offset):] #删除第一行
 
 for stock in stocklist:
     code,name,skip1 = getstockinfo(stock)
-    #get_doctor_html(code,name)
-    #time.sleep(0.5)
-    get_stats_value(code,name,skip1)
+    get_doctor_html(code,name)
+    time.sleep(0.5)
+    #get_stats_value(code,name,skip1)
 
-df = pd.DataFrame(result_list,columns=['name','code','行业'])
-df['code']=df['code'].apply(create_clickable_code)
-print(df.to_html(escape=False))
+#df = pd.DataFrame(result_list,columns=['name','code','行业'])
+#df['code']=df['code'].apply(create_clickable_code)
+#print(df.to_html(escape=False))
