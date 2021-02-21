@@ -37,11 +37,11 @@ def get_fund_info(fund):
     order,code,jc,name,skip1,skip2 = fund.split(",")
     return code,name
 
-for fund in fundlist[:2000]:
+for fund in fundlist:
     code,name = get_fund_info(fund)
     print(code,name)
     get_fund_stock(code,name)
-    time.sleep(0.2)
+    #time.sleep(0.3)
 df = pd.DataFrame(fund_ok_list)
 df.to_csv("./datas/fund_ok_list.csv")
 print(fund_ok_list)
