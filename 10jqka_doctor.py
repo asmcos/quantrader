@@ -36,7 +36,8 @@ def get_doctor_html(code,name):
         print(resp.text)
 
 def create_clickable_code(code):
-    code = code.split(".")[1]
+    if code.find('.') != -1:
+        code = code.split(".")[1]
     url_template= '''<a href="http://doctor.10jqka.com.cn/{code}/" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
@@ -83,10 +84,10 @@ key = "股价短线上涨概率较大"
 
 for stock in stocklist:
     code,name,skip1 = getstockinfo(stock)
-    get_doctor_html(code,name)
-    time.sleep(0.5)
-    #count = stockdict.get(code,"0")
-    #get_stats_value(code,name,skip1,key,count)
+    #get_doctor_html(code,name)
+    #time.sleep(0.5)
+    count = stockdict.get(code,"0")
+    get_stats_value(code,name,skip1,key,count)
 
 df = pd.DataFrame(result_list,columns=['name','code','行业','fund'])
 df['code']=df['code'].apply(create_clickable_code)
