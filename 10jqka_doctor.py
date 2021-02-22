@@ -8,12 +8,10 @@ import pandas as pd
 import argparse
 import os
 import time
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--offset", help="开始执行的位置",default='0')
-args = parser.parse_args()
-
-offset = args.offset
+from common.common import *
+#endday ,offset 
+if not os.path.exists('./datas/doctor/'+endday):
+    os.makedirs('./datas/doctor/'+endday)
 
 result_list = []
 
@@ -24,13 +22,16 @@ def get_doctor_html(code,name):
     code1 = code.split('.')[1]
     url="http://doctor.10jqka.com.cn/%s/"% code1
     resp = requests.get(url,headers=headers)
+
+    save_file('./datas/doctor/'+endday+'/stock_'+code+'.html',resp.text)
+
     info = re.findall('<p class="cnt showlevel2 hide">(.*?)</p>',resp.text,re.S|re.M|re.I)
     info1 = re.findall('<div class="value_info">(.*?)</ul>',resp.text,re.S|re.M|re.I)
     if len(info) > 0:
         print(code,name,info[0])
         result_list.append([code,name,info[0],info1[0]])
         df = pd.DataFrame([code,name,info[0],info1[0]])
-        df.to_csv("./datas/doctor/stock_"+code+"_text.csv")
+        df.to_csv("./datas/doctor/"+endday+"/stock_"+code+"_text.csv")
     else:
         print(resp.text)
 
@@ -42,7 +43,7 @@ def create_clickable_code(code):
 #key 是所搜的关键词，例如：涨
 #count 是多少只基金购买了该股票
 def get_stats_value(code,name,industry,key,count):
-    p = os.popen("cd datas/doctor/ ; grep '"+key+"' stock_"+code+"_text.csv;cd ../../")
+    p = os.popen("cd datas/doctor/"+endday+"/ ; grep '"+key+"' stock_"+code+"_text.csv;cd ../../../")
     content = p.read()
     if len(content) > 20:
         result_list.append([name,code,industry,int(count)])
@@ -82,10 +83,10 @@ key = "股价短线上涨概率较大"
 
 for stock in stocklist:
     code,name,skip1 = getstockinfo(stock)
-    #get_doctor_html(code,name)
-    #time.sleep(0.5)
-    count = stockdict.get(code,"0")
-    get_stats_value(code,name,skip1,key,count)
+    get_doctor_html(code,name)
+    time.sleep(0.5)
+    #count = stockdict.get(code,"0")
+    #get_stats_value(code,name,skip1,key,count)
 
 df = pd.DataFrame(result_list,columns=['name','code','行业','fund'])
 df['code']=df['code'].apply(create_clickable_code)
