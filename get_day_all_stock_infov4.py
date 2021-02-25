@@ -60,7 +60,7 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','名称','date','代码','行业'])
+	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','行业'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
@@ -93,15 +93,16 @@ def save_db_server():
 	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
 	df = df.sort_values(by="当日涨跌",ascending=False)
 	df = df.iloc[0:200]
-	df.rename(columns={'当日收盘':'close', 
+	df.rename(columns={
+						'名称':'name',
+						'代码':'code',
+                        '当日收盘':'close', 
 						'前日收盘':'close1',
 						'21日收盘':'close21',
 						'百日收盘':'close100',
 						'当日涨跌':'rise1',
 						'21日涨跌':'rise21',
 						'百日涨跌':'rise100',
-						'名称':'name',
-						'代码':'code',
 						'行业':'industry',
 						}, inplace = True)
 	del df['序号']
@@ -174,13 +175,14 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100):
 	print(ENDC)
 
 	all_up_down_list.append([
+        name,date,code,
 		lastday,lastday1,
 		lastday21,
 		lastday100,
 		delta1,
 		delta21,
 		delta100,
-        name,date,code,industry
+        industry
 	])	
 
 		
