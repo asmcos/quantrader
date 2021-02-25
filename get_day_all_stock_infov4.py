@@ -114,20 +114,27 @@ def save_db_server():
 
 #仅仅显示
 def display_save_data():
-	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
+    df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
 	
-	del df['序号']
-	df = df.set_index('date')
-
-	df = df.sort_values(by="当日涨跌",ascending=False)
-	if ishtml == "1":
-		df['代码'] = df['代码'].apply(create_clickable_code)
-		df['名称'] = df['名称'].apply(create_clickable_name)
-		df['当日涨跌'] = df['当日涨跌'].apply(create_color_rise1)
-		print(df.iloc[0:200].to_html(escape=False))
-	else:
-		print(df.iloc[0:200])
-	print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")
+    del df['序号']
+    df = df.set_index('date')
+    print("当日涨幅榜单:")
+    df = df.sort_values(by="当日涨跌",ascending=False)
+    if ishtml == "1":
+        df['代码'] = df['代码'].apply(create_clickable_code)
+        df['名称'] = df['名称'].apply(create_clickable_name)
+        df['当日涨跌'] = df['当日涨跌'].apply(create_color_rise1)
+        #print(df.iloc[0:200]
+        #    .reset_index(drop=True)
+        #    .style.set_table_attributes('border="1" class="table"').render())
+        print(df.iloc[0:200].to_html(escape=False))
+        print("当日涨幅榜，之前超跌榜")
+        
+        df = df.iloc[0:200].sort_values(by="百日涨跌",ascending=True)
+        print(df.to_html(escape=False))
+    else:
+        print(df.iloc[0:200])
+    print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")
 
 def get_day_data(code,name):
     try:
