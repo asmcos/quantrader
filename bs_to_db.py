@@ -51,19 +51,22 @@ def get_data(name,code, start, end, adj):
     dbmongo_stock.insertdayKs(name,code,data_list)
 
 def get_data_post_server(name,code,start,end,adj):
-	rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code', start_date=start,
+    rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code', start_date=start,
                                       frequency='d' )
-	datas = rs.get_data()
-	if len(datas) < 2:
-		return
-	print(len(datas),datas.date[datas.index[-1]])
-	datas['name'] = name
-	datas = datas.set_index('date')
-	datas = datas.to_json(orient='table')
-	jsondatas = json.loads(datas)['data']
-	
+    datas = rs.get_data()
+    if len(datas) < 2:
+        return
+    print(len(datas),datas.date[datas.index[-1]])
+	#datas['name'] = name
+    #datas = datas.set_index('date')
+    datas = datas.to_json(orient='table')
+    jsondatas = json.loads(datas)['data']
+    for d in jsondatas:
+        d['name'] = name
+        del d['index']
+    #print(jsondatas)
 	#requests.post("http://127.0.0.1:3000/stock/updatedayk",json=jsondatas)
-	requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas)
+    requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas)
 #获取股票的名字和代码号
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
@@ -88,4 +91,4 @@ if __name__ == "__main__":
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data_post_server(name,code,"2021-01-20",today,"3")
+        get_data_post_server(name,code,"2021-02-22",today,"3")
