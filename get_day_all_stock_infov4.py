@@ -60,7 +60,7 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','行业'])
+	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','流通股值(亿)','行业'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
@@ -155,7 +155,7 @@ def get_day_data(code,name):
 
     return df
 
-def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100):
+def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz):
 	lastday = float(lastday)
 	lastday1 = float(lastday1)
 	lastday21 = float(lastday21)
@@ -189,6 +189,7 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100):
 		delta1,
 		delta21,
 		delta100,
+		qsltsz*lastday,
         industry
 	])	
 
@@ -197,15 +198,15 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100):
 def getstockinfo(stock):
 	#2019-12-09,sz.002094,青岛金王,化工,申万一级行业
 	# 时间，股票代码，名称，类别
-	d,code,name,industry,skip2 = stock.split(',')
+	d,code,name,industry,skip2,hqltsz = stock.split(',')
 	return code,name,industry
 
 #获取所有的股票并下载数据
 def handler_data_thread(n):
     while True:
-        code,date,name,industry,lastday,lastday1,lastday21,lastday100 = q.get()
-        print('正在分析',name,'代码',code)
-        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100)
+        code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz = q.get()
+        print('正在分析',name,'代码',code,qsltsz)
+        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz)
         q.task_done() #每次做完任务就通知 join，jion收到最后一条通知就主程序退出
 
 def get_data():
@@ -213,10 +214,17 @@ def get_data():
 		code ,name,industry = getstockinfo(stock)
 		print('正在获取',name,'代码',code)
 		df = get_day_data(code,name)
+		#print(df)
 		if len(df) > 2:
-			date = df.date[df.index[-1]]
-			lastday  = df.close[df.index[-1]]
-			lastday1 = df.close[df.index[-2]]
+			try:
+			    date = df.date[df.index[-1]]
+			    turn = df.turn[df.index[-1]] 
+			    volume = df.volume[df.index[-1]]
+			    qsltsz = volume / turn / 1000000 
+			    lastday  = df.close[df.index[-1]]
+			    lastday1 = df.close[df.index[-2]]
+			except:
+			    continue
 		else:
 			continue
 		lastday21 = 0
@@ -225,8 +233,7 @@ def get_data():
 		lastday100 = 0
 		if len(df) > 99:
 			lastday100 = df.close[df.index[-100]] 
-		q.put((code,date,name,industry,lastday,lastday1,lastday21,lastday100))
-
+		q.put((code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz))
 
 #
 # 程序开始，监听信号
@@ -259,4 +266,4 @@ else:
     q.join() #等待任务完成
     make_save_data()	
     display_save_data()
-    
+    os._exit(os.EX_OK)    

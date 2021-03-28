@@ -18,20 +18,30 @@ print('query_stock_industry respond  error_msg:'+rs.error_msg)
 industry_list = []
 while (rs.error_code == '0') & rs.next():
     # 获取一条记录，将记录合并在一起
-	row = rs.get_row_data()
-	print(row)
-	kdata = bs.query_history_k_data_plus(row[1], 'date,open,high,low,close,volume', start_date='2020-12-01', 
+    row = rs.get_row_data()
+    kdata = bs.query_history_k_data_plus(row[1], 'date,open,high,low,close,volume', start_date='2020-12-01', 
                                       frequency='d')	
-	if len(kdata.get_row_data()) == 0:
-		continue
-	industry_list.append(row)	
-	""" default don't save to mongodb
-	dbmongo.insertIndustry(industry_list[-1][0],
+    if len(kdata.get_row_data()) == 0:
+        continue
+    #增加流通值
+    rs_profit = bs.query_profit_data(code=row[1],year=2020)
+    rs_row = rs_profit.get_row_data()
+    if len(rs_row)> 0:
+        row.append(rs_row[-1])
+        print(rs_row)
+    else:
+        row.append(0)
+    print(row)
+    industry_list.append(row)	
+    """ default don't save to mongodb
+	
+    dbmongo.insertIndustry(industry_list[-1][0],
     industry_list[-1][1],
     industry_list[-1][2],
     industry_list[-1][3],
     industry_list[-1][4])
 	"""
+rs.fields.append('流通值')
 result = pd.DataFrame(industry_list, columns=rs.fields)
 # 结果集输出到csv文件
 result.to_csv("./datas/stock_industry_check.csv", index=False)

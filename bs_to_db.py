@@ -36,13 +36,13 @@ lg = bs.login()
 """
 def get_data(name,code, start, end, adj):
 
-    rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume', start_date=start, end_date=end,
+    rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,turn', start_date=start, end_date=end,
                                       frequency='d', adjustflag=adj)
     
 	#print('query_history_k_data_plus respond error_code:' + rs.error_code)
     #print('query_history_k_data_plus respond  error_msg:' + rs.error_msg)
     # 打印结果集
-    columns = ['date', 'open', 'high', 'low', 'close', 'volume']
+    columns = ['date', 'open', 'high', 'low', 'close', 'volume','turn']
     data_list = []
     while (rs.error_code == '0') & rs.next():
         # 获取一条记录，将记录合并在一起
@@ -51,7 +51,7 @@ def get_data(name,code, start, end, adj):
     dbmongo_stock.insertdayKs(name,code,data_list)
 
 def get_data_post_server(name,code,start,end,adj):
-    rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code', start_date=start,
+    rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
                                       frequency='d' )
     datas = rs.get_data()
     if len(datas) < 2:
@@ -71,7 +71,7 @@ def get_data_post_server(name,code,start,end,adj):
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
-    d,code,name,skip1,skip2 = stock.split(',')
+    d,code,name,skip1,skip2,HQLTSZ= stock.split(',')
     return code,name
 
 
@@ -91,4 +91,4 @@ if __name__ == "__main__":
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data_post_server(name,code,"2021-02-22",today,"3")
+        get_data_post_server(name,code,"2021-03-20",today,"3")
