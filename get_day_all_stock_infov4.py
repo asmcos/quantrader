@@ -60,7 +60,7 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','流通股值(亿)','行业'])
+	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','流通股值','行业'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
@@ -76,6 +76,12 @@ def create_color_rise1(rise):
     url_template= '''<font color="#ef4136">{rise}</font></a>'''.format(rise=rise)
     return url_template
 
+def create_color_hqltgz(hqltsz):
+    if hqltsz > 80.0:
+        url_template= '''<font color="#ef4136">{hqltsz}</font></a>'''.format(hqltsz=hqltsz)
+    else:
+        url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
+    return url_template
 """
     name: String,
     code: String,
@@ -124,6 +130,7 @@ def display_save_data():
         df['代码'] = df['代码'].apply(create_clickable_code)
         df['名称'] = df['名称'].apply(create_clickable_name)
         df['当日涨跌'] = df['当日涨跌'].apply(create_color_rise1)
+        df['流通股值'] = df['流通股值'].apply(create_color_hqltgz)
         #print(df.iloc[0:200]
         #    .reset_index(drop=True)
         #    .style.set_table_attributes('border="1" class="table"').render())
@@ -155,7 +162,7 @@ def get_day_data(code,name):
 
     return df
 
-def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz):
+def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqltsz):
 	lastday = float(lastday)
 	lastday1 = float(lastday1)
 	lastday21 = float(lastday21)
@@ -189,7 +196,7 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,qslts
 		delta1,
 		delta21,
 		delta100,
-		qsltsz*lastday,
+		hqltsz*lastday,
         industry
 	])	
 
@@ -204,9 +211,9 @@ def getstockinfo(stock):
 #获取所有的股票并下载数据
 def handler_data_thread(n):
     while True:
-        code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz = q.get()
-        print('正在分析',name,'代码',code,qsltsz)
-        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz)
+        code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqltsz = q.get()
+        print('正在分析',name,'代码',code,hqltsz)
+        upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqltsz)
         q.task_done() #每次做完任务就通知 join，jion收到最后一条通知就主程序退出
 
 def get_data():
@@ -220,7 +227,7 @@ def get_data():
 			    date = df.date[df.index[-1]]
 			    turn = df.turn[df.index[-1]] 
 			    volume = df.volume[df.index[-1]]
-			    qsltsz = volume / turn / 1000000 
+			    hqltsz = volume / turn / 1000000 
 			    lastday  = df.close[df.index[-1]]
 			    lastday1 = df.close[df.index[-2]]
 			except:
@@ -233,7 +240,7 @@ def get_data():
 		lastday100 = 0
 		if len(df) > 99:
 			lastday100 = df.close[df.index[-100]] 
-		q.put((code,date,name,industry,lastday,lastday1,lastday21,lastday100,qsltsz))
+		q.put((code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqltsz))
 
 #
 # 程序开始，监听信号
