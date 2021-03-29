@@ -3,6 +3,33 @@
 #
 #
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-X", help="X",default=0.0)
+parser.add_argument("-A", help="A",default=0)
+parser.add_argument("-B", help="B",default=0)
+parser.add_argument("-C", help="C",default=0)
+parser.add_argument("-D", help="D",default=0)
+args = parser.parse_args()
+
+X= float(args.X)
+A= float(args.A)
+B= float(args.B)
+C= float(args.C)
+D= float(args.D)
+
+def approx(i,j):
+    if i > j:
+        dt = i - j
+        if (dt / i < 0.05):
+            return True  
+    else :
+        dt = j - i
+        if (dt / i < 0.05):
+            return True
+    return False
+
 datalist=[0.382, 0.50,0.618,0.786, 1.00,1.27,1.618 ,2.0, 2.24, 2.618, 3.14]
 
 #0.382 , 2.24
@@ -13,11 +40,13 @@ datalist=[0.382, 0.50,0.618,0.786, 1.00,1.27,1.618 ,2.0, 2.24, 2.618, 3.14]
 
 def downN(high,low,n):
     stopline = high-(high-low) * n
+    stopline = float("%.3f"%stopline)
     print(stopline)
     return stopline
 
 def upN(high,low,n): 
     stopline = low + (high-low) * n 
+    stopline = float("%.3f"%stopline)
     print(stopline)
     return stopline
 
@@ -78,3 +107,23 @@ def detectUpN(high,low):
         print(i)
         upN(high,low,i)
 
+#-X=2.3 -A=5.1 -B=2.89 -C=4.6 -D=1.5
+def bullish_butterfly(x1,a1,b1,c1,d1):
+    print("0.786 b=")
+    downN(a1,x1,0.786) #b
+    print("0.681 b = ")
+    downN(a1,x1,0.618) #b
+
+    print("0.786 c =")
+    upN(a1,b1,0.786) #c
+    print("0.618 c=") 
+    upN(a1,b1,0.618) #c
+
+    print("d=")
+    downN(c1,b1,1.618) # d
+    
+    downN(a1,x1,1.618) # d
+    downN(a1,x1,1.27) # d
+    
+bullish_butterfly(X,A,B,C,D)
+     
