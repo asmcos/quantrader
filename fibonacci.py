@@ -112,7 +112,9 @@ def bullish_butterfly(x1,a1,b1,c1,d1):
     okb = False
     okc = False
     okd = False
-
+    # stop stock
+    if x1 == a1 || a1 == b1:
+        return
     b2 = downN(a1,x1,0.786) #b
     b3 = downN(a1,x1,0.618) #b
 
