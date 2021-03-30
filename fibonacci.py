@@ -208,7 +208,7 @@ def switchhigh(status,i):
     return status,False
 
 
-def search_pattern(name,code,mnlist):
+def _search_pattern(name,code,mnlist):
     status = NULL
     for i in mnlist:
         if i[0] == 0: # low
@@ -217,3 +217,9 @@ def search_pattern(name,code,mnlist):
                 bullish_butterfly(X,A,B,C,D)
         if i[0] == 1: # high 
             status,ok = switchhigh(status,i)
+
+def search_pattern(name,code,mnlist):
+    for i in range(len(mnlist)):
+        if mnlist[i][0] == 0:
+            _search_pattern(name,code,mnlist[i+1:])
+
