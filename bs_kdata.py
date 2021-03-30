@@ -33,7 +33,7 @@ def get_data(name,code,start,end,adj):
 
     for i in range(period,len(dates)-period):
         m = talib.MAX(closes[i+1-period:i-1+period],2*period-2)
-        n = talib.MIN(closes[i+1-period:i-1+period],2*period-2)
+        n = talib.MIN(closes[i+1-period:i+5],period+5) #d 是最近时间，所以D不能往后太多
         m1 = m.values[-1]
         n1 = n.values[-1]
         if float(m1) == float(closes[i]):
@@ -43,6 +43,14 @@ def get_data(name,code,start,end,adj):
             #print("min",dates[i],closes[i])
             mnlist.append([0,datas.values[i],float(closes.values[i])])
 
+
+    # 追加D发现最近的D 
+    for i in range(len(dates)-period,len(datas)):
+        n = talib.MIN(closes[i+1-period:i],period-1) #d 是最近时间，所以D不能往后太多
+        if float(n1) == float(closes[i]):
+            print("min",dates[i],closes[i])
+            mnlist.append([0,datas.values[i],float(closes.values[i])])
+        
     search_pattern(name,code,mnlist)
 
 
