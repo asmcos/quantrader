@@ -109,21 +109,106 @@ def detectUpN(high,low):
 
 #-X=2.3 -A=5.1 -B=2.89 -C=4.6 -D=1.5
 def bullish_butterfly(x1,a1,b1,c1,d1):
-    print("0.786 b=")
-    downN(a1,x1,0.786) #b
-    print("0.681 b = ")
-    downN(a1,x1,0.618) #b
+    okb = False
+    okc = False
+    okd = False
 
-    print("0.786 c =")
-    upN(a1,b1,0.786) #c
-    print("0.618 c=") 
-    upN(a1,b1,0.618) #c
+    b2 = downN(a1,x1,0.786) #b
+    b3 = downN(a1,x1,0.618) #b
 
-    print("d=")
-    downN(c1,b1,1.618) # d
+    if(approx(b1,b2)):
+        okb = True
+        print(b1,"~~",b2,"0.786")    
+    if(approx(b1,b3)):
+        okb = True
+        print(b1,"~~",b3,"0.618")    
+
+    c2= upN(a1,b1,0.786) #c
+    c3= upN(a1,b1,0.618) #c
+
+    if(approx(c1,c2)):
+        okc = True
+        print(c1,"~~",c2,"0.786")    
+    if(approx(c1,c3)):
+        okc = True
+        print(c1,"~~",c3,"0.618")    
+
+
+
+
+    d2 = downN(c1,b1,1.618) # d
     
-    downN(a1,x1,1.618) # d
-    downN(a1,x1,1.27) # d
+    d3 = downN(a1,x1,1.618) # d
+    d4 = downN(a1,x1,1.27) # d
+
+    if(approx(d1,d3)):
+        okd = True
+        print(d1,"~~",d3,"1.618")    
+    if(approx(d1,d4)):
+        okd = True
+        print(d1,"~~",d4,"1.27")    
+
+    if (okb and okc and okd):
+        print("===============================")
+        print("===============================")
+        print("===============================")
+        print("===============================")
+        print("===============================")
+        print(XD[6],XD[0],AD[0],BD[0],CD[0],DD[0])
+        print("===============================")
+        print("===============================")
+        print("===============================")
+        print("===============================")
+   
     
-bullish_butterfly(X,A,B,C,D)
-     
+#bullish_butterfly(X,A,B,C,D)
+
+NULL   = 0
+STATEX = 1
+STATEA = 2
+STATEB = 3
+STATEC = 4
+STATED = 5
+XD,AD,BD,CD,DD = "","","","",""
+def switchlow(status,i):
+    global X,A,B,C,D,XD,AD,BD,CD,DD
+    if status == NULL:
+        X = i[2]
+        XD = i[1]
+        return STATEX,True
+    if status == STATEA:
+        B = i[2]
+        BD = i[1]
+        return STATEB,True
+    if status == STATEC:
+        D = i[2]
+        DD = i[1]
+        return STATED,True
+    if status == STATED:
+        X = i[2]
+        XD = i[1]
+        return STATEX,True
+    return status,False
+
+def switchhigh(status,i):
+    global X,A,B,C,D,XD,AD,BD,CD,DD
+    if status == STATEX:
+        A = i[2]
+        AD = i[1]
+        return STATEA,True
+    if status == STATEB:
+        C = i[2]
+        CD = i[1]
+        return STATEC,True
+    return status,False
+
+
+def search_pattern(name,code,mnlist):
+    status = NULL
+    for i in mnlist:
+        if i[0] == 0: # low
+            status,ok = switchlow(status,i)
+            if ok and (status == STATED):
+                bullish_butterfly(X,A,B,C,D)
+        if i[0] == 1: # high 
+            status,ok = switchhigh(status,i)

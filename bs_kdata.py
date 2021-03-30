@@ -12,15 +12,16 @@ import talib
 # 判断是否 是显示，还是重新下载数据计算
 # 数据每天只需要下载一次
 from common.common import *
-
+from fibonacci import search_pattern
 
 today = datetime.now().strftime('%Y-%m-%d')
 
 lg = bs.login()
 
-period = 8
+period = 8 
 
 def get_data(name,code,start,end,adj):
+    mnlist = []
     rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
                                       frequency='d' )
     datas = rs.get_data()
@@ -36,9 +37,14 @@ def get_data(name,code,start,end,adj):
         m1 = m.values[-1]
         n1 = n.values[-1]
         if float(m1) == float(closes[i]):
-            print("max",dates[i],closes[i])
+            #print("max",dates[i],closes[i])
+            mnlist.append([1,datas.values[i],float(closes.values[i])])
         if float(n1) == float(closes[i]):
-            print("min",dates[i],closes[i])
+            #print("min",dates[i],closes[i])
+            mnlist.append([0,datas.values[i],float(closes.values[i])])
+
+    search_pattern(name,code,mnlist)
+
 
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
