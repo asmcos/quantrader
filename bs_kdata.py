@@ -47,6 +47,7 @@ def get_data(name,code,start,end,adj):
     # 追加D发现最近的D 
     for i in range(len(dates)-period,len(datas)):
         n = talib.MIN(closes[i+1-period:i],period-1) #d 是最近时间，所以D不能往后太多
+        n1 = n.values[-1]
         if float(n1) == float(closes[i]):
             print("min",dates[i],closes[i])
             mnlist.append([0,datas.values[i],float(closes.values[i])])
