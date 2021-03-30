@@ -115,8 +115,9 @@ def bullish_butterfly(x1,a1,b1,c1,d1):
     # stop stock
     if x1 == a1 or a1 == b1:
         return
-    if b1 < d1*1.05 or a1 < d1 * 1.2:
+    if b1 < d1*1.05 or b1 > c1 * 0.9:
         return 
+    print(x1,a1,b1,c1,d1)
     b2 = downN(a1,x1,0.786) #b
     b3 = downN(a1,x1,0.618) #b
 

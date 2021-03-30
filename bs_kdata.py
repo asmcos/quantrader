@@ -18,7 +18,7 @@ today = datetime.now().strftime('%Y-%m-%d')
 
 lg = bs.login()
 
-period = 7 
+period = 8 
 
 def get_data(name,code,start,end,adj):
     mnlist = []
@@ -33,7 +33,7 @@ def get_data(name,code,start,end,adj):
 
     for i in range(period,len(dates)-period):
         m = talib.MAX(closes[i-period:i+period],len(closes[i-period:i+period]))
-        n = talib.MIN(closes[i-period:i+5],len(closes[i-period:i+5])) #d 是最近时间，所以D不能往后太多
+        n = talib.MIN(closes[i-period:i+period],len(closes[i-period:i+period])) #d 是最近时间，所以D不能往后太多
         m1 = m.values[-1]
         n1 = n.values[-1]
         if float(m1) == float(closes[i]):
@@ -78,4 +78,4 @@ if __name__ == "__main__":
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data(name,code,"2020-12-20",today,"3")
+        get_data(name,code,"2020-08-20",today,"3")
