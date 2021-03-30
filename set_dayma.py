@@ -59,14 +59,14 @@ def save_db_server(df):
     df = df.to_json(orient='table')
     jsondatas = json.loads(df)['data']
 
-    requests.post(server+"/stock/updatedayMa",json=jsondatas,timeout=60)
+    requests.post(server+"/stock/updatedayMa",json=jsondatas,timeout=1000)
 
 
 def get_day_ma(code,name):
     json = requests.get(server+"/stock/getdayMa",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
 
-    print(json)
+    print(json[0])
 
 def get_day_data(code,name):
     try:
@@ -119,9 +119,6 @@ def ma(df):
     df['ma20'] = ma20
     df['ma30'] = ma30
     df['ma60'] = ma60
-    del df['high']
-    del df['low']
-    del df['turn']
     save_db_server(df) 
 
 def get_data():
@@ -133,7 +130,7 @@ def get_data():
             ma(df)
         else:
             continue
-        get_day_ma(code,name)
+        #get_day_ma(code,name)
 
 #
 # 程序开始，监听信号
