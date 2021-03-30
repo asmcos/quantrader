@@ -18,7 +18,7 @@ today = datetime.now().strftime('%Y-%m-%d')
 
 lg = bs.login()
 
-period = 8 
+period = 7 
 
 def get_data(name,code,start,end,adj):
     mnlist = []
@@ -32,24 +32,24 @@ def get_data(name,code,start,end,adj):
     dates = datas['date']
 
     for i in range(period,len(dates)-period):
-        m = talib.MAX(closes[i+1-period:i-1+period],2*period-2)
-        n = talib.MIN(closes[i+1-period:i+5],period+4) #d 是最近时间，所以D不能往后太多
+        m = talib.MAX(closes[i-period:i+period],len(closes[i-period:i+period]))
+        n = talib.MIN(closes[i-period:i+5],len(closes[i-period:i+5])) #d 是最近时间，所以D不能往后太多
         m1 = m.values[-1]
         n1 = n.values[-1]
         if float(m1) == float(closes[i]):
             #print("max",dates[i],closes[i])
             mnlist.append([1,datas.values[i],float(closes.values[i])])
         if float(n1) == float(closes[i]):
-            #print("min",dates[i],closes[i])
+            #print("min",dates[i],closes[i],i,closes[i-period:i+5])
             mnlist.append([0,datas.values[i],float(closes.values[i])])
 
 
     # 追加D发现最近的D 
-    for i in range(len(dates)-period,len(datas)):
-        n = talib.MIN(closes[i+1-period:i],period-1) #d 是最近时间，所以D不能往后太多
+    for i in range(len(dates)-period,len(datas)-1):
+        n = talib.MIN(closes[i-period:i+2],len(closes[i-period:i+2])) #d 是最近时间，所以D不能往后太多
         n1 = n.values[-1]
         if float(n1) == float(closes[i]):
-            print("min",dates[i],closes[i])
+            #print("min",dates[i],closes[i])
             mnlist.append([0,datas.values[i],float(closes.values[i])])
         
     search_pattern(name,code,mnlist)
