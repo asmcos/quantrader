@@ -46,13 +46,15 @@ def get_data(name,code,start,end,adj):
 
     # 追加D发现最近的D 
     for i in range(len(dates)-period,len(datas)-1):
+      try:
         n = talib.MIN(closes[i-period:i+2],len(closes[i-period:i+2])) #d 是最近时间，所以D不能往后太多
         n1 = n.values[-1]
         if float(n1) == float(closes[i]):
             #print("min",dates[i],closes[i])
             mnlist.append([0,datas.values[i],float(closes.values[i])])
-        
-    search_pattern(name,code,mnlist)
+      except:
+            pass
+    search_pattern(name,code,mnlist)#fibonacci.py
 
 
 def getstockinfo(stock):
@@ -87,4 +89,5 @@ if __name__ == "__main__":
  
    LoopOne()   
    period = 15
-   LoopOne() #big butterfly   
+   LoopOne() #big butterfly  
+   Displaybutterfly() #fibonacci.py 
