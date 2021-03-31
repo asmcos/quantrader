@@ -54,6 +54,9 @@
     <div class="form-row">
         <div class="form-group col-lg-12">
             <!--button type="submit" class="btn btn-primary btn-sm">Add</button-->
+            <label>你可以在上面挨个输入数字，也可以一次粘贴5个数字到这里。用空格分开,例如：20 30 40 50 20</label>
+            <input type="text" class="form-control form-control-sm" placeholder="输入5个数用空格分开" v-model="point5">
+            <label style="display:none;">{{point5split}}</label>
         </div>
     </div>
 
@@ -144,7 +147,8 @@
         A:0.0,
         B:0.0,
         C:0.0,
-        D:0.0, 
+        D:0.0,
+        point5:'输入5个数字用空格分开', 
         }
       },
     
@@ -268,6 +272,16 @@
         return result.toFixed(3) + pre
         },
 
+        point5split:function(){
+            datas = this.point5.split(" ")
+            if (datas.length == 5){
+                this.X = datas[0]
+                this.A = datas[1]
+                this.B = datas[2]
+                this.C = datas[3]
+                this.D = datas[4]
+            }
+        }
 
 
 
