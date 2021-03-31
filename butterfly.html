@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <!-- 必须的 meta 标签 -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 的 CSS 文件 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <style>
+    .form-group.col-md-4 {
+    display: flex;
+    align-items: center;
+    margin-bottom:20px;
+    }
+    label {
+       margin-right:5px;
+    }
+    input {
+       margin-right:5px;
+    }
+    </style>
+
+    <title>基于fibonacci的蝴蝶战法数据计算</title>
+  </head>
+  <body>
+    <div class="alert alert-dark" role="alert">
+     欢迎试用 蝴蝶战法计算公式
+    </div>
+    <div class="container" id="app">
+
+       <div class="form-row" >
+        <div class="form-group col-md-4">
+            <label class="mr-2 col-form-label-sm">X</label>
+            <input type="text" class="form-control form-control-sm" placeholder="X" v-model="X">
+
+            <label class="mr-2 col-form-label-sm">A</label>
+            <input type="text" class="form-control form-control-sm" placeholder="A" v-model="A">
+
+
+            <label class="mr-2 col-form-label-sm">B</label>
+            <input type="text" class="form-control form-control-sm" placeholder="B" v-model="B">
+
+            <label class="mr-2 col-form-label-sm">C</label>
+            <input type="text" class="form-control form-control-sm" placeholder="C" v-model="C">
+
+
+            <label class="mr-2 col-form-label-sm">D</label>
+            <input type="text" class="form-control form-control-sm" placeholder="D" v-model="D">
+        </div>
+     </div>
+
+    <div class="form-row">
+        <div class="form-group col-lg-12">
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+        </div>
+    </div>
+
+  <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">0.382</th>
+      <th scope="col">0.618</th>
+      <th scope="col">0.786</th>
+      <th scope="col">1.27</th>
+      <th scope="col">1.618</th>
+      <th scope="col">2.24</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">XA->B:{{B}}</th>
+      <td>{{XA382}}</td>
+      <td>{{XA618}}</td>
+      <td>{{XA786}}</td>
+      <td>NULL</td>
+      <td>NULL</td>
+      <td>NULL</td>
+    </tr>
+    <tr>
+      <th scope="row">AB->C:{{C}}</th>
+      <td>{{AB382}}</td>
+      <td>{{AB618}}</td>
+      <td>{{AB786}}</td>
+      <td>NULL</td>
+      <td>NULL</td>
+      <td>NULL</td>
+    </tr>
+    <tr>
+      <th scope="row">BC->D:{{D}}</th>
+      <td >NULL</td>
+      <td>{{BC618}}</td>
+      <td>{{BC786}}</td>
+      <td>{{BC127}}</td>
+      <td>{{BC1618}}</td>
+      <td>{{BC224}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">XA->D:{{D}}</th>
+      <td>NULL</td>
+      <td>NULL</td>
+      <td>NULL</td>
+      <td>{{XA127}}</td>
+      <td>{{XA1618}}</td>
+      <td>{{XA224}}</td>
+    </tr>
+
+  </tbody>
+</table>
+
+
+
+
+    <!-- Content here -->
+    </div>
+
+    <!-- JavaScript 文件是可选的。从以下两种建议中选择一个即可！ -->
+
+    <!-- 选项 1：包含 Popper 的 Bootstrap 集成包 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+
+    <!-- 选项 2：Popper 和 Bootstrap 的 JS 插件各自独立 -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+    -->
+  </body>
+    <script>
+
+   const VueApp = {
+      data() {
+        return {
+        X:0.0,
+        A:0.0,
+        B:0.0,
+        C:0.0,
+        D:0.0, 
+        }
+      },
+    
+      created() {
+      },
+      computed: {
+    // 计算属性的 getter
+        XA382: function () {
+        // `this` 指向 vm 实例
+        result = this.A - (this.A-this.X)*0.384
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+         XA618: function () {
+        // `this` 指向 vm 实例
+        result = this.A - (this.A-this.X)*0.618
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        XA786: function () {
+        // `this` 指向 vm 实例
+        result= this.A - (this.A-this.X)*0.786
+
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        XA127: function () {
+        // `this` 指向 vm 实例
+        result= this.A - (this.A-this.X)*127
+
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        XA1618: function () {
+        // `this` 指向 vm 实例
+        result= this.A - (this.A-this.X)*1618
+
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        XA224: function () {
+        // `this` 指向 vm 实例
+        result= this.A - (this.A-this.X)*224
+
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+
+
+
+
+        AB382: function () {
+        // `this` 指向 vm 实例
+        result = this.B + (this.A-this.B)*0.384
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+         AB618: function () {
+        // `this` 指向 vm 实例
+        result = this.B + (this.A-this.B)*0.618
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        AB786: function () {
+        // `this` 指向 vm 实例
+        result= this.B + (this.A-this.B)*0.786
+
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+
+        BC618: function () {
+        // `this` 指向 vm 实例
+        result = this.C - (this.C-this.B)*0.618
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        BC786: function () {
+        // `this` 指向 vm 实例
+        result = this.C - (this.C-this.B)*0.786
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        BC127: function () {
+        // `this` 指向 vm 实例
+        result = this.C - (this.C-this.B)*1.27
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+
+        BC1618: function () {
+        // `this` 指向 vm 实例
+        result = this.C - (this.C-this.B)*1.618
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+        BC224: function () {
+        // `this` 指向 vm 实例
+        result = this.C - (this.C-this.B)*0.224
+        result =parseFloat(result)
+        return result.toFixed(3)
+        },
+
+
+
+
+
+    },
+      methods: {
+        // These methods won't trigger a watcher because we changed only a property of Object/Array,
+        // not the Object/Array itself
+      }
+    }
+    Vue.createApp(VueApp).mount('#app')   
+ 
+    </script>
+</html>
