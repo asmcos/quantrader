@@ -74,8 +74,17 @@ stocklist = open('./datas/stock_industry_check.csv').readlines()
 stocklist = stocklist[1+int(offset):] #删除第一行
 
 
-if __name__ == "__main__":
+def LoopOne():
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
         get_data(name,code,"2020-08-20",today,"3")
+    
+
+if __name__ == "__main__":
+   LoopOne()   
+   period = 10
+ 
+   LoopOne()   
+   period = 15
+   LoopOne() #big butterfly   
