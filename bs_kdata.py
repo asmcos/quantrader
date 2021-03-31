@@ -13,6 +13,7 @@ import talib
 # 数据每天只需要下载一次
 from common.common import *
 from fibonacci import search_pattern
+from fibonacci import Displaybutterfly 
 
 today = datetime.now().strftime('%Y-%m-%d')
 
@@ -84,10 +85,8 @@ def LoopOne():
     
 
 if __name__ == "__main__":
-   LoopOne()   
-   period = 10
+   #LoopOne()   
  
-   LoopOne()   
    period = 15
    LoopOne() #big butterfly  
    Displaybutterfly() #fibonacci.py 

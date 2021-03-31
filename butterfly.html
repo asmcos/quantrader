@@ -53,7 +53,7 @@
 
     <div class="form-row">
         <div class="form-group col-lg-12">
-            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+            <!--button type="submit" class="btn btn-primary btn-sm">Add</button-->
         </div>
     </div>
 
@@ -130,6 +130,13 @@
   </body>
     <script>
 
+    function approx(r1,r2){
+        if (0.9<(r1 / r2) && (r1/ r2)<1.1){
+            return " ->√"
+        } 
+        return ""
+        
+    }
    const VueApp = {
       data() {
         return {
@@ -149,41 +156,47 @@
         // `this` 指向 vm 实例
         result = this.A - (this.A-this.X)*0.384
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.B)
+        return result.toFixed(3) + pre
         },
          XA618: function () {
         // `this` 指向 vm 实例
         result = this.A - (this.A-this.X)*0.618
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.B)
+        return result.toFixed(3) + pre
         },
         XA786: function () {
         // `this` 指向 vm 实例
         result= this.A - (this.A-this.X)*0.786
 
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.B)
+        return result.toFixed(3) + pre
         },
         XA127: function () {
         // `this` 指向 vm 实例
-        result= this.A - (this.A-this.X)*127
+        result= this.A - (this.A-this.X)*1.27
 
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
         XA1618: function () {
         // `this` 指向 vm 实例
-        result= this.A - (this.A-this.X)*1618
+        result= this.A - (this.A-this.X)*1.618
 
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
         XA224: function () {
         // `this` 指向 vm 实例
-        result= this.A - (this.A-this.X)*224
+        result= this.A - (this.A-this.X)*2.24
 
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
 
 
@@ -191,54 +204,68 @@
 
         AB382: function () {
         // `this` 指向 vm 实例
-        result = this.B + (this.A-this.B)*0.384
+        B = parseFloat(this.B)
+        A = parseFloat(this.A)
+        result = B +  (A-B) * 0.382 
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.C)
+        return result.toFixed(3) + pre
         },
          AB618: function () {
         // `this` 指向 vm 实例
-        result = this.B + (this.A-this.B)*0.618
+        B = parseFloat(this.B)
+        A = parseFloat(this.A)
+        result = B + (A-B)*0.618
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.C)
+        return result.toFixed(3) + pre
         },
         AB786: function () {
         // `this` 指向 vm 实例
-        result= this.B + (this.A-this.B)*0.786
+        B = parseFloat(this.B)
+        A = parseFloat(this.A)
+        result= B + (A-B)*0.786
 
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.C)
+        return result.toFixed(3) + pre
         },
 
         BC618: function () {
         // `this` 指向 vm 实例
         result = this.C - (this.C-this.B)*0.618
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
         BC786: function () {
         // `this` 指向 vm 实例
         result = this.C - (this.C-this.B)*0.786
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
         BC127: function () {
         // `this` 指向 vm 实例
         result = this.C - (this.C-this.B)*1.27
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
 
         BC1618: function () {
         // `this` 指向 vm 实例
         result = this.C - (this.C-this.B)*1.618
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
         BC224: function () {
         // `this` 指向 vm 实例
-        result = this.C - (this.C-this.B)*0.224
+        result = this.C - (this.C-this.B)*2.24
         result =parseFloat(result)
-        return result.toFixed(3)
+        pre = approx(result,this.D)
+        return result.toFixed(3) + pre
         },
 
 
