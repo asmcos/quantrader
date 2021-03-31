@@ -116,6 +116,29 @@ def addbutterfly(butter):
             return
     butterflylist.append(butter)
 
+def dumpDown(high,low,opt):
+    ratio =  (high-opt)/(high-low)
+    ratio = float("%.3f"%ratio)
+    print (ratio)
+    return ratio 
+
+def dumpUp(high,low,opt):
+    ratio =  (opt-low)/(high-low)
+    ratio = float("%.3f"%ratio)
+    print (ratio)
+    return ratio 
+
+def dumpratio(x1,a1,b1,c1,d1):
+    print(x1,a1,b1,c1,d1)
+    print("xa->b")
+    dumpDown(a1,x1,b1)
+    print("ab->c")
+    dumpUp(a1,b1,c1)
+    print("bc->d")
+    dumpDown(c1,b1,d1)
+    print("xa->d")
+    dumpDown(a1,x1,d1)
+    
 def Displaybutterfly():
     for i in butterflylist:
         print("=====================================================")
@@ -133,6 +156,9 @@ def Displaybutterfly():
         print("==================================\==================")
         print("=====================================\===============")
         print("=========================================D===========")
+        x1,a1,b1,c1,d1 = i[6]
+        dumpratio(x1,a1,b1,c1,d1)
+
 #-X=2.3 -A=5.1 -B=2.89 -C=4.6 -D=1.5
 def bullish_butterfly(x1,a1,b1,c1,d1):
     okb = False
@@ -195,7 +221,9 @@ def bullish_butterfly(x1,a1,b1,c1,d1):
         print("==================================\==================")
         print("=====================================\===============")
         print("=========================================D===========")
-        addbutterfly([XD[6],XD[0],AD[0],BD[0],CD[0],DD[0]])
+        point5 = [x1,a1,b1,c1,d1]
+        addbutterfly([XD[6],XD[0],AD[0],BD[0],CD[0],DD[0],point5])
+        dumpratio(x1,a1,b1,c1,d1)
          
 #bullish_butterfly(X,A,B,C,D)
 

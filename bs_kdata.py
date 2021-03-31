@@ -85,7 +85,7 @@ def LoopOne():
     
 
 if __name__ == "__main__":
-   #LoopOne()   
+   LoopOne()   
  
    period = 15
    LoopOne() #big butterfly  
