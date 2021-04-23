@@ -34,8 +34,12 @@ def td9(code,name,datas):
         if isgt(datas[i-4:i+1]):
             gtstatus += 1
             if gtstatus > 3 and i == (len(datas)-1):
-                print(OKBLUE,datas.date[datas.index[i]],gtstatus,ENDC)
-                result_list.append([code,name,datas.date[datas.index[i]],gtstatus])
+                turn = datas.turn[datas.index[i]]
+                volume = datas.volume[datas.index[i]]
+                hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
+                hqltsz = float('%.2f' % hqltsz)
+                print(OKBLUE,datas.date[datas.index[i]],gtstatus,turn,volume,hqltsz,ENDC)
+                result_list.append([name,code,datas.date[datas.index[i]],gtstatus,hqltsz])
         else:
             gtstatus = 0
 
@@ -44,7 +48,12 @@ def display():
     for i in result_list:
         print(i)
 
+def save():
+        df = pd.DataFrame(result_list, columns = ['name','code','date','9转第N天','流通股值'])
+        save_df_tohtml('./datas/stock_'+endday+"9dt.html",df)
+
 if __name__ == "__main__":
     init_stock_list()
     loop_all(td9)
     display()
+    save()

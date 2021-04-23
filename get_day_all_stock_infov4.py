@@ -19,13 +19,15 @@ import requests
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--display", help="显示本地数据",default='0')
-parser.add_argument("--ishtml", help="生成html格式",default='0')
+parser.add_argument("--ishtml", help="生成html格式",default='1')
 parser.add_argument("--save_db", help="存储到远程数据库",default='0')
+parser.add_argument("--file", help="存文件",default='0')
 parser.add_argument("--endday", help="日期",default='0')
 args = parser.parse_args()
 
 display = args.display
 ishtml = args.ishtml
+filename = args.file
 save_db = args.save_db
 endday = args.endday
 
@@ -38,6 +40,9 @@ lg = bs.login()
 today = datetime.now()
 if endday== '0':
 	endday = str(today.year) + str(today.month) + str(today.day)
+
+if filename == '0':
+    filename = './datas/stock_'+endday+'.html'
 	
 # print 打印color 表
 HEADER = '\033[95m'
@@ -134,11 +139,16 @@ def display_save_data():
         #print(df.iloc[0:200]
         #    .reset_index(drop=True)
         #    .style.set_table_attributes('border="1" class="table"').render())
-        print(df.iloc[0:200].to_html(escape=False))
+        from common.common import save_file
+        content = "当日涨幅榜单:\n"
+        content += df.iloc[0:200].to_html(escape=False)
+        content += "当日涨幅榜，之前超跌榜\n"
         print("当日涨幅榜，之前超跌榜")
         
         df = df.iloc[0:200].sort_values(by="百日涨跌",ascending=True)
         print(df.to_html(escape=False))
+        print("save to file:",filename)
+        save_file(filename,content + df.to_html(escape=False))
     else:
         print(df.iloc[0:200])
     print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")

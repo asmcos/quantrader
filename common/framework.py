@@ -16,6 +16,34 @@ stocklist=[]
 
 bs.login()
 
+def create_clickable_code(code):
+    code = code.replace(".","")
+    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
+def create_clickable_name(name):
+    url_template= '''<a href="http://so.eastmoney.com/News/s?keyword={name}" target="_blank"><font color="blue">{name}</font></a>'''.format(name=name)
+    return url_template
+
+def create_color_rise1(rise):
+    url_template= '''<font color="#ef4136">{rise}</font></a>'''.format(rise=rise)
+    return url_template
+
+def create_color_hqltgz(hqltsz):
+    if hqltsz > 80.0:
+        url_template= '''<font color="#ef4136">{hqltsz}</font></a>'''.format(hqltsz=hqltsz)
+    else:
+        url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
+    return url_template
+
+def save_df_tohtml(filename,df):
+        df['代码'] = df['code'].apply(create_clickable_code)
+        df['名称'] = df['name'].apply(create_clickable_name)
+        df['流通股值'] = df['流通股值'].apply(create_color_hqltgz)
+        del df['code']
+        del df['name']
+        content = df.to_html(escape=False)
+        save_file(filename,content)
+
 def get_data(name,code,start,end):
     mnlist = []
     rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
