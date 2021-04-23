@@ -81,7 +81,7 @@ def LoopOne():
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data(name,code,"2020-08-20",today,"3")
+        get_data(name,code,"2020-12-01",today,"3")
     
 
 if __name__ == "__main__":

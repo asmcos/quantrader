@@ -1,9 +1,11 @@
 from .common import *
 import baostock as bs
+import talib
 
 # print 打印color 表
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
+OKRED = '\033[31m'
 OKGREEN = '\033[92m'
 WARNING = '\033[93m'
 FAIL = '\033[91m'
@@ -43,6 +45,37 @@ def save_df_tohtml(filename,df):
         del df['name']
         content = df.to_html(escape=False)
         save_file(filename,content)
+
+def get_mnlist(datas,period=3):
+    mnlist = []
+    closes = datas['close']
+    dates = datas['date']
+
+    for i in range(period,len(dates)-period):
+        m = talib.MAX(closes[i-period:i+period],len(closes[i-period:i+period]))
+        n = talib.MIN(closes[i-period:i+period],len(closes[i-period:i+period])) #d 是最近时间，所以D不能往后太多
+        m1 = m.values[-1]
+        n1 = n.values[-1]
+        if float(m1) == float(closes[i]):
+            #print("max",dates[i],closes[i])
+            mnlist.append([1,datas.values[i],float(closes.values[i])])
+        if float(n1) == float(closes[i]):
+            #print("min",dates[i],closes[i],i,closes[i-period:i+5])
+            mnlist.append([0,datas.values[i],float(closes.values[i])])
+
+
+    # 追加D发现最近的D 
+    for i in range(len(dates)-period,len(dates)-1):
+      try:
+        n = talib.MIN(closes[i-period:i+2],len(closes[i-period:i+2])) #d 是最近时间，所以D不能往后太多
+        n1 = n.values[-1]
+        if float(n1) == float(closes[i]):
+            #print("min",dates[i],closes[i])
+            mnlist.append([0,datas.values[i],float(closes.values[i])])
+      except:
+            pass
+    return mnlist
+
 
 def get_data(name,code,start,end):
     mnlist = []

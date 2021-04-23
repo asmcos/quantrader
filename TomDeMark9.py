@@ -1,6 +1,7 @@
 from common.framework import *
 
-result_list = []
+resultgt_list = []
+resultlt_list = []
 #greater than 大于
 def isgt(dts):
     i1 = dts.index[-1]
@@ -22,7 +23,23 @@ def isgt(dts):
 
 #less than 小于
 def islt(dts):
-    pass
+    i1 = dts.index[-1]
+    i2 = dts.index[-2]
+    i3 = dts.index[-3]
+    i4 = dts.index[-4]
+    i5 = dts.index[-5]
+
+    if (dts.close[i1] < dts.close[i2]
+        and
+       dts.close[i1] < dts.close[i3]
+        and
+       dts.close[i1] < dts.close[i4]
+        and
+       dts.close[i1] < dts.close[i5]):
+        return True
+    else:
+        return False
+
 
 def td9(code,name,datas):
     print(code,name)
@@ -38,18 +55,29 @@ def td9(code,name,datas):
                 volume = datas.volume[datas.index[i]]
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
                 hqltsz = float('%.2f' % hqltsz)
-                print(OKBLUE,datas.date[datas.index[i]],gtstatus,turn,volume,hqltsz,ENDC)
-                result_list.append([name,code,datas.date[datas.index[i]],gtstatus,hqltsz])
+                print(OKRED,datas.date[datas.index[i]],gtstatus,turn,volume,hqltsz,ENDC)
+                resultgt_list.append([name,code,datas.date[datas.index[i]],gtstatus,hqltsz])
         else:
             gtstatus = 0
 
-        islt(datas[i-5:i])
+        if islt(datas[i-4:i+1]):
+            ltstatus += 1
+            if ltstatus > 3 and i == (len(datas)-1):
+                turn = datas.turn[datas.index[i]]
+                volume = datas.volume[datas.index[i]]
+                hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
+                hqltsz = float('%.2f' % hqltsz)
+                print(OKGREEN,datas.date[datas.index[i]],ltstatus,turn,volume,hqltsz,ENDC)
+                resultlt_list.append([name,code,datas.date[datas.index[i]],ltstatus,hqltsz])
+    
+        else:
+            ltstatus = 0    
 def display():
-    for i in result_list:
+    for i in resultgt_list  + resultlt_list:
         print(i)
 
 def save():
-        df = pd.DataFrame(result_list, columns = ['name','code','date','9转第N天','流通股值'])
+        df = pd.DataFrame(resultgt_list +[['0','sh.0000','0',1,10.0]]+ resultlt_list, columns = ['name','code','date','9转第N天','流通股值'])
         save_df_tohtml('./datas/stock_'+endday+"9dt.html",df)
 
 if __name__ == "__main__":
