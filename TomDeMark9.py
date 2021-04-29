@@ -11,12 +11,13 @@ def isgt(dts):
     i5 = dts.index[-5]
 
     if (dts.close[i1] > dts.close[i2]
-        and 
-       dts.close[i1] > dts.close[i3]
-        and 
-       dts.close[i1] > dts.close[i4]
-        and 
-       dts.close[i1] > dts.close[i5]):
+       #and 
+       #dts.close[i1] > dts.close[i3]
+       # and 
+       #dts.close[i1] > dts.close[i4]
+       # and 
+       #dts.close[i1] > dts.close[i5]
+       ):
         return True
     else:
         return False
@@ -30,12 +31,13 @@ def islt(dts):
     i5 = dts.index[-5]
 
     if (dts.close[i1] < dts.close[i2]
-        and
-       dts.close[i1] < dts.close[i3]
-        and
-       dts.close[i1] < dts.close[i4]
-        and
-       dts.close[i1] < dts.close[i5]):
+       # and
+       #dts.close[i1] < dts.close[i3]
+       # and
+       #dts.close[i1] < dts.close[i4]
+       # and
+       #dts.close[i1] < dts.close[i5]):
+       ):
         return True
     else:
         return False
@@ -50,7 +52,7 @@ def td9(code,name,datas):
     for i in range(5,len(datas)):
         if isgt(datas[i-4:i+1]):
             gtstatus += 1
-            if gtstatus > 3 and i == (len(datas)-1):
+            if gtstatus > 2 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
@@ -62,7 +64,7 @@ def td9(code,name,datas):
 
         if islt(datas[i-4:i+1]):
             ltstatus += 1
-            if ltstatus > 3 and i == (len(datas)-1):
+            if ltstatus > 2 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 

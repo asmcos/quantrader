@@ -77,6 +77,29 @@ def get_mnlist(datas,period=3):
     return mnlist
 
 
+def get_day_data(name,code,start,end):
+    
+    
+    try:
+        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+            params={"code":code,"start":start,"limit":0},timeout=1000).json()
+    except:
+        time.sleep(2)
+        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+            params={"code":code,"start":start,"limit":0},timeout=1000).json()
+
+    df = pd.io.json.json_normalize(json)
+
+    if len(df) < 2:
+       return df
+    df = df.drop(columns=['_id','codedate'])
+    df = df.sort_values(by="date",ascending=True)
+
+    print(len(df),df.date[df.index[-1]])
+    return df
+
+
+
 def get_data(name,code,start,end):
     mnlist = []
     rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
@@ -85,8 +108,6 @@ def get_data(name,code,start,end):
     if len(datas) < 2:
         return [] 
     print(len(datas),datas.date[datas.index[-1]])
-    closes = datas['close']
-    dates = datas['date']
     return datas
 
 def getstockinfo(stock):
@@ -100,7 +121,7 @@ def loop_all(callback):
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        datas = get_data(name,code,start,today)
+        datas = get_day_data(name,code,start,today)
         callback(code,name,datas)
 
 def init_stock_list():
