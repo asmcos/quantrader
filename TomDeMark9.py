@@ -5,12 +5,12 @@ resultlt_list = []
 #greater than 大于
 def isgt(dts):
     i1 = dts.index[-1]
-    i2 = dts.index[-2]
-    i3 = dts.index[-3]
-    i4 = dts.index[-4]
+    #i2 = dts.index[-2]
+    #i3 = dts.index[-3]
+    #i4 = dts.index[-4]
     i5 = dts.index[-5]
 
-    if (dts.close[i1] > dts.close[i2]
+    if (dts.close[i1] > dts.close[i5]
        #and 
        #dts.close[i1] > dts.close[i3]
        # and 
@@ -25,12 +25,12 @@ def isgt(dts):
 #less than 小于
 def islt(dts):
     i1 = dts.index[-1]
-    i2 = dts.index[-2]
-    i3 = dts.index[-3]
-    i4 = dts.index[-4]
+    #i2 = dts.index[-2]
+    #i3 = dts.index[-3]
+    #i4 = dts.index[-4]
     i5 = dts.index[-5]
 
-    if (dts.close[i1] < dts.close[i2]
+    if (dts.close[i1] < dts.close[i5]
        # and
        #dts.close[i1] < dts.close[i3]
        # and
@@ -52,7 +52,7 @@ def td9(code,name,datas):
     for i in range(5,len(datas)):
         if isgt(datas[i-4:i+1]):
             gtstatus += 1
-            if gtstatus > 2 and i == (len(datas)-1):
+            if gtstatus > 3 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
@@ -64,7 +64,7 @@ def td9(code,name,datas):
 
         if islt(datas[i-4:i+1]):
             ltstatus += 1
-            if ltstatus > 2 and i == (len(datas)-1):
+            if ltstatus > 3 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
