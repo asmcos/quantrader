@@ -12,6 +12,7 @@ import os
 import json
 import argparse
 import requests
+import time
 # 判断是否 是显示，还是重新下载数据计算
 # 数据每天只需要下载一次
 
@@ -66,24 +67,30 @@ def get_data_post_server(name,code,start,end,adj):
         del d['index']
     #print(jsondatas)
 	#requests.post("http://127.0.0.1:3000/stock/updatedayk",json=jsondatas)
-    requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas)
+    try:
+        requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas,timeout=2000)
+    except:
+        time.sleep(2)
+        requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas,timeout=2000)
+        
 #获取股票的名字和代码号
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
-    d,code,name,skip1,skip2,HQLTSZ= stock.split(',')
+    d,code,name,skip1,skip2= stock.split(',')
     return code,name
 
 
 
 
 # 判断是否已经下载了股票分类代码
+filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 
-if not os.path.exists('./datas/stock_industry_check.csv'):
+if not os.path.exists(filename_sl):
     print('正在下载股票库列表....')
     os.system('python3 bs_get_industry_check.py')
 
-stocklist = open('./datas/stock_industry_check.csv').readlines()
+stocklist = open(filename_sl).readlines()
 stocklist = stocklist[1+int(offset):] #删除第一行
 
 
@@ -91,4 +98,4 @@ if __name__ == "__main__":
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data_post_server(name,code,"2021-03-20",today,"3")
+        get_data_post_server(name,code,"2021-04-10",today,"3")

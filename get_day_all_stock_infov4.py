@@ -128,9 +128,10 @@ def display_save_data():
     df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
 	
     del df['序号']
-    df = df.set_index('date')
+    #df = df.set_index('date')
     print("当日涨幅榜单:")
-    df = df.sort_values(by="当日涨跌",ascending=False)
+    df = df.sort_values(by="当日涨跌",ascending=False).reset_index()
+    del df['index']
     if ishtml == "1":
         df['代码'] = df['代码'].apply(create_clickable_code)
         df['名称'] = df['名称'].apply(create_clickable_name)
@@ -215,7 +216,7 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqlts
 def getstockinfo(stock):
 	#2019-12-09,sz.002094,青岛金王,化工,申万一级行业
 	# 时间，股票代码，名称，类别
-	d,code,name,industry,skip2,hqltsz = stock.split(',')
+	d,code,name,industry,skip2= stock.split(',')
 	return code,name,industry
 
 #获取所有的股票并下载数据
@@ -261,12 +262,13 @@ signal.signal(signal.SIGTERM, handler)
 q = queue.Queue()
 
 # 判断是否已经下载了股票分类代码
+filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 
-if not os.path.exists('./datas/stock_industry_check.csv'):
+if not os.path.exists(filename_sl):
 	print('正在下载股票库列表....')
 	os.system('python3 bs_get_industry_check.py')
 
-stocklist = open('./datas/stock_industry_check.csv').readlines()
+stocklist = open(filename_sl).readlines()
 stocklist = stocklist[1:] #删除第一行
 
 # 判断是仅仅显示，还是需要下载数据计算

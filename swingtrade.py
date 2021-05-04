@@ -5,14 +5,13 @@ from common.framework import *
 result_list = []
 
 #近似值，考虑有一点浮动
-approx = 0.05
+approx = 0.0
 
 def up(datas):
     a = datas[-1][2]
     b = datas[-2][2]
     c = datas[-3][2]
-    approx = 1 - approx 
-    if (a*approx >b and b*approx > c):
+    if (a > b and b > c):
         return True
     else :
         return False
@@ -29,12 +28,11 @@ def swing(code,name,datas):
     length = len(mnlist)
 
     # 寻找一个强上升趋势 上升空间 20%
-
     for i in range(0,len(mnlist)-1):
         if mnlist[i][0] == 0 and mnlist[i+1][0] == 1:    
             a = mnlist[i][2] #close value
             b = mnlist[i+1][2] # close value
-            if (b / a) > 1.5:
+            if (b / a) > 1.4:
                 print(OKRED,b / a ,a,b,ENDC)
                 mnlist1 = mnlist[i:]                
                 break
@@ -62,16 +60,23 @@ def swing(code,name,datas):
             count = 0
         if count > 1:
             print(OKBLUE,name,code,nlist[i-2][2],nlist[i-1][2],nlist[i][2],ENDC)
-
+            turn = nlist[i][3].turn
+            volume = nlist[i][3].volume
+            date = nlist[i][3].date
+            close = nlist[i][2]
+            hqltsz = float(close) * float(volume) / float(turn) / 1000000
+            hqltsz = float('%.2f' % hqltsz)
+            result_list.append([name,code,date,hqltsz])
 def display():
     for i in result_list:
         print(i)
 
 def save():
-        df = pd.DataFrame(result_list ,columns = ['name','code','date','9转第N天','流通股值'])
+        df = pd.DataFrame(result_list ,columns = ['name','code','date','流通股值'])
         save_df_tohtml('./datas/stock_'+endday+"swing.html",df)
 
 if __name__ == "__main__":
     init_stock_list()
     loop_all(swing)
     display()
+    save()

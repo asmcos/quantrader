@@ -18,6 +18,10 @@ stocklist=[]
 
 bs.login()
 
+
+#
+# pandas 转化html是可以定制化渲染，增加可以点击，颜色等
+#
 def create_clickable_code(code):
     code = code.replace(".","")
     url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
@@ -36,7 +40,10 @@ def create_color_hqltgz(hqltsz):
     else:
         url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
     return url_template
+######################################
 
+
+#pandas 格式变成html格式
 def save_df_tohtml(filename,df):
         df['代码'] = df['code'].apply(create_clickable_code)
         df['名称'] = df['name'].apply(create_clickable_name)
@@ -46,6 +53,9 @@ def save_df_tohtml(filename,df):
         content = df.to_html(escape=False)
         save_file(filename,content)
 
+
+
+#简单的计算某个周期内的最大值和最小值
 def get_mnlist(datas,period=3):
     mnlist = []
     closes = datas['close']
@@ -58,10 +68,10 @@ def get_mnlist(datas,period=3):
         n1 = n.values[-1]
         if float(m1) == float(closes[i]):
             #print("max",dates[i],closes[i])
-            mnlist.append([1,datas.values[i],float(closes.values[i])])
+            mnlist.append([1,datas.values[i],float(closes.values[i]),datas.iloc[i]])
         if float(n1) == float(closes[i]):
             #print("min",dates[i],closes[i],i,closes[i-period:i+5])
-            mnlist.append([0,datas.values[i],float(closes.values[i])])
+            mnlist.append([0,datas.values[i],float(closes.values[i]),datas.iloc[i]])
 
 
     # 追加D发现最近的D 
@@ -71,12 +81,12 @@ def get_mnlist(datas,period=3):
         n1 = n.values[-1]
         if float(n1) == float(closes[i]):
             #print("min",dates[i],closes[i])
-            mnlist.append([0,datas.values[i],float(closes.values[i])])
+            mnlist.append([0,datas.values[i],float(closes.values[i]),datas.iloc[i]])
       except:
             pass
     return mnlist
 
-
+#从zhanluejia获取日K
 def get_day_data(name,code,start,end):
     
     
@@ -99,9 +109,8 @@ def get_day_data(name,code,start,end):
     return df
 
 
-
+#从bs获取日K数据
 def get_data(name,code,start,end):
-    mnlist = []
     rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
                                       frequency='d' )
     datas = rs.get_data()
@@ -110,13 +119,14 @@ def get_data(name,code,start,end):
     print(len(datas),datas.date[datas.index[-1]])
     return datas
 
+# 从文件中一行数据 格式化分析出信息
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
     d,code,name,skip1,skip2,HQLTSZ= stock.split(',')
     return code,name
 
-
+#循环调用A股所有的股票
 def loop_all(callback):
      for stock in stocklist:
         code ,name = getstockinfo(stock)
@@ -124,6 +134,7 @@ def loop_all(callback):
         datas = get_day_data(name,code,start,today)
         callback(code,name,datas)
 
+#从csv文件列表中获取A股所有的股票信息
 def init_stock_list():
     global stocklist
 

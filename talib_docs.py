@@ -61,7 +61,28 @@ print("3日平均:\n",sma)
 ema3 = talib.EMA(closes,3)
 print("ema3:\n",ema3)
 
-# .macd
+# 双均
+# talib.DEMA(closes, timeperiod = 30)
+# 考夫曼
+# talib.KAMA(closes, timeperiod = 30)
+# 三重指数移动平均线
+# talib.TEMA(closes, timeperiod=30)
+
+# 阶段中点价格
+# 
+#midpoint = talib.MIDPOINT(closes,3)
+
+# 移动加权平均
+# talib.WMA(closes, timeperiod = 30)
+
+# 5.布林线BBANDS
+# 参数说明：talib.BBANDS(close, timeperiod, matype)
+# close:收盘价；timeperiod:周期；matype:平均方法(bolling线的middle线 = MA，用于设定哪种类型的MA)
+# MA_Type: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3 (Default=SMA)
+upper, middle, lower = talib.BBANDS(closes,5,matype = talib.MA_Type.EMA)
+print("布林线: ",upper,middle,lower)
+
+# 6 .macd
 # 注意这个日线周期要长，大家可以调整获取k线数据的周期 例如：2021-01-01
 # 另外：macd是相对的值，周期不一样，结果也不一样
 # 例子，我使用了常见的参数12,26,9
@@ -69,6 +90,23 @@ print("ema3:\n",ema3)
 # talib name: macd, macdsignal,macdhist
 df1 = get_day_data("隆基",'sh.601012','2020-02-18','')
 df1['diff'], df1['dea'], df1['macd'] = talib.MACD(df1['close'], fastperiod=12, slowperiod=26, signalperiod=9)
-print(df1)
+print("MACD 数据必须大于26天:\n",df1)
 
-# 
+print("################\n# 波动量指标\n################")
+
+# 7. ATR：真实波动幅度均值
+#
+atr = talib.ATR(df1['high'], df1['low'], df1['close'], timeperiod=14)
+print("ATR\n",atr)
+
+# 8. AD 量价指标
+ad = talib.AD(df1['high'],df1['low'],df1['close'],df1['volume'])
+print("AD\n",ad)
+
+# 9. OBV：能量潮
+obv = talib.OBV(df1['close'],df1['volume'])
+print("OBV\n",obv)
+
+
+
+ 

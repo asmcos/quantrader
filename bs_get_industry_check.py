@@ -23,6 +23,7 @@ while (rs.error_code == '0') & rs.next():
                                       frequency='d')	
     if len(kdata.get_row_data()) == 0:
         continue
+    """
     #增加流通值
     rs_profit = bs.query_profit_data(code=row[1],year=2020)
     rs_row = rs_profit.get_row_data()
@@ -31,6 +32,7 @@ while (rs.error_code == '0') & rs.next():
         print(rs_row)
     else:
         row.append(0)
+    """
     print(row)
     industry_list.append(row)	
     """ default don't save to mongodb
@@ -44,7 +46,8 @@ while (rs.error_code == '0') & rs.next():
 rs.fields.append('流通值')
 result = pd.DataFrame(industry_list, columns=rs.fields)
 # 结果集输出到csv文件
-result.to_csv("./datas/stock_industry_check.csv", index=False)
+filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
+result.to_csv(filename_sl, index=False)
 print(result)
 
 # 登出系统

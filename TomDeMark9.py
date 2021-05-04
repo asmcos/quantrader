@@ -55,8 +55,12 @@ def td9(code,name,datas):
             if gtstatus > 3 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
+                if float(turn) == 0 :
+                    continue
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
                 hqltsz = float('%.2f' % hqltsz)
+                if hqltsz < 50.0:
+                    continue
                 print(OKRED,datas.date[datas.index[i]],gtstatus,turn,volume,hqltsz,ENDC)
                 resultgt_list.append([name,code,datas.date[datas.index[i]],gtstatus,hqltsz])
         else:
@@ -67,8 +71,12 @@ def td9(code,name,datas):
             if ltstatus > 3 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
+                if float(turn) ==0 :
+                    continue
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
                 hqltsz = float('%.2f' % hqltsz)
+                if hqltsz < 50.0:
+                    continue
                 print(OKGREEN,datas.date[datas.index[i]],ltstatus,turn,volume,hqltsz,ENDC)
                 resultlt_list.append([name,code,datas.date[datas.index[i]],ltstatus,hqltsz])
     
