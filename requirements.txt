@@ -14,3 +14,4 @@ yahoo_fin
 jqdatasdk
 demjson
 click
+pytdx
