@@ -23,6 +23,8 @@ def get_bar():
         code = i[0]
         name = i[1]
         datas = api.get_index_bars(9,1, code, 0, 20)
+        if datas == None or len(datas)<1:
+            continue
         c1 = datas[-1]['close']
         d1 = datas[-1]['datetime']
         c2 = datas[-2]['close']
