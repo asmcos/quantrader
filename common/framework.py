@@ -123,7 +123,7 @@ def get_data(name,code,start,end):
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
-    d,code,name,skip1,skip2,HQLTSZ= stock.split(',')
+    d,code,name,skip1,skip2= stock.split(',')
     return code,name
 
 #循环调用A股所有的股票
@@ -134,15 +134,16 @@ def loop_all(callback):
         datas = get_day_data(name,code,start,today)
         callback(code,name,datas)
 
+filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 #从csv文件列表中获取A股所有的股票信息
 def init_stock_list():
     global stocklist
 
-    if not os.path.exists('./datas/stock_industry_check.csv'):
+    if not os.path.exists(filename_sl):
         print('正在下载股票库列表....')
         os.system('python3 bs_get_industry_check.py')
 
-    stocklist = open('./datas/stock_industry_check.csv').readlines()
+    stocklist = open(filename_sl).readlines()
     stocklist = stocklist[1+int(offset):] #删除第一行
     return stocklist
 
