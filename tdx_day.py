@@ -4,6 +4,7 @@ from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.framework import * 
 from common.common import today
+import json
 
 api = TdxHq_API()
 
@@ -21,7 +22,10 @@ def get_bar(name,code):
     if datas == None :
        return
     df = api.to_df(datas)
-    print(df)
+    #print(df)
+    print(len(df),df.datetime[df.index[-1]],df.iloc[0])
+    df = df.to_json(orient='table')
+    jsondatas = json.loads(df)['data']
 
 if api.connect('119.147.212.81', 7709):
 
