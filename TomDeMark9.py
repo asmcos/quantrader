@@ -88,6 +88,7 @@ def display():
 
 def save():
         df = pd.DataFrame(resultgt_list +[['0','sh.0000','0',1,10.0]]+ resultlt_list, columns = ['name','code','date','9转第N天','流通股值'])
+        print("保存在",'./datas/stock_'+endday+"9dt.html")
         save_df_tohtml('./datas/stock_'+endday+"9dt.html",df)
 
 if __name__ == "__main__":
