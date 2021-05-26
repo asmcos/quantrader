@@ -6,7 +6,7 @@ from common.framework import *
 from common.common import endday 
 import json
 
-api = TdxHq_API()
+api = TdxHq_API(auto_retry=True)
 
 
 def get_bar(name,code):
@@ -20,11 +20,11 @@ def get_bar(name,code):
     print(name,code1)
     datas = api.get_security_bars(9,zone,code1, 0, 2)
     info = api.get_finance_info(zone, code1)  
-    liutonggu = float(info['liutongguben'])
     datas = api.to_df(datas)
     if len(datas) < 2:
         return
 
+    liutonggu = float(info['liutongguben'])
     datas = datas.assign(date=datas['datetime'].apply(lambda x: str(x)[0:10])).drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)
     datas.rename(columns={'vol':'volume'},inplace = True)
 
