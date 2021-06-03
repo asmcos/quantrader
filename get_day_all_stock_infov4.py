@@ -82,7 +82,7 @@ def create_color_rise1(rise):
     return url_template
 
 def create_color_hqltgz(hqltsz):
-    if hqltsz > 80.0:
+    if hqltsz >= 300.0:
         url_template= '''<font color="#ef4136">{hqltsz}</font></a>'''.format(hqltsz=hqltsz)
     else:
         url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
@@ -155,12 +155,15 @@ def display_save_data():
     print("注：当日涨跌是date日期和他前一个交易日比较,百日涨跌是date日期和100天的股价比较")
 
 def get_day_data(code,name):
+
+    #json = requests.get("http://127.0.0.1:1337/dayks",
+    #    	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
     try:
-        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        json = requests.get("http://klang.zanluejia.net.cn/dayks",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
     except:
         time.sleep(2)
-        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
 		
     df = pd.io.json.json_normalize(json)

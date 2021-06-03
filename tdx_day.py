@@ -18,7 +18,7 @@ def get_bar(name,code):
         zone = 1
     
     print(name,code1)
-    datas = api.get_security_bars(9,zone,code1, 0, 2)
+    datas = api.get_security_bars(9,zone,code1, 0, 343)
     info = api.get_finance_info(zone, code1)  
     datas = api.to_df(datas)
     if len(datas) < 2:
@@ -38,10 +38,10 @@ def get_bar(name,code):
         del d['index']
     #print(jsondatas)
     try:
-        requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas,timeout=2000)
+        requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
     except:
         time.sleep(2)
-        requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas,timeout=2000)
+        requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
 
 if api.connect('119.147.212.81', 7709):
 

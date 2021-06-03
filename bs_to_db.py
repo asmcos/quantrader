@@ -66,12 +66,13 @@ def get_data_post_server(name,code,start,end,adj):
         d['name'] = name
         del d['index']
     #print(jsondatas)
-	#requests.post("http://127.0.0.1:3000/stock/updatedayk",json=jsondatas)
+    #resp = requests.post("http://127.0.0.1:1337/dayks/updates",json=jsondatas)
+    #print(resp.content)
     try:
-        requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas,timeout=2000)
+        requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
     except:
         time.sleep(2)
-        requests.post("http://zhanluejia.net.cn/stock/updatedayk",json=jsondatas,timeout=2000)
+        requests.post("http://zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
         
 #获取股票的名字和代码号
 def getstockinfo(stock):
@@ -98,4 +99,4 @@ if __name__ == "__main__":
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data_post_server(name,code,"2021-04-10",today,"3")
+        get_data_post_server(name,code,"2020-01-01",today,"3")
