@@ -72,7 +72,7 @@ def get_data_post_server(name,code,start,end,adj):
         requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
     except:
         time.sleep(2)
-        requests.post("http://zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
+        requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
         
 #获取股票的名字和代码号
 def getstockinfo(stock):

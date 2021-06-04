@@ -159,13 +159,13 @@ def get_day_data(code,name):
     #json = requests.get("http://127.0.0.1:1337/dayks",
     #    	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
     try:
-        json = requests.get("http://klang.zanluejia.net.cn/dayks",
+        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
     except:
         time.sleep(2)
         json = requests.get("http://klang.zhanluejia.net.cn/dayks",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
-		
+	
     df = pd.io.json.json_normalize(json)
 	
     if len(df) < 2:
