@@ -119,6 +119,15 @@ def get_data(name,code,start,end):
     print(len(datas),datas.date[datas.index[-1]])
     return datas
 
+#从bs获取60min K数据
+def get_60_data(name,code,start,end):
+    rs = bs.query_history_k_data_plus(code, 'date,time,open,high,low,close,volume,code', start_date=start,
+                                      frequency='60' )
+    datas = rs.get_data()
+    if len(datas) < 2:
+        return [] 
+    print(len(datas),datas.date[datas.index[-1]])
+    return datas
 # 从文件中一行数据 格式化分析出信息
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
@@ -133,6 +142,15 @@ def loop_all(callback):
         print('正在获取',name,'代码',code)
         datas = get_day_data(name,code,start,today)
         callback(code,name,datas)
+
+
+def loop_60all(callback):
+     for stock in stocklist:
+        code ,name = getstockinfo(stock)
+        print('正在获取',name,'代码',code)
+        datas = get_60_data(name,code,start,today)
+        callback(code,name,datas)
+    
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 #从csv文件列表中获取A股所有的股票信息
