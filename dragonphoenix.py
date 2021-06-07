@@ -43,12 +43,16 @@ def dp(code,name,datas):
     df1['K'],df1['D'] = KD(df1['high'], df1['low'], df1['close'], fastk=55, slowk=13, slowd=8)
     #print("kd",CrossUp(df1['K'].values,df1['D'].values))
 
-
+    distance = 0
     for i in range(10,len(datas)):
         ma = CrossUp(df1['diff'].values[:i],df1['dea'].values[:i])
         kd = CrossUp(df1['K'].values[:i],df1['D'].values[:i])
-        if ma and kd:
-            print(ma,kd,datas['time'].iloc[i])
+        if ma or kd:
+            if ma and kd : distance = 0
+            print(OKGREEN,ma,kd,datas['time'].iloc[i],distance,ENDC)
+            distance = 0
+
+        distance += 1
 
 if __name__ == "__main__":
     init_stock_list()
