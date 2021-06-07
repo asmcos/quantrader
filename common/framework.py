@@ -1,7 +1,7 @@
 from .common import *
 import baostock as bs
 import talib
-
+import numpy as np
 # print 打印color 表
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
@@ -18,6 +18,33 @@ stocklist=[]
 
 bs.login()
 
+
+def SMA(data,period,period2):
+    y1 = 0
+    result = []
+    for d in data:
+        if str(d) == 'nan':
+            result.append(np.nan)
+            continue
+        y1=( period2 * d + (period-period2)*y1 )/period
+        result.append(y1) 
+    return result
+
+def KD(high,low,close,fastk,slowk,slowd):
+    """
+    RSV:=(CLOSE-LLV(LOW,N))/(HHV(HIGH,N)-LLV(LOW,N))*100;
+    K:SMA(RSV,M1,1);
+    D:SMA(K,M2,1);
+    """
+    lo = talib.MIN(low,timeperiod=fastk)
+    hi = talib.MAX(high,timeperiod=fastk)
+
+    close = close.astype('float64')
+
+    rsv = (close-lo)/(hi-lo) * 100
+    k = SMA(rsv,slowk,1)
+    d = SMA(k,slowd,1)
+    return k,d
 
 #
 # pandas 转化html是可以定制化渲染，增加可以点击，颜色等
