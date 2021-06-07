@@ -22,9 +22,54 @@ K:SMA(RSV,M1,1);
 D:SMA(K,M2,1);
 """
 
+period = 5 
+#大瀑布列表
+wflist = []
+def mn(datas,code,name):
+
+    if len(datas) < 10:
+        return []
+    mnlist = []
+    closes = datas['close']
+    dates = datas['date']
+    distance = 0
+    prev_close = -1
+    for i in range(period,len(dates)-period):
+        m = talib.MAX(closes[i-period:i+period],len(closes[i-period:i+period]))
+        n = talib.MIN(closes[i-period:i+period],len(closes[i-period:i+period])) #d 是最近时间，所以D不能往后太多
+        m1 = m.values[-1]
+        n1 = n.values[-1]
+        if float(m1) == float(closes[i]):
+            print("max",dates[i],closes[i],i-distance)
+            mnlist.append([1,datas.values[i],float(closes.values[i]),i])
+            distance = i
+            prev_close = closes[i]
+        if float(n1) == float(closes[i]):
+            print("min",dates[i],closes[i],i-distance)
+            if (i - distance) > 20 and closes[i] < prev_close: 
+                print(OKBLUE,"bigwaterfall",code,name,dates[i],i-distance,ENDC)
+                wflist.append([code,name,dates[i]])
+            mnlist.append([0,datas.values[i],float(closes.values[i]),i])
+            distance = i
+            prev_close = closes[i]
+
+ 
+    return mnlist
+
+def search_wf(code):
+    for i in wflist:
+        if i[0] == code:
+            return True
+    return False
+    
+# 搜索瀑布,统计日K
+def waterfall(code,name,datas):
+    mn(datas,code,name)
+
+#搜索 macd金叉，kd 金叉，统计60分钟线
 def dp(code,name,datas):
     print(code,name)
-    #print(datas)
+    
 
     df1 = datas #股票数据
     # 数据太少 macd 计算不准确 
@@ -35,13 +80,9 @@ def dp(code,name,datas):
     # 21,88,13
     df1['diff'], df1['dea'], df1['macd'] = talib.MACD(df1['close'], fastperiod=21, slowperiod=88, signalperiod=13)
 
-    #print(df1['diff'],df1['dea'],df1['macd'])
-    #print("macd",CrossUp(df1['dea'].values,df1['diff'].values))
-
 
     # 55,13,8
     df1['K'],df1['D'] = KD(df1['high'], df1['low'], df1['close'], fastk=55, slowk=13, slowd=8)
-    #print("kd",CrossUp(df1['K'].values,df1['D'].values))
 
     distance = 0
     for i in range(10,len(datas)):
@@ -49,11 +90,15 @@ def dp(code,name,datas):
         kd = CrossUp(df1['K'].values[:i],df1['D'].values[:i])
         if ma or kd:
             if ma and kd : distance = 0
-            print(OKGREEN,ma,kd,datas['time'].iloc[i],distance,ENDC)
+            if distance < 10:
+                print(OKGREEN,ma,kd,datas['time'].iloc[i],distance,ENDC)
+                if search_wf(code):
+                    print(OKGREEN,"dragon",name,code,datas['time'].iloc[i],ENDC)
             distance = 0
 
         distance += 1
 
 if __name__ == "__main__":
     init_stock_list()
+    loop_all(waterfall)
     loop_60all(dp)
