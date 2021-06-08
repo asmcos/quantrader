@@ -1,6 +1,10 @@
 #Dragon phoenix 龙凤呈祥
 
 from common.framework import *
+import pandas as pd
+
+
+filename = './datas/stock_dragon.html'
 
 #金叉
 def CrossUp(a,b):
@@ -66,6 +70,7 @@ def search_wf(code):
 def waterfall(code,name,datas):
     mn(datas,code,name)
 
+dragonlist=[]
 #搜索 macd金叉，kd 金叉，统计60分钟线
 def dp(code,name,datas):
     print(code,name)
@@ -77,8 +82,8 @@ def dp(code,name,datas):
         return
 
    # macd = macd * 2
-    # 21,88,13
-    df1['diff'], df1['dea'], df1['macd'] = talib.MACD(df1['close'], fastperiod=21, slowperiod=88, signalperiod=13)
+    # 21,89,13
+    df1['diff'], df1['dea'], df1['macd'] = talib.MACD(df1['close'], fastperiod=21, slowperiod=89, signalperiod=13)
 
 
     # 55,13,8
@@ -92,13 +97,31 @@ def dp(code,name,datas):
             if ma and kd : distance = 0
             if distance < 10:
                 print(OKGREEN,ma,kd,datas['time'].iloc[i],distance,ENDC)
-                if search_wf(code):
+                if search_wf(code) and df1['K'].values[i] <= 60:
                     print(OKGREEN,"dragon",name,code,datas['time'].iloc[i],ENDC)
+                    dragonlist.append([code,name,datas['time'].iloc[i]])
             distance = 0
 
         distance += 1
+
+def create_clickable_code(code):
+    code = code.replace(".","")
+    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+
+def save():
+
+    df = pd.DataFrame(dragonlist,columns=['code','name','date'])
+    df['code'] = df['code'].apply(create_clickable_code)
+
+    content ='龙凤呈祥\n'
+    content += df.to_html(escape=False,float_format='%.2f')
+
+    print("save file",filename)
+    save_file(filename,content)
+ 
 
 if __name__ == "__main__":
     init_stock_list()
     loop_all(waterfall)
     loop_60all(dp)
+    save()

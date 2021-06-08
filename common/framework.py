@@ -118,11 +118,11 @@ def get_day_data(name,code,start,end):
     
     
     try:
-        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
             params={"code":code,"start":start,"limit":0},timeout=1000).json()
     except:
         time.sleep(2)
-        json = requests.get("http://zhanluejia.net.cn/stock/getdayK",
+        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
             params={"code":code,"start":start,"limit":0},timeout=1000).json()
 
     df = pd.io.json.json_normalize(json)
@@ -130,9 +130,10 @@ def get_day_data(name,code,start,end):
     if len(df) < 2:
        return df
     df = df.drop(columns=['_id','codedate'])
-    df = df.sort_values(by="date",ascending=True)
-
-    print(len(df),df.date[df.index[-1]])
+    df = df.sort_values(by="date",ascending=True).reset_index()
+    del df['index']
+    
+    print(len(df),df.date.iloc[-1])
     return df
 
 
@@ -164,6 +165,7 @@ def getstockinfo(stock):
 
 #循环调用A股所有的股票
 def loop_all(callback):
+     bs.login()
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
@@ -172,6 +174,7 @@ def loop_all(callback):
 
 
 def loop_60all(callback):
+     bs.login()
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)

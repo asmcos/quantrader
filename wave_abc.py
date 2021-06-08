@@ -11,25 +11,15 @@ from common.framework import *
 import numpy as np
 
 #金叉
-def CrossUp(a,b,state):
-    if a > b :
-        if state == 0:
-            return True,1
-        return False,1     
-    else:
-        return False,0
-#死叉    
-def CrossDown(a,b,state):
-    if (a < b):
-        if state == 1:
-            return True,0
-        return False,0
-    else:
-        return False,1
+def CrossUp(a,b):
+    if a[-1] >= b[-1] and a[-2] < b[-2]:
+        return True
+    return False
 
-
+resultlist = []
 def wave_abc(code,name,datas):
-    state = 2
+
+    print(code,name) 
 
     df1 = datas #股票数据
     # 数据太少 macd 计算不准确 
@@ -43,27 +33,28 @@ def wave_abc(code,name,datas):
     #计算 MACD 高点附近
     macd1_approx = talib.MAX(np.abs(df1['macd'].values),30)*0.7
 
-    for i in range(1,len(df1)):
-        dk = df1.iloc[i] #交叉后一个交易周期
-        dk1 = df1.iloc[i-1]#交叉交易日
+    status = 0
+    for i in range(1,len(df1)-1):
+        dk = df1.iloc[i-1:i+1] #交叉后一个交易周期
+        if CrossUp(dk['diff'].values,dk['dea'].values):
+            if abs(df1['diff'].iloc[i])  < abs(macd0_approx[i]*2) and status == 4:
+                print(OKBLUE,"0Cross轴金叉",code,name,df1.date.iloc[i],abs(df1['diff'].iloc[i]),ENDC)
+                resultlist.append([code,name,df1.date.iloc[i]])
+            else:
+                status = 1
+        #死叉
+        if CrossUp(dk['dea'].values,dk['diff'].values):
+            if abs(df1['diff'].iloc[i])  > abs(macd1_approx[i]*2) :
+                print("高位死叉",df1.date.iloc[i],abs(df1['diff'].iloc[i]))
+                status = 4
+            else:
+                status = 1
 
-        dif = float("%.2f"% dk1['diff'])
-        dea = float("%.2f"% dk1['dea'])
-        macd = float("%.2f"% dk1['macd']) * 2
-
-        up,state1 = CrossUp(dk['diff'],dk['dea'],state)
-        down,state = CrossDown(dk['diff'],dk['dea'],state)
-        if up:
-            if 0 < dif and dif < macd1_approx[i] : #0轴上方附近
-                print("金叉:",name,code,dk1['date'],dif,dea,macd)
-                
-            if 0 > dif and -dif < macd1_approx[i] : #0轴下方附近 
-                print("金叉:",name,code,dk1['date'],dif,dea,macd)
-
-        if down:
-            if 0 < dif and dif > macd1_approx[i] : #0轴高点附近
-                print("死叉:",name,code,dk1['date'],dif,dea,macd)
+def display():
+    for i in resultlist:
+        print(i)
 
 if __name__ == "__main__":
     init_stock_list()
     loop_all(wave_abc) 
+    display()
