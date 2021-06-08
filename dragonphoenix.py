@@ -113,7 +113,7 @@ def save():
 
     df = pd.DataFrame(dragonlist,columns=['code','name','date'])
     df['code'] = df['code'].apply(create_clickable_code)
-    content ='龙凤呈祥\n'
+    content ='<meta charset="utf-8">\n龙凤呈祥\n'
     content += df.to_html(escape=False,float_format='%.2f')
 
     print("save file",filename)
