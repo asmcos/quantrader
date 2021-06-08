@@ -107,12 +107,12 @@ def dp(code,name,datas):
 def create_clickable_code(code):
     code = code.replace(".","")
     url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
 
 def save():
 
     df = pd.DataFrame(dragonlist,columns=['code','name','date'])
     df['code'] = df['code'].apply(create_clickable_code)
-
     content ='龙凤呈祥\n'
     content += df.to_html(escape=False,float_format='%.2f')
 
