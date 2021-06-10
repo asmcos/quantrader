@@ -29,6 +29,8 @@ D:SMA(K,M2,1);
 period = 5 
 #大瀑布列表
 wflist = []
+#d,code,name,skip1,skip2
+wfstocklist = []
 def mn(datas,code,name):
 
     if len(datas) < 10:
@@ -53,6 +55,7 @@ def mn(datas,code,name):
             if (i - distance) > 20 and closes[i] < prev_close: 
                 print(OKBLUE,"bigwaterfall",code,name,dates[i],i-distance,ENDC)
                 wflist.append([code,name,dates[i]])
+                wfstocklist.append("1,"+code+","+name+",skip1,skip2")
             mnlist.append([0,datas.values[i],float(closes.values[i]),i])
             distance = i
             prev_close = closes[i]
@@ -123,5 +126,5 @@ def save():
 if __name__ == "__main__":
     init_stock_list()
     loop_all(waterfall)
-    loop_60all(dp)
+    loop_60all(dp,wfstocklist)
     save()

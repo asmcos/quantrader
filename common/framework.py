@@ -164,7 +164,7 @@ def getstockinfo(stock):
     return code,name
 
 #循环调用A股所有的股票
-def loop_all(callback):
+def loop_all(callback,stlist=stocklist):
      bs.login()
      for stock in stocklist:
         code ,name = getstockinfo(stock)
@@ -173,9 +173,9 @@ def loop_all(callback):
         callback(code,name,datas)
 
 
-def loop_60all(callback):
+def loop_60all(callback,stlist=stocklist):
      bs.login()
-     for stock in stocklist:
+     for stock in stlist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
         datas = get_60_data(name,code,start,today)
