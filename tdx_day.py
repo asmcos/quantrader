@@ -18,7 +18,7 @@ def get_bar(name,code):
         zone = 1
     
     print(name,code1)
-    datas = api.get_security_bars(9,zone,code1, 0, 343)
+    datas = api.get_security_bars(9,zone,code1, 0, 2)
     info = api.get_finance_info(zone, code1)  
     datas = api.to_df(datas)
     if len(datas) < 2:
@@ -34,9 +34,11 @@ def get_bar(name,code):
     for d in jsondatas:
         d['name'] = name
         d['code'] = code
-        d['turn'] = d['volume'] / (liutonggu * 100)
+        d['volume'] = d['volume'] * 100 #股 = 手*100
+        d['turn'] = float("%.4f" %(d['volume']*100 / liutonggu)) 
         del d['index']
     #print(jsondatas)
+    #print(datas.iloc[-1],liutonggu,d)
     try:
         requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
     except:
