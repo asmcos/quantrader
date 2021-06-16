@@ -49,10 +49,17 @@ def KD(high,low,close,fastk,slowk,slowd):
 #
 # pandas 转化html是可以定制化渲染，增加可以点击，颜色等
 #
+"""
 def create_clickable_code(code):
     code = code.replace(".","")
     url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
+"""
+def create_clickable_code(code):
+    code = code.replace(".","")
+    url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
+
 def create_clickable_name(name):
     url_template= '''<a href="http://so.eastmoney.com/News/s?keyword={name}" target="_blank"><font color="blue">{name}</font></a>'''.format(name=name)
     return url_template

@@ -55,7 +55,7 @@ def td9(code,name,datas):
             if gtstatus > 3 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
-                if float(turn) == 0 :
+                if volume < 1 or float(turn) == 0 :
                     continue
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
                 hqltsz = float('%.2f' % hqltsz)
@@ -71,7 +71,7 @@ def td9(code,name,datas):
             if ltstatus > 3 and i == (len(datas)-1):
                 turn = datas.turn[datas.index[i]]
                 volume = datas.volume[datas.index[i]]
-                if float(turn) ==0 :
+                if volume < 1 or float(turn) ==0 :
                     continue
                 hqltsz = float(datas.close[datas.index[i]]) * float(volume) / float(turn) / 1000000 
                 hqltsz = float('%.2f' % hqltsz)
