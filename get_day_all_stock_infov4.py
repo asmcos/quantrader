@@ -71,7 +71,7 @@ def make_save_data():
 
 def create_clickable_code(code):
     code = code.replace(".","")
-    url_template= '''<a href="http://quote.eastmoney.com/{code}.html" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 def create_clickable_name(name):
     url_template= '''<a href="http://so.eastmoney.com/News/s?keyword={name}" target="_blank"><font color="blue">{name}</font></a>'''.format(name=name)
@@ -134,7 +134,7 @@ def display_save_data():
     del df['index']
     if ishtml == "1":
         df['代码'] = df['代码'].apply(create_clickable_code)
-        df['名称'] = df['名称'].apply(create_clickable_name)
+        #df['名称'] = df['名称'].apply(create_clickable_name)
         df['当日涨跌'] = df['当日涨跌'].apply(create_color_rise1)
         df['流通股值'] = df['流通股值'].apply(create_color_hqltgz)
         #print(df.iloc[0:200]

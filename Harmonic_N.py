@@ -92,13 +92,25 @@ def N(mnlist,code,name):
             b2 = downN(A[2],X[2],0.618) #b 
             if approx(B[2],b1):
                 print("N 0.786",(X[2],X[1]),(A[2],A[1]),(B[2],B[1]),b1)
-                Nllist.append([code,name,B[1]])
+                Nlist.append([code,name,B[1]])
             if approx(B[2],b2):
                 print("N 0.618",(X[2],X[1]),(A[2],A[1]),(B[2],B[1]),b2)
-                Nllist.append([code,name,B[1]])
+                Nlist.append([code,name,B[1]])
  
 # 搜索最大最小值,统计日K
 def waterfall(code,name,datas):
+
+    try:
+        df = datas
+        turn = df.turn[df.index[-1]]
+        volume = df.volume[df.index[-1]]
+        close = df.close[df.index[-1]]
+        hqltsz = volume / turn / 1000000
+        if hqltsz*close < 300:
+            return 
+    except:
+        return
+
     mnlist = mn(datas,code,name)
     N(mnlist,code,name)
 
