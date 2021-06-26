@@ -1,7 +1,6 @@
 import baostock as bs
 import pandas as pd
-import dbmongo
-
+import os
 # 登陆系统
 lg = bs.login()
 # 显示登陆返回信息
