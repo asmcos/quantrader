@@ -43,7 +43,7 @@ while (rs.error_code == '0') & rs.next():
     industry_list[-1][3],
     industry_list[-1][4])
 	"""
-rs.fields.append('流通值')
+#rs.fields.append('流通值')
 result = pd.DataFrame(industry_list, columns=rs.fields)
 # 结果集输出到csv文件
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
