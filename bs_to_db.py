@@ -7,7 +7,6 @@ import baostock as bs
 import pandas as pd
 import click
 from datetime import datetime
-import dbmongo_stock
 import os
 import json
 import argparse
@@ -99,4 +98,4 @@ if __name__ == "__main__":
      for stock in stocklist:
         code ,name = getstockinfo(stock)
         print('正在获取',name,'代码',code)
-        get_data_post_server(name,code,"2020-01-01",today,"3")
+        get_data_post_server(name,code,"2021-06-01",today,"3")
