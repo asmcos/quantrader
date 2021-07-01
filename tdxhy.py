@@ -227,12 +227,12 @@ def sortblock(bklist,bkname,sse=0):
     if sse:
         for i in range(0,len(bklist)):
             ret =  get_bar(bklist.code.iloc[i],getmarket(bklist.code.iloc[i]))
-            if ret Not None:
+            if ret is not None:
                 result_list.append(ret)
     else:
         for i in range(0,len(bklist)):
             ret = get_bar(bklist.code.iloc[i],bklist.sse.iloc[i])
-            if ret Not None:
+            if ret is not None:
                 result_list.append(ret)
 
     df = pd.DataFrame(result_list,columns=['code','name','close','今日涨幅','周涨幅','流通市值'])
