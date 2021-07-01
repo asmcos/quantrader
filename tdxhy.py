@@ -168,7 +168,7 @@ def get_bar(code,sse):
     info = api.get_finance_info(sse, code)
     datas = api.to_df(datas)
 
-    if len(datas) < 2:
+    if len(datas) < 5:
         return
 
     liutonggu = float(info['liutongguben'])
