@@ -47,6 +47,7 @@ def get_blockbar():
     df = pd.DataFrame(dayK_list,columns=['name','code','date','close','今日涨幅','周涨幅','半月涨幅','月涨幅'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
 
+    del df['index']
     content += df.to_html(escape=False,float_format='%.2f')
 
 
