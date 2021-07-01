@@ -3,7 +3,7 @@
 from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.common import *
-
+from common.framework import init_stock_list,getstockinfo
 api = TdxHq_API()
 
 tdxblockdf = ''
@@ -15,6 +15,8 @@ float2 = lambda a:float('%.2f' % a)
 block_list = []
 
 filename = './datas/stock_tdx_block'+endday+'.html'
+
+codename = {}
 
 def get_block():
     all_list = api.get_security_list(1, 0)
@@ -164,6 +166,11 @@ def get_bar(code,sse):
     code = str(code)
     api.connect('119.147.212.81', 7709)
 
+    if sse == 1:
+        code1 = 'sh' + code
+    else:
+        code1 = 'sz' + code
+
     datas = api.get_security_bars(9,sse,code, 0, 10)
     info = api.get_finance_info(sse, code)
     datas = api.to_df(datas)
@@ -180,7 +187,9 @@ def get_bar(code,sse):
     c1 = float(c1)*100
     c5  = float(c5)*100
     liutonggu  = liutonggu * close / 10000 / 10000
-    return (code,close,float2(c1),float2(c5),float2(liutonggu))
+    code = code1
+    name = codename[code]
+    return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
 
 api.connect('119.147.212.81', 7709)
 b = api.get_and_parse_block_info('block_gn.dat')
@@ -193,6 +202,17 @@ hy = tdxblockdf
 def getmarket(code):
     ret = hy.loc[hy.code == code,:]
     return ret.sse.iloc[0]
+
+def create_clickable_code(code):
+    url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
+
+def create_color_hqltgz(hqltsz):
+    if hqltsz >= 200.0:
+        url_template= '''<font color="#ef4136">{hqltsz}</font></a>'''.format(hqltsz=hqltsz)
+    else:
+        url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
+    return url_template
 
 content = ""
 def sortblock(bklist,bkname,sse=0):
@@ -210,10 +230,12 @@ def sortblock(bklist,bkname,sse=0):
                )
 
 
-    df = pd.DataFrame(result_list,columns=['code','close','今日涨幅','周涨幅','流通市值'])
+    df = pd.DataFrame(result_list,columns=['code','name','close','今日涨幅','周涨幅','流通市值'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
     del df['index']
 
+    df['code'] = df['code'].apply(create_clickable_code)
+    df['流通市值'] = df['流通市值'].apply(create_clickable_code)
     content += '板块:' + bkname + '\n' 
     content += df.to_html(escape=False,float_format='%.2f')
     
@@ -236,6 +258,10 @@ def get_code_list(bkname):
         sortblock(tbk1,bkname)
         return
 
+alllist = init_stock_list()
+for i in alllist:
+    code,name = getstockinfo(i)
+    codename[code.replace('.','')] = name
 
 get_block()
 df1,df2 = get_blockbar()
@@ -246,4 +272,4 @@ for i in range(0,len(df1)):
 for i in range(0,len(df2)):
     get_code_list(df2.name.iloc[i])
 
-print(content)
+save_file("tdxhy.html",content)
