@@ -214,7 +214,7 @@ def sortblock(bklist,bkname,sse=0):
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
     del df['index']
 
-    content += '板块:' + bklist + '\n' 
+    content += '板块:' + bkname + '\n' 
     content += df.to_html(escape=False,float_format='%.2f')
     
 
