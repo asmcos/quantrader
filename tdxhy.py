@@ -189,7 +189,7 @@ def get_bar(code,sse):
     liutonggu  = liutonggu * close / 10000 / 10000
     code = code1
     name = codename.get(code,"")
-    if (liutonggu < 100)
+    if (liutonggu < 100):
         return None
 
     if c5  < 5:
