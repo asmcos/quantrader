@@ -17,6 +17,7 @@ block_list = []
 filename = './datas/stock_tdx_block'+endday+'.html'
 
 codename = {}
+content = ""
 
 def get_block():
     all_list = api.get_security_list(1, 0)
@@ -27,6 +28,7 @@ def get_block():
             block_list.append([i['code'],i['name']])
 dayK_list = []
 def get_blockbar():
+    global content
     for i in block_list:
         code = i[0]
         name = i[1]
@@ -44,6 +46,9 @@ def get_blockbar():
 
     df = pd.DataFrame(dayK_list,columns=['name','code','date','close','今日涨幅','周涨幅','半月涨幅','月涨幅'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
+
+    content += df.to_html(escape=False,float_format='%.2f')
+
 
     df1 = df.iloc[:15]
 
@@ -220,7 +225,6 @@ def create_color_hqltgz(hqltsz):
         url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
     return url_template
 
-content = ""
 def sortblock(bklist,bkname,sse=0):
     global content
     result_list = []
@@ -277,4 +281,4 @@ for i in range(0,len(df1)):
 for i in range(0,len(df2)):
     get_code_list(df2.name.iloc[i])
 
-save_file("tdxhy.html",content)
+save_file(filename,content)
