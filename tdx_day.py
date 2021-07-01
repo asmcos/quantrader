@@ -8,6 +8,8 @@ import json
 
 api = TdxHq_API(auto_retry=True)
 
+hostname="http://klang.org.cn"
+hostname="http://klang.zhanluejia.net.cn"
 
 def get_bar(name,code):
     zone,code1 = code.split('.') 
@@ -40,10 +42,10 @@ def get_bar(name,code):
     #print(jsondatas)
     #print(datas.iloc[-1],liutonggu,d)
     try:
-        requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
+        requests.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
     except:
         time.sleep(2)
-        requests.post("http://klang.zhanluejia.net.cn/dayks/updates",json=jsondatas,timeout=2000)
+        requests.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
 
 if api.connect('119.147.212.81', 7709):
 

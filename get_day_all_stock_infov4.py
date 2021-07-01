@@ -35,7 +35,8 @@ requests.adapters.DEFAULT_RETRIES = 5
 ####################
 #1. 获取股票数据
 ####################
-
+#hostname = "http://klang.org.cn"
+hostname = "http://klang.zhanluejia.net.cn"
 lg = bs.login()
 today = datetime.now()
 if endday== '0':
@@ -100,28 +101,6 @@ def create_color_hqltgz(hqltsz):
     rise21: Number,
     rise100: Number,
 """
-def save_db_server():
-	df= pd.read_csv("./datas/stock_up_down_{0}.csv".format(endday))
-	df = df.sort_values(by="当日涨跌",ascending=False)
-	df = df.iloc[0:200]
-	df.rename(columns={
-						'名称':'name',
-						'代码':'code',
-                        '当日收盘':'close', 
-						'前日收盘':'close1',
-						'21日收盘':'close21',
-						'百日收盘':'close100',
-						'当日涨跌':'rise1',
-						'21日涨跌':'rise21',
-						'百日涨跌':'rise100',
-						'行业':'industry',
-						}, inplace = True)
-	del df['序号']
-	df = df.set_index('date')
-	df = df.to_json(orient='table')
-	jsondatas = json.loads(df)['data']
-
-	requests.post("http://zhanluejia.net.cn/stock/updaterisek",json=jsondatas,timeout=60)
 
 #仅仅显示
 def display_save_data():
@@ -159,11 +138,11 @@ def get_day_data(code,name):
     #json = requests.get("http://127.0.0.1:1337/dayks",
     #    	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
     try:
-        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
+        json = requests.get(hostname+"/dayks",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
     except:
         time.sleep(2)
-        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
+        json = requests.get(hostname+"/dayks",
         	params={"code":code,"end":endday,"limit":150},timeout=1000).json()
 	
     df = pd.io.json.json_normalize(json)
@@ -277,8 +256,6 @@ stocklist = stocklist[1:] #删除第一行
 # 判断是仅仅显示，还是需要下载数据计算
 if display == '1':
     display_save_data()
-elif save_db == '1':
-	save_db_server()
 else:
     t = threading.Thread(target=handler_data_thread,args=(1,))
     t.start()
