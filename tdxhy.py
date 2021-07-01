@@ -176,7 +176,7 @@ def get_bar(code,sse):
     datas = api.to_df(datas)
 
     if len(datas) < 5:
-        return
+        return None
 
     liutonggu = float(info['liutongguben'])
     close = datas.close.iloc[-1]
@@ -188,7 +188,13 @@ def get_bar(code,sse):
     c5  = float(c5)*100
     liutonggu  = liutonggu * close / 10000 / 10000
     code = code1
-    name = codename[code]
+    name = codename.get(code,"")
+    if (liutonggu < 100)
+        return None
+
+    if c5  < 5:
+        return None
+        
     return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
 
 api.connect('119.147.212.81', 7709)
@@ -220,15 +226,14 @@ def sortblock(bklist,bkname,sse=0):
     result_list = []
     if sse:
         for i in range(0,len(bklist)):
-            result_list.append(
-                get_bar(bklist.code.iloc[i],getmarket(bklist.code.iloc[i]))
-               )
+            ret =  get_bar(bklist.code.iloc[i],getmarket(bklist.code.iloc[i]))
+            if ret Not None:
+                result_list.append(ret)
     else:
         for i in range(0,len(bklist)):
-            result_list.append(
-                get_bar(bklist.code.iloc[i],bklist.sse.iloc[i])
-               )
-
+            ret = get_bar(bklist.code.iloc[i],bklist.sse.iloc[i])
+            if ret Not None:
+                result_list.append(ret)
 
     df = pd.DataFrame(result_list,columns=['code','name','close','今日涨幅','周涨幅','流通市值'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
