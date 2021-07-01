@@ -121,8 +121,6 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
         incon = pd.concat([pd.DataFrame.from_dict(v).assign(type=k) for k,v in incon_dict.items()]) \
             .rename({0: 'code', 1: 'name'}, axis=1).reset_index(drop=True)
 
-        #for i in range(0,len(incon)):
-        #    print(incon.code.iloc[i],incon.name.iloc[i])
 
         with open(hy, encoding='GB18030', mode='r') as f:
             hy = f.readlines()
@@ -204,6 +202,7 @@ def get_bar(code,sse):
     return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
 
 api.connect('119.147.212.81', 7709)
+api.get_and_parse_block_info('block.dat')
 b = api.get_and_parse_block_info('block_gn.dat')
 hy1 = pd.DataFrame(b)
 
@@ -240,10 +239,14 @@ def sortblock(bklist,bkname,sse=0):
             if ret is not None:
                 result_list.append(ret)
 
+    if len(result_list) == 0:
+        return
+
     df = pd.DataFrame(result_list,columns=['code','name','close','今日涨幅','周涨幅','流通市值'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
     del df['index']
 
+    df['板块'] = bkname
     df['code'] = df['code'].apply(create_clickable_code)
     df['流通市值'] = df['流通市值'].apply(create_clickable_code)
     content += '板块:' + bkname + '\n' 
@@ -273,6 +276,7 @@ for i in alllist:
     code,name = getstockinfo(i)
     codename[code.replace('.','')] = name
 
+api.connect('119.147.212.81', 7709)
 get_block()
 df1,df2 = get_blockbar()
 
@@ -282,4 +286,5 @@ for i in range(0,len(df1)):
 for i in range(0,len(df2)):
     get_code_list(df2.name.iloc[i])
 
+print("save to file ", filename)
 save_file(filename,content)
