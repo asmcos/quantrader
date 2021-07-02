@@ -17,7 +17,7 @@ print('query_stock_industry respond  error_msg:'+rs.error_msg)
 
 # 打印结果集
 industry_list = []
-while (rs.error_code == '0') & rs.next():
+while (rs.error_code == '0') & rs.next() :
     # 获取一条记录，将记录合并在一起
     row = rs.get_row_data()
     kdata = bs.query_history_k_data_plus(row[1], 'date,open,high,low,close,volume', start_date='2020-12-01', 
@@ -30,22 +30,23 @@ while (rs.error_code == '0') & rs.next():
     row.append(tdxgn)
     print(row)
     industry_list.append(row)	
+
 fields = rs.fields
-fields.append('TDX板块')
-fields.append('概念板块')
+fields.append('tdxbk')
+fields.append('tdxgn')
 
 datas = pd.DataFrame(industry_list, columns=fields)
 
 datas = datas.to_json(orient='table')
 jsondatas = json.loads(datas)['data']
 
-
 hostname = "http://klang.org.cn"
 #hostname = "http://klang.zhanluejia.net.cn"
-requests.post(hostname+"/industries/drop")   
-
+resp = requests.post(hostname+"/industries/drop")   
+print(resp.content)
 try:
-   requests.post(hostname+"/industries/updates",json=jsondatas,timeout=2000)
+   resp = requests.post(hostname+"/industries/updates",json=jsondatas,timeout=2000)
+   print(resp.content)
 except:
    time.sleep(2)
    requests.post(hostname+"/industries/updates",json=jsondatas,timeout=2000)
