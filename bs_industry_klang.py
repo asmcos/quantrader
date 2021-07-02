@@ -2,6 +2,7 @@ import baostock as bs
 import pandas as pd
 import requests
 import json
+import tdxhy 
 # 登录系统
 lg = bs.login()
 # 显示登陆返回信息
@@ -23,16 +24,24 @@ while (rs.error_code == '0') & rs.next():
                                       frequency='d')	
     if len(kdata.get_row_data()) == 0:
         continue
+    tdxbk = tdxhy.gettdxbk(row[1])
+    tdxgn = tdxhy.gettdxgn(row[1])
+    row.append(tdxbk)
+    row.append(tdxgn)
     print(row)
     industry_list.append(row)	
+fields = rs.fields
+fields.append('TDX板块')
+fields.append('概念板块')
 
-datas = pd.DataFrame(industry_list, columns=rs.fields)
+datas = pd.DataFrame(industry_list, columns=fields)
 
 datas = datas.to_json(orient='table')
 jsondatas = json.loads(datas)['data']
 
+
 hostname = "http://klang.org.cn"
-hostname = "http://klang.zhanluejia.net.cn"
+#hostname = "http://klang.zhanluejia.net.cn"
 requests.post(hostname+"/industries/drop")   
 
 try:
@@ -40,7 +49,6 @@ try:
 except:
    time.sleep(2)
    requests.post(hostname+"/industries/updates",json=jsondatas,timeout=2000)
-
 
 # 登出系统
 bs.logout()

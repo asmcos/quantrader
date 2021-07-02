@@ -201,6 +201,7 @@ def get_bar(code,sse):
         
     return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
 
+#初始化 
 api.connect('119.147.212.81', 7709)
 api.get_and_parse_block_info('block.dat')
 b = api.get_and_parse_block_info('block_gn.dat')
@@ -209,10 +210,34 @@ hy1 = pd.DataFrame(b)
 # 获取板块
 QA_fetch_get_tdx_industry()
 hy = tdxblockdf
+hydict = {}
+hy1dict = {}
 
+for i in range(0,len(hy)):
+    sse = hy.sse.iloc[i]
+    code = hy.code.iloc[i]
+    bkname = hy.tdxnhy.iloc[i]
+    hydict[code] = [bkname,sse]
+
+for i in range(0,len(hy1)):
+    code = hy1.code.iloc[i]
+    bkname = hy1.blockname.iloc[i]
+    hy1dict[code] = [bkname]
+
+
+
+# 0 is name, 1 is sse
 def getmarket(code):
-    ret = hy.loc[hy.code == code,:]
-    return ret.sse.iloc[0]
+    return hydict[code][1]
+
+def gettdxbk(code):
+    code = code.split('.')[1]
+    return hydict.get(code,[""])[0]
+
+def gettdxgn(code):
+    code = code.split('.')[1]
+    return hy1dict.get(code,[""])[0]
+
 
 def create_clickable_code(code):
     url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
@@ -253,6 +278,7 @@ def sortblock(bklist,bkname,sse=0):
     content += df.to_html(escape=False,float_format='%.2f')
     
 
+    
 #尝试获取板块下面的股票列表
 def get_code_list(bkname):
     print(bkname)
@@ -275,16 +301,16 @@ alllist = init_stock_list()
 for i in alllist:
     code,name = getstockinfo(i)
     codename[code.replace('.','')] = name
+if __name__ == "__main__":
+    api.connect('119.147.212.81', 7709)
+    get_block()
+    df1,df2 = get_blockbar()
 
-api.connect('119.147.212.81', 7709)
-get_block()
-df1,df2 = get_blockbar()
+    for i in range(0,len(df1)):
+        get_code_list(df1.name.iloc[i])
 
-for i in range(0,len(df1)):
-    get_code_list(df1.name.iloc[i])
+    for i in range(0,len(df2)):
+        get_code_list(df2.name.iloc[i])
 
-for i in range(0,len(df2)):
-    get_code_list(df2.name.iloc[i])
-
-print("save to file ", filename)
-save_file(filename,content)
+    print("save to file ", filename)
+    save_file(filename,content)
