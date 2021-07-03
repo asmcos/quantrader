@@ -6,12 +6,10 @@ pandas
 matplotlib
 tushare
 sh
-pymongo
 backtrader_plotting
 sklearn
 tensorflow
 yahoo_fin
-jqdatasdk
 demjson
 click
 pytdx
