@@ -5,6 +5,10 @@ import pandas as pd
 from common.common import *
 from common.framework import init_stock_list,getstockinfo
 api = TdxHq_API()
+import os
+
+serverip = '119.147.212.81'
+serverip = '119.147.212.81'
 
 tdxblockdf = ''
 tdxblockex = ''
@@ -19,6 +23,7 @@ filename = './datas/stock_tdx_block'+endday+'.html'
 codename = {}
 content = ""
 
+#获取所有的板块
 def get_block():
     all_list = api.get_security_list(1, 0)
     for i in all_list:
@@ -27,6 +32,7 @@ def get_block():
             #print(i['code'],i['name'])
             block_list.append([i['code'],i['name']])
 dayK_list = []
+#获取板块日K数据
 def get_blockbar():
     global content
     for i in block_list:
@@ -48,22 +54,25 @@ def get_blockbar():
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
 
     del df['index']
-    content += df.to_html(escape=False,float_format='%.2f')
+    content += df.loc[df['今日涨幅']> 0,:].to_html(escape=False,float_format='%.2f')
 
 
-    df1 = df.iloc[:15]
+    df1 = df.iloc[:20]
 
     df = df.sort_values(by='周涨幅',ascending=False).reset_index()
-    return df1, df.iloc[:15]
-    #del df['index']
+    
+    del df['index']
 
-    #content += df.to_html(escape=False,float_format='%.2f')
+    content += df.loc[df['周涨幅']>0,:].to_html(escape=False,float_format='%.2f')
+ 
+    return df1, df.iloc[:20]
+
     #print("save file",filename)
     #save_file(filename,content)
 
 
 
-
+#获取个股对应的板块名称
 def QA_fetch_get_tdx_industry() -> pd.DataFrame:
     import random
     import tempfile
@@ -164,11 +173,11 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
         tdxblockdf = df
 
 
-
+#获取个股日K数据
 def get_bar(code,sse):
     sse = int(sse)
     code = str(code)
-    api.connect('119.147.212.81', 7709)
+    api.connect(serverip, 7709)
 
     if sse == 1:
         code1 = 'sh' + code
@@ -201,8 +210,8 @@ def get_bar(code,sse):
         
     return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
 
-#初始化 
-api.connect('119.147.212.81', 7709)
+#初始化 ,并获取概念板块名称
+api.connect(serverip, 7709)
 api.get_and_parse_block_info('block.dat')
 b = api.get_and_parse_block_info('block_gn.dat')
 hy1 = pd.DataFrame(b)
@@ -213,17 +222,18 @@ hy = tdxblockdf
 hydict = {}
 hy1dict = {}
 
+#个股对应板块名的表
 for i in range(0,len(hy)):
     sse = hy.sse.iloc[i]
     code = hy.code.iloc[i]
     bkname = hy.tdxnhy.iloc[i]
     hydict[code] = [bkname,sse]
 
+#个股对应概念板块的表
 for i in range(0,len(hy1)):
     code = hy1.code.iloc[i]
     bkname = hy1.blockname.iloc[i]
     hy1dict[code] = [bkname]
-
 
 
 # 0 is name, 1 is sse
@@ -250,6 +260,7 @@ def create_color_hqltgz(hqltsz):
         url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
     return url_template
 
+#获取板块下面的个股数据
 def sortblock(bklist,bkname,sse=0):
     global content
     result_list = []
@@ -297,12 +308,15 @@ def get_code_list(bkname):
         sortblock(tbk1,bkname)
         return
 
+#tdx 板块信息只有 个股code对应板块名
+#因此要获取code和股票名的 对应表
 alllist = init_stock_list()
 for i in alllist:
     code,name = getstockinfo(i)
     codename[code.replace('.','')] = name
+
 if __name__ == "__main__":
-    api.connect('119.147.212.81', 7709)
+    api.connect(serverip, 7709)
     get_block()
     df1,df2 = get_blockbar()
 
@@ -312,5 +326,5 @@ if __name__ == "__main__":
     for i in range(0,len(df2)):
         get_code_list(df2.name.iloc[i])
 
-    print("save to file ", filename)
+    print("save to ", 'file://'+os.getcwd()+ '/' + filename)
     save_file(filename,content)
