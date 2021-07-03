@@ -167,14 +167,14 @@ def get_60_data(name,code,start,end):
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
-    d,code,name,skip1,skip2= stock.split(',')
-    return code,name
+    d,code,name,skip1,skip2,tdxbk,tdxgn= stock.split(',')
+    return code,name,tdxbk,tdxgn
 
 #循环调用A股所有的股票
 def loop_all(callback,stlist=stocklist):
      bs.login()
      for stock in stocklist:
-        code ,name = getstockinfo(stock)
+        code ,name ,tdxbk,tdxgn= getstockinfo(stock)
         print('正在获取',name,'代码',code)
         datas = get_day_data(name,code,start,today)
         callback(code,name,datas)
@@ -183,7 +183,7 @@ def loop_all(callback,stlist=stocklist):
 def loop_60all(callback,stlist=stocklist):
      bs.login()
      for stock in stlist:
-        code ,name = getstockinfo(stock)
+        code ,name,tdxbk,tdxgn = getstockinfo(stock)
         print('正在获取',name,'代码',code)
         datas = get_60_data(name,code,start,today)
         callback(code,name,datas)

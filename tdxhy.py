@@ -1,11 +1,11 @@
 #pytdx
 
+import os
 from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.common import *
 from common.framework import init_stock_list,getstockinfo
 api = TdxHq_API()
-import os
 
 serverip = '119.147.212.81'
 serverip = '119.147.212.81'
@@ -14,7 +14,6 @@ tdxblockdf = ''
 tdxblockex = ''
 
 float2 = lambda a:float('%.2f' % a)
-
 
 block_list = []
 
@@ -312,7 +311,7 @@ def get_code_list(bkname):
 #因此要获取code和股票名的 对应表
 alllist = init_stock_list()
 for i in alllist:
-    code,name = getstockinfo(i)
+    code,name,tdxbk,tdxgn = getstockinfo(i)
     codename[code.replace('.','')] = name
 
 if __name__ == "__main__":

@@ -127,7 +127,7 @@ def display_save_data():
         
         df = df.iloc[0:200].sort_values(by="百日涨跌",ascending=True)
         print(df.to_html(escape=False))
-        print("save to file:",filename)
+        print("save to ", 'file://'+os.getcwd()+ '/' +filename)
         save_file(filename,content + df.to_html(escape=False))
     else:
         print(df.iloc[0:200])
@@ -198,8 +198,8 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqlts
 def getstockinfo(stock):
 	#2019-12-09,sz.002094,青岛金王,化工,申万一级行业
 	# 时间，股票代码，名称，类别
-	d,code,name,industry,skip2= stock.split(',')
-	return code,name,industry
+	d,code,name,industry,skip2,tdxbk,tdxgn= stock.split(',')
+	return code,name,tdxbk,tdxgn
 
 #获取所有的股票并下载数据
 def handler_data_thread(n):
@@ -211,7 +211,7 @@ def handler_data_thread(n):
 
 def get_data():
 	for stock in stocklist:
-		code ,name,industry = getstockinfo(stock)
+		code ,name,industry,tdxgn = getstockinfo(stock)
 		print('正在获取',name,'代码',code)
 		df = get_day_data(code,name)
 		#print(df)

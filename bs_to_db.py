@@ -12,6 +12,8 @@ import json
 import argparse
 import requests
 import time
+import tdxhy
+
 # 判断是否 是显示，还是重新下载数据计算
 # 数据每天只需要下载一次
 
@@ -48,7 +50,6 @@ def get_data(name,code, start, end, adj):
         # 获取一条记录，将记录合并在一起
         data_list.append(rs.get_row_data())
 
-    dbmongo_stock.insertdayKs(name,code,data_list)
 
 def get_data_post_server(name,code,start,end,adj):
     rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
@@ -77,8 +78,8 @@ def get_data_post_server(name,code,start,end,adj):
 def getstockinfo(stock):
     #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
     # 时间，股票代码，名称，类别
-    d,code,name,skip1,skip2= stock.split(',')
-    return code,name
+    d,code,name,skip1,skip2,tdxbk,tdxgn= stock.split(',')
+    return code,name,tdxbk,tdxgn
 
 
 
@@ -96,6 +97,6 @@ stocklist = stocklist[1+int(offset):] #删除第一行
 
 if __name__ == "__main__":
      for stock in stocklist:
-        code ,name = getstockinfo(stock)
+        code ,name,tdxbk,tdxgn = getstockinfo(stock)
         print('正在获取',name,'代码',code)
         get_data_post_server(name,code,"2021-06-01",today,"3")

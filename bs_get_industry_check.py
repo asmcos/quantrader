@@ -1,7 +1,8 @@
 import baostock as bs
 import pandas as pd
 import os
-# 登陆系统
+import tdxhy
+# 登录系统
 lg = bs.login()
 # 显示登陆返回信息
 print('login respond error_code:'+lg.error_code)
@@ -32,16 +33,17 @@ while (rs.error_code == '0') & rs.next():
     else:
         row.append(0)
     """
+    tdxbk = tdxhy.gettdxbk(row[1])
+    tdxgn = tdxhy.gettdxgn(row[1])
+    row.append(tdxbk)
+    row.append(tdxgn)
     print(row)
     industry_list.append(row)	
-    """ default don't save to mongodb
-	
-    dbmongo.insertIndustry(industry_list[-1][0],
-    industry_list[-1][1],
-    industry_list[-1][2],
-    industry_list[-1][3],
-    industry_list[-1][4])
-	"""
+
+fields = rs.fields
+fields.append('tdxbk')
+fields.append('tdxgn')
+
 #rs.fields.append('流通值')
 result = pd.DataFrame(industry_list, columns=rs.fields)
 # 结果集输出到csv文件
