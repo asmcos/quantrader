@@ -46,8 +46,8 @@ def get_blockbar():
         c5 = datas[-5]['close']
         c10 = datas[-10]['close']
         c20 = datas[-20]['close']
-        print(name,code,d1,c1,(c1-c2)*100/c2,(c1-c5)*100/c5,(c1-c10)*100/c10,(c1-c20)*100/c20)
-        dayK_list.append([name,code,d1,c1,(c1-c2)*100/c2,(c1-c5)*100/c5,(c1-c10)*100/c10,(c1-c20)*100/c20])
+        print(name,code,d1,c1,float2((c1-c2)*100/c2),float2((c1-c5)*100/c5),float2((c1-c10)*100/c10),float2((c1-c20)*100/c20))
+        dayK_list.append([name,code,d1,c1,float2((c1-c2)*100/c2),float2((c1-c5)*100/c5),float2((c1-c10)*100/c10),float2((c1-c20)*100/c20)])
 
     df = pd.DataFrame(dayK_list,columns=['name','code','date','close','今日涨幅','周涨幅','半月涨幅','月涨幅'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
