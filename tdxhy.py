@@ -172,17 +172,27 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
         tdxblockdf = df
 
 
-#获取个股日K数据
+codebuffer={}
+
 def get_bar(code,sse):
+
+    if codebuffer.get(code,None) is None:
+        ret = _get_bar(code,sse)
+        codebuffer[code] = ret 
+
+    return codebuffer[code]
+
+#获取个股日K数据
+def _get_bar(code,sse):
     sse = int(sse)
     code = str(code)
-    api.connect(serverip, 7709)
 
     if sse == 1:
         code1 = 'sh' + code
     else:
         code1 = 'sz' + code
-
+    name = codename.get(code1,"")
+    print(code1,name)
     datas = api.get_security_bars(9,sse,code, 0, 10)
     info = api.get_finance_info(sse, code)
     datas = api.to_df(datas)
@@ -202,7 +212,6 @@ def get_bar(code,sse):
     c5  = float(c5)*100
     liutonggu  = liutonggu * close / 10000 / 10000
     code = code1
-    name = codename.get(code,"")
     if (liutonggu < 100):
         return None
 
@@ -269,6 +278,8 @@ def create_color_hqltgz(hqltsz):
 #获取板块下面的个股数据
 def sortblock(bklist,bkname,sse=0):
     global content
+
+    api.connect(serverip, 7709)
     result_list = []
     if sse:
         for i in range(0,len(bklist)):
