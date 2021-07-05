@@ -213,8 +213,13 @@ def get_bar(code,sse):
 
 #初始化 ,并获取概念板块名称
 api.connect(serverip, 7709)
-api.get_and_parse_block_info('block.dat')
-b = api.get_and_parse_block_info('block_gn.dat')
+
+# 偶尔出现 gn加载不成功的情况
+try:
+    b = api.get_and_parse_block_info('block_gn.dat')
+except:
+    b = api.get_and_parse_block_info('block_gn.dat')
+    
 hy1 = pd.DataFrame(b)
 
 # 获取板块

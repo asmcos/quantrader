@@ -58,6 +58,13 @@ Final Portfolio Value: 73601.29
 结果是5万的启动资金2年后7万3.
 
 
+### 数据的获取
+
+* common/*   #公共部分
+* bs_get_industry_check.py #获取所有股票列表 包含板块信息
+* bs_industry_klang.py  #获取板块信息，并且提交到 klang.org.cn
+* tdxhy.py #获取 通达信板块信息
+
 # AI图谱
 
 ![](http://www.zhanluejia.net.cn/static/uploads/5b1dea78fd13d5f1869043d867906e0c.png)
