@@ -56,7 +56,7 @@ def get_blockbar():
     content += df.loc[df['今日涨幅']> 0,:].to_html(escape=False,float_format='%.2f')
 
 
-    df1 = df.iloc[:20]
+    df1 = df.iloc[:40]
 
     df = df.sort_values(by='周涨幅',ascending=False).reset_index()
     
@@ -64,7 +64,7 @@ def get_blockbar():
 
     content += df.loc[df['周涨幅']>0,:].to_html(escape=False,float_format='%.2f')
  
-    return df1, df.iloc[:20]
+    return df1, df.iloc[:40]
 
     #print("save file",filename)
     #save_file(filename,content)
@@ -336,7 +336,8 @@ if __name__ == "__main__":
     api.connect(serverip, 7709)
     get_block()
     df1,df2 = get_blockbar()
-
+    print(df1)
+    print(df2)
     for i in range(0,len(df1)):
         get_code_list(df1.name.iloc[i])
 
