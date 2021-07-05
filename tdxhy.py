@@ -189,8 +189,10 @@ def get_bar(code,sse):
 
     if len(datas) < 5:
         return None
-
-    liutonggu = float(info['liutongguben'])
+    try:
+        liutonggu = float(info['liutongguben'])
+    except:
+        liutonggu = 0.1
     close = datas.close.iloc[-1]
     close1 = datas.close.iloc[-2]
     close5 = datas.close.iloc[-5]
