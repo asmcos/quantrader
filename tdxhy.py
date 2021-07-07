@@ -21,7 +21,7 @@ filename = './datas/stock_tdx_block'+endday+'.html'
 
 codename = {}
 content = ""
-
+content1 = ""
 #获取所有的板块
 def get_block():
     all_list = api.get_security_list(1, 0)
@@ -33,7 +33,7 @@ def get_block():
 dayK_list = []
 #获取板块日K数据
 def get_blockbar():
-    global content
+    global content1
     for i in block_list:
         code = i[0]
         name = i[1]
@@ -53,7 +53,7 @@ def get_blockbar():
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
 
     del df['index']
-    content += df.loc[df['今日涨幅']> 0,:].to_html(escape=False,float_format='%.2f')
+    content1 += df.loc[df['今日涨幅']> 0,:].to_html(escape=False,float_format='%.2f')
 
 
     df1 = df.iloc[:40]
@@ -62,7 +62,7 @@ def get_blockbar():
     
     del df['index']
 
-    content += df.loc[df['周涨幅']>0,:].to_html(escape=False,float_format='%.2f')
+    content1 += df.loc[df['周涨幅']>0,:].to_html(escape=False,float_format='%.2f')
  
     return df1, df.iloc[:40]
 
@@ -345,4 +345,4 @@ if __name__ == "__main__":
         get_code_list(df2.name.iloc[i])
 
     print("save to ", 'file://'+os.getcwd()+ '/' + filename)
-    save_file(filename,content)
+    save_file(filename,content+content1)
