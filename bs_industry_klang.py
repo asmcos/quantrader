@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import json
 import tdxhy 
+import time
 # 登录系统
 lg = bs.login()
 # 显示登陆返回信息

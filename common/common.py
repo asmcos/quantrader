@@ -14,8 +14,9 @@ parser.add_argument("--endday", help="日期",default='0')
 parser.add_argument("--start", help="日期",default='2021-01-01')
 parser.add_argument("--download", help="下载",default='1')
 
-args = parser.parse_args()
-
+args = parser.parse_known_args()
+if len(args) > 1:
+    args = args[0]
 offset = args.offset
 download = args.download
 endday = args.endday

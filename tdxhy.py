@@ -5,6 +5,13 @@ from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.common import *
 from common.framework import init_stock_list,getstockinfo
+
+
+parser.add_argument('--reset', type=int, default=0, help='reset data') 
+
+args = parser.parse_args()
+reset = args.reset
+
 api = TdxHq_API()
 
 serverip = '119.147.212.81'
@@ -161,6 +168,8 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
         #shutil.rmtree(folder, ignore_errors=True)
         return df
     folder = gettempdir()
+    if reset != 0:
+        shutil.rmtree(folder, ignore_errors=True)
     dirpath = folder
     if not os.path.exists(folder + '/incon.dat') or not os.path.exists(folder + '/tdxhy.cfg'): 
         print("Save file to ",folder)
