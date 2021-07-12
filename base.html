@@ -9,20 +9,38 @@
    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
    <script>
 
-   var stocklist = ['sh601012','sz000100']
+       var stocklist = ['sh601012','sz000100']
+       var  win = window
    
-   var  win = window
-   
-   params = stocklist.join()
-         axios
-                .get("http://127.0.0.1:8000/?list="+params)
-                .then(function(response){
-                        eval(response.data)
-                        stocklist.forEach(function(item){
+       params = stocklist.join()
 
-                            eval('win.'+item +'= hq_str_'+item)
+       function formatData(datas){
+            var name = datas[0]
+            var close1 = datas[2]
+            var close = datas[3]
+            
+            var rise = 100 * (close - close1) / close1
 
-                        })
+            rise = parseFloat(rise).toFixed(2)
+
+            result.push([name,close,rise])
+            console.log(name,close,rise)
+       }
+       
+       var result = [] 
+       axios
+          .get("http://127.0.0.1:8000/?list="+params)
+          .then(function(response){
+               eval(response.data)
+               stocklist.forEach(function(item){
+
+                  eval('win.'+item +'= hq_str_'+item)
+                  var datas= win[item].split(',')
+
+                  formatData(datas)
+
                 })
+          })
+
    </script>
 </body>
