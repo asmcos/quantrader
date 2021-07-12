@@ -1,0 +1,28 @@
+<body>
+
+
+
+
+
+
+   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
+   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+   <script>
+
+   var stocklist = ['sh601012','sz000100']
+   
+   var  win = window
+   
+   params = stocklist.join()
+         axios
+                .get("http://127.0.0.1:8000/?list="+params)
+                .then(function(response){
+                        eval(response.data)
+                        stocklist.forEach(function(item){
+
+                            eval('win.'+item +'= hq_str_'+item)
+
+                        })
+                })
+   </script>
+</body>
