@@ -285,7 +285,7 @@ def create_color_hqltgz(hqltsz):
     return url_template
 
 #获取板块下面的个股数据
-def sortblock(bklist,bkname,sse=0):
+def sortblock(bklist,bkname,bkcode,sse=0):
     global content
 
     api.connect(serverip, 7709)
@@ -311,27 +311,27 @@ def sortblock(bklist,bkname,sse=0):
     df['板块'] = bkname
     df['code'] = df['code'].apply(create_clickable_code)
     df['流通市值'] = df['流通市值'].apply(create_clickable_code)
-    content += '板块:' + bkname + '\n' 
+    content += '板块:' + bkname + '(' + bkcode +')\n' 
     content += df.to_html(escape=False,float_format='%.2f')
     
 
     
 #尝试获取板块下面的股票列表
-def get_code_list(bkname):
+def get_code_list(bkname,code):
     print(bkname)
     l1 =  hy1.loc[hy1.blockname == bkname,:]
     if len(l1) > 0:
-        sortblock(l1,bkname,1)
+        sortblock(l1,bkname,code,1)
         return
     
     l =  hy.loc[hy.tdxnhy == bkname,:]
     if len(l):
-        sortblock(l,bkname)
+        sortblock(l,bkname,code)
         return
 
     tbk1 = hy.loc[hy.tbk1 == bkname,:]
     if len(tbk1):
-        sortblock(tbk1,bkname)
+        sortblock(tbk1,bkname,code)
         return
 
 #tdx 板块信息只有 个股code对应板块名
@@ -348,10 +348,10 @@ if __name__ == "__main__":
     print(df1)
     print(df2)
     for i in range(0,len(df1)):
-        get_code_list(df1.name.iloc[i])
+        get_code_list(df1.name.iloc[i],df1.code.iloc[i])
 
     for i in range(0,len(df2)):
-        get_code_list(df2.name.iloc[i])
+        get_code_list(df2.name.iloc[i],df2.code.iloc[i])
 
     print("save to ", 'file://'+os.getcwd()+ '/' + filename)
     save_file(filename,content+content1)
