@@ -1,29 +1,20 @@
 <body>
 <div id="app">
-
-<table>
-<tr v-if="result['sh601012']">
-<td>{{result['sh601012'][1]}}</td>
-<td>{{result['sh601012'][2]}}</td>
-<td></td>
-</tr>
-</table>
-
+<div v-if="load">
+    %s
+</div>
 </div>
 
 
 
    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
-   <script>
 
-       var stocklist = ['sh601012','sz000100']
-  
-   </script>
+    %s
+
     <script>
        var  win = window
    
-       params = stocklist.join()
 
        function formatData(code,datas){
             var name = datas[0]
@@ -31,14 +22,37 @@
             var close = datas[3]
             
             var rise = 100 * (close - close1) / close1
-
-            rise = parseFloat(rise).toFixed(2)
-
+            if (String(parseFloat(rise)) != "NaN"){ //NaN 是无法直接比较的)
+                rise = parseFloat(rise).toFixed(2)
+            } else {
+                rise = 0.000
+            } 
             vue.$data.result[code]=[name,close,rise]
             console.log(name,close,rise)
        }
        
-       //var result = [] 
+
+      async function getDatas(that){
+
+        for (i=0 ; i < stocklist.length;i+=100){
+            params = stocklist.slice(i,i+100).join()
+            response = await axios.get(apihost+"/?list="+params)
+        
+            eval(response.data)
+            console.log(response)
+        }
+        stocklist.forEach(function(item){
+
+                  eval('win.'+item +'= hq_str_'+item)
+                  var datas= win[item].split(',')
+
+                  formatData(item,datas)
+
+                })
+         that.load = 1
+
+      }
+
 
    var hostname = window.location.hostname
    var host = window.location.host
@@ -52,6 +66,7 @@
       const VueApp = {
         data() {
             return {
+                load:0,
                 result:{},
             }
         },
@@ -61,21 +76,8 @@
         },
 
         mounted () {
-            var that = this
-        axios
-          .get(apihost+"/?list="+params)
-          .then(function(response){
-               eval(response.data)
-               stocklist.forEach(function(item){
-
-                  eval('win.'+item +'= hq_str_'+item)
-                  var datas= win[item].split(',')
-
-                  formatData(item,datas)
-
-                })
-          })
-
+           var that = this
+            getDatas(that)
        },
         methods: {
         }

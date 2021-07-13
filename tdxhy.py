@@ -5,7 +5,7 @@ from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.common import *
 from common.framework import init_stock_list,getstockinfo
-
+import json
 
 parser.add_argument('--reset', type=int, default=0, help='reset data') 
 
@@ -25,9 +25,11 @@ float2 = lambda a:float('%.2f' % a)
 block_list = []
 
 filename = './datas/stock_tdx_block'+endday+'.html'
+filename_rt = './datas/stock_tdx_block_rt'+endday+'.html'
 
 codename = {}
 content = ""
+contentrt = ""
 content1 = ""
 #获取所有的板块
 def get_block():
@@ -73,8 +75,6 @@ def get_blockbar():
  
     return df1, df.iloc[:40]
 
-    #print("save file",filename)
-    #save_file(filename,content)
 
 
 
@@ -184,12 +184,18 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
 codebuffer={}
 
 def get_bar(code,sse):
+    sse = int(sse)
 
-    if codebuffer.get(code,None) is None:
+    if sse == 1:
+        code1 = 'sh' + code
+    else:
+        code1 = 'sz' + code
+
+    if codebuffer.get(code1,None) is None:
         ret = _get_bar(code,sse)
-        codebuffer[code] = ret 
+        codebuffer[code1] = ret 
 
-    return codebuffer[code]
+    return codebuffer[code1]
 
 #获取个股日K数据
 def _get_bar(code,sse):
@@ -200,6 +206,7 @@ def _get_bar(code,sse):
         code1 = 'sh' + code
     else:
         code1 = 'sz' + code
+
     name = codename.get(code1,"")
     print(code1,name)
     datas = api.get_security_bars(9,sse,code, 0, 10)
@@ -277,6 +284,14 @@ def create_clickable_code(code):
     url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
+def create_close_code(code):
+    url_template= '''result['{code}'][1]'''.format(code=code)
+    return '{{'+url_template+'}}'
+
+def create_rise_code(code):
+    url_template= '''result['{code}'][2]'''.format(code=code)
+    return '<font color="#ef4136">{{'+url_template+'}}</font>'
+
 def create_color_hqltgz(hqltsz):
     if hqltsz >= 200.0:
         url_template= '''<font color="#ef4136">{hqltsz}</font></a>'''.format(hqltsz=hqltsz)
@@ -286,7 +301,7 @@ def create_color_hqltgz(hqltsz):
 
 #获取板块下面的个股数据
 def sortblock(bklist,bkname,bkcode,sse=0):
-    global content
+    global content,contentrt
 
     api.connect(serverip, 7709)
     result_list = []
@@ -309,12 +324,17 @@ def sortblock(bklist,bkname,bkcode,sse=0):
     del df['index']
 
     df['板块'] = bkname
+    df['当前价格'] = df['code'].apply(create_close_code)
+    df['涨幅'] = df['code'].apply(create_rise_code)
     df['code'] = df['code'].apply(create_clickable_code)
     df['流通市值'] = df['流通市值'].apply(create_clickable_code)
-    content += '板块:' + bkname + '(' + bkcode +')\n' 
-    content += df.to_html(escape=False,float_format='%.2f')
-    
+    title = '板块:' + bkname + '(' + bkcode +')\n' 
+    contentrt += title + df.to_html(escape=False,float_format='%.2f')
+   
+    del df['当前价格'] 
+    del df['涨幅']
 
+    content += title + df.to_html(escape=False,float_format='%.2f')
     
 #尝试获取板块下面的股票列表
 def get_code_list(bkname,code):
@@ -353,5 +373,16 @@ if __name__ == "__main__":
     for i in range(0,len(df2)):
         get_code_list(df2.name.iloc[i],df2.code.iloc[i])
 
+
+
+    k  = codebuffer.keys()
+    k = list(k)
+    content2 = "<script>\n var stocklist="
+    content2 += json.dumps(k)
+    content2 += ";\n</script>"
+    base = open('base.html').read()
+    
     print("save to ", 'file://'+os.getcwd()+ '/' + filename)
     save_file(filename,content+content1)
+    print("save to ", 'file://'+os.getcwd()+ '/' + filename_rt)
+    save_file(filename_rt,base % (contentrt+content1 ,content2))
