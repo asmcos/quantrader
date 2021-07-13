@@ -9,8 +9,8 @@ import json
 
 parser.add_argument('--reset', type=int, default=0, help='reset data') 
 
-args = parser.parse_args()
-reset = args.reset
+args = parser.parse_known_args()
+reset = args[0].reset
 
 api = TdxHq_API()
 
@@ -361,8 +361,8 @@ for i in alllist:
     code,name,tdxbk,tdxgn = getstockinfo(i)
     codename[code.replace('.','')] = name
 
+api.connect(serverip, 7709)
 if __name__ == "__main__":
-    api.connect(serverip, 7709)
     get_block()
     df1,df2 = get_blockbar()
     print(df1)
