@@ -1,9 +1,36 @@
+<html>
+    <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+
+      <!-- Vendor CSS Files -->
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+
+
+  <!-- Template Main CSS File -->
+  <link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet">
+
+
+
+        <title>Klang(金浪)语言在线试用</title>
+
+    </head>
+
+
 <body>
 <div id="app">
-<div v-if="load">
+<div v-if="load" class="row" style="width:60%%;margin:100px;">
     %s
 </div>
+
+<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+<button class="btn btn-primary" @click="refresh">刷</button>
 </div>
+
+</div> <!--app -->
 
 
 
@@ -14,7 +41,17 @@
 
     <script>
        var  win = window
-   
+ 
+
+
+       function tableClass(){
+         tables = document.getElementsByTagName('table')
+         for (i=0;i<tables.length;i++){
+            tables[i].className = 'table table-bordered'
+         }
+      }
+
+  
 
        function formatData(code,datas){
             var name = datas[0]
@@ -22,7 +59,7 @@
             var close = datas[3]
             
             var rise = 100 * (close - close1) / close1
-            if (String(parseFloat(rise)) != "NaN"){ //NaN 是无法直接比较的)
+            if (String(parseFloat(rise)) != "NaN"){ //NaN 是无法直接比较的
                 rise = parseFloat(rise).toFixed(2)
             } else {
                 rise = 0.000
@@ -51,8 +88,13 @@
                 })
          that.load = 1
 
-      }
+         that.$nextTick(function(){
+            tableClass()
+         });
 
+        setTimeout("tableClass()",1000 );  
+
+      }
 
    var hostname = window.location.hostname
    var host = window.location.host
@@ -80,6 +122,10 @@
             getDatas(that)
        },
         methods: {
+            refresh(e){
+             var that = this
+             getDatas(that)
+          }
         }
       }//VueApp
       window.vue = Vue.createApp(VueApp).mount('#app')
@@ -88,3 +134,4 @@
 
 
 </body>
+</html>
