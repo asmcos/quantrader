@@ -208,7 +208,6 @@ def _get_bar(code,sse):
         code1 = 'sz' + code
 
     name = codename.get(code1,"")
-    print(code1,name)
     datas = api.get_security_bars(9,sse,code, 0, 10)
     info = api.get_finance_info(sse, code)
     datas = api.to_df(datas)
@@ -228,12 +227,16 @@ def _get_bar(code,sse):
     c5  = float(c5)*100
     liutonggu  = liutonggu * close / 10000 / 10000
     code = code1
+
+    print(code1,name,close,float2(c1),float2(liutonggu),"亿")
+
     if (liutonggu < 100):
         return None
 
     if c5  < 5:
         return None
         
+
     return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
 
 #初始化 ,并获取概念板块名称
@@ -290,7 +293,7 @@ def create_close_code(code):
 
 def create_rise_code(code):
     url_template= '''result['{code}'][2]'''.format(code=code)
-    return '<font color="#ef4136">{{'+url_template+'}}</font>'
+    return """<font v-if=" """ +url_template + """ > 0" color="#ef4136">{{"""+url_template+"""}}</font> <font v-else color="#00ef00">{{"""+url_template+"""}}</font>"""
 
 def create_color_hqltgz(hqltsz):
     if hqltsz >= 200.0:
