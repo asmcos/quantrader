@@ -29,8 +29,8 @@ filename_rt = './datas/stock_tdx_block_rt'+endday+'.html'
 
 codename = {}
 content = ""
-contentrt = ""
-content1 = ""
+contentrt = "因为除权问题，部分数据可能存在差异\n"
+content1 = "因为除权问题，部分数据可能存在差异\n"
 #获取所有的板块
 def get_block():
     all_list = api.get_security_list(1, 0)
