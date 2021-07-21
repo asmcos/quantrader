@@ -2,6 +2,7 @@ from .common import *
 import baostock as bs
 import talib
 import numpy as np
+
 # print 打印color 表
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
@@ -187,6 +188,28 @@ def loop_60all(callback,stlist=stocklist):
         print('正在获取',name,'代码',code)
         datas = get_60_data(name,code,start,today)
         callback(code,name,datas)
+
+
+
+hostname="http://klang.org.cn"
+#hostname="http://klang.zhanluejia.net.cn"
+
+#
+#stock list
+#
+cm_dict  = {}
+def init_chouma( ):
+
+    json = requests.get(hostname+"/industries").json()
+    #df = pd.json_normalize(json)
+    #df = df.drop(columns=['_id','updatedAt','id','createdAt'])
+    # 结果集输出到csv文件
+    #df.to_csv(stname, index=False,columns=['updateDate','code','code_name','industry','industryClassification','tdxbk','tdxgn','chouma'])
+    for i in json:
+        cm_dict[i['code']] = i.get('chouma','50')
+
+def get_chouma(code):
+    return cm_dict.get(code,"50")
     
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
@@ -200,5 +223,9 @@ def init_stock_list():
 
     stocklist = open(filename_sl).readlines()
     stocklist = stocklist[1+int(offset):] #删除第一行
+    init_chouma()
+
     return stocklist
+
+
 

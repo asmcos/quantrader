@@ -14,6 +14,8 @@ import baostock as bs
 import json
 import argparse
 import requests
+from common.framework import init_chouma,get_chouma
+
 # 判断是否 是显示，还是重新下载数据计算
 # 数据每天只需要下载一次
 
@@ -37,7 +39,7 @@ requests.adapters.DEFAULT_RETRIES = 5
 ####################
 #hostname = "http://klang.org.cn"
 hostname = "http://klang.zhanluejia.net.cn"
-lg = bs.login()
+
 today = datetime.now()
 if endday== '0':
 	endday = str(today.year) + str(today.month) + str(today.day)
@@ -66,7 +68,7 @@ def handler(signum, frame):
 
 #存盘并且打印
 def make_save_data():
-	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','流通股值','行业'])
+	df = pd.DataFrame(all_up_down_list, columns = ['名称','date','代码','当日收盘','前日收盘','21日收盘','百日收盘','当日涨跌','21日涨跌','百日涨跌','流通股值','行业','筹码'])
 	df.to_csv("./datas/stock_up_down_{0}.csv".format(endday),float_format='%.2f',index_label="序号")
 
 
@@ -88,6 +90,7 @@ def create_color_hqltgz(hqltsz):
     else:
         url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
     return url_template
+
 """
     name: String,
     code: String,
@@ -164,6 +167,8 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqlts
 
 	delta21 = 0
 	delta100 = 0
+	chouma = get_chouma(code)
+
 	if lastday21 > 0:
 		delta21 = (lastday-lastday21)/lastday21 * 100.0
 	if lastday100 > 0:
@@ -190,7 +195,8 @@ def upordown(code,date,name,industry,lastday,lastday1,lastday21,lastday100,hqlts
 		delta21,
 		delta100,
 		hqltsz*lastday,
-        industry
+        industry,
+        chouma
 	])	
 
 		
@@ -252,6 +258,8 @@ if not os.path.exists(filename_sl):
 
 stocklist = open(filename_sl).readlines()
 stocklist = stocklist[1:] #删除第一行
+
+init_chouma()
 
 # 判断是仅仅显示，还是需要下载数据计算
 if display == '1':

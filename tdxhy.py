@@ -4,7 +4,7 @@ import os
 from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.common import *
-from common.framework import init_stock_list,getstockinfo
+from common.framework import init_stock_list,getstockinfo,get_chouma
 import json
 
 parser.add_argument('--reset', type=int, default=0, help='reset data') 
@@ -29,8 +29,8 @@ filename_rt = './datas/stock_tdx_block_rt'+endday+'.html'
 
 codename = {}
 content = ""
-contentrt = "因为除权问题，部分数据可能存在差异\n"
-content1 = "因为除权问题，部分数据可能存在差异\n"
+contentrt = "因为除权问题，部分数据可能存在差异\n</p>"
+content1 = "因为除权问题，部分数据可能存在差异\n</p>"
 #获取所有的板块
 def get_block():
     all_list = api.get_security_list(1, 0)
@@ -204,8 +204,10 @@ def _get_bar(code,sse):
 
     if sse == 1:
         code1 = 'sh' + code
+        code2 = 'sh.' + code
     else:
         code1 = 'sz' + code
+        code2 = 'sz.' + code
 
     name = codename.get(code1,"")
     datas = api.get_security_bars(9,sse,code, 0, 10)
@@ -236,8 +238,8 @@ def _get_bar(code,sse):
     if c5  < 5:
         return None
         
-
-    return (code,name,close,float2(c1),float2(c5),float2(liutonggu))
+    chouma = get_chouma(code2)
+    return (code,name,close,float2(c1),float2(c5),float2(liutonggu),chouma)
 
 #初始化 ,并获取概念板块名称
 api.connect(serverip, 7709)
@@ -322,7 +324,7 @@ def sortblock(bklist,bkname,bkcode,sse=0):
     if len(result_list) == 0:
         return
 
-    df = pd.DataFrame(result_list,columns=['code','name','close','今日涨幅','周涨幅','流通市值'])
+    df = pd.DataFrame(result_list,columns=['code','name','close','今日涨幅','周涨幅','流通市值','筹码'])
     df = df.sort_values(by='今日涨幅',ascending=False).reset_index()
     del df['index']
 

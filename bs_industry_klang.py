@@ -4,6 +4,9 @@ import requests
 import json
 import tdxhy 
 import time
+import os
+from common.common import *
+
 # 登录系统
 lg = bs.login()
 # 显示登陆返回信息
@@ -16,6 +19,20 @@ rs = bs.query_stock_industry()
 print('query_stock_industry error_code:'+rs.error_code)
 print('query_stock_industry respond  error_msg:'+rs.error_msg)
 
+
+filename_cm = os.path.expanduser("~/.klang_stock_cm.csv")
+if not os.path.exists(filename_cm):
+    cm = 0
+else:
+    cm = 1
+    cmdict = {}
+    cm_list = open(filename_cm).readlines()
+    cm_list = cm_list[1+int(offset):] #删除第一行
+
+    for i in cm_list:
+        ilist = i.split(',')
+        code = ilist[0].split('.')[1].lower() + '.' + ilist[0].split('.')[0]
+        cmdict[code] = ilist[2]
 # 打印结果集
 industry_list = []
 while (rs.error_code == '0') & rs.next() :
@@ -27,14 +44,22 @@ while (rs.error_code == '0') & rs.next() :
         continue
     tdxbk = tdxhy.gettdxbk(row[1])
     tdxgn = tdxhy.gettdxgn(row[1])
+        
     row.append(tdxbk)
     row.append(tdxgn)
+    if cm == 1:
+        code = row[1]    
+        chouma = cmdict.get(code,"50")
+        row.append(chouma)
     print(row)
     industry_list.append(row)	
 
 fields = rs.fields
 fields.append('tdxbk')
 fields.append('tdxgn')
+
+if cm == 1:
+    fields.append('chouma')
 
 datas = pd.DataFrame(industry_list, columns=fields)
 
