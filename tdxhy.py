@@ -238,7 +238,7 @@ def _get_bar(code,sse):
     if c5  < 5:
         return None
         
-    chouma = get_chouma(code2)
+    chouma = str(get_chouma(code2))
     return (code,name,close,float2(c1),float2(c5),float2(liutonggu),chouma)
 
 #初始化 ,并获取概念板块名称
