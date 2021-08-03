@@ -175,6 +175,7 @@ def config():
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
+    set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
 
 if __name__ == '__main__':
     config()
