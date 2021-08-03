@@ -169,12 +169,12 @@ def config():
 
     def modify_gn(path,resp):
         print(path,"modify resp")
-        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,re.S|re.M)
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
         return content.encode('gbk') 
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
-
+    set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
 
 if __name__ == '__main__':
     config()
