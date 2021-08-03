@@ -66,6 +66,16 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, body=True):
         sent = False
         try:
+            if (self.path == '/gn.html'):
+                gncontent = open('gn.html').read()
+
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Content-Length', len(gncontent.encode()))
+                self.end_headers()
+
+                self.wfile.write(gncontent.encode())
+                return
 
             host = get_pathmap(self.path)
             url = '{}{}'.format(host, self.path)
@@ -141,6 +151,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
         self.end_headers()
+        #self.send_header('Access-Control-Allow-Origin', '*')
+        #self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
 
 
 

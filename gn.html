@@ -1,0 +1,108 @@
+<html>
+    <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+
+      <!-- Vendor CSS Files -->
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+
+
+  <!-- Template Main CSS File -->
+  <link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet">
+
+
+
+        <title>Klang(金浪)板块实时数据</title>
+
+    </head>
+
+
+<body>
+<div id="app">
+<div v-if="load" class="row" style="width:60%%;margin:100px;">
+</div>
+
+<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+<button class="btn btn-primary" @click="refresh">刷</button>
+</div>
+
+</div> <!--app -->
+
+
+
+   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
+   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+
+    <script>
+       var  win = window
+ 
+
+
+       function tableClass(){
+         tables = document.getElementsByTagName('table')
+         for (i=0;i<tables.length;i++){
+            tables[i].className = 'table table-bordered'
+         }
+      }
+  
+      
+
+      async function getDatas(that){
+
+            response = await axios.get(apihost+"/funds/gnzjl/")
+  
+            console.log(response)
+      
+            that.load = 1
+
+         that.$nextTick(function(){
+            tableClass()
+         });
+
+        setTimeout("tableClass()",1000 );  
+
+      }
+
+   var hostname = window.location.hostname
+   var host = window.location.host
+     if (hostname == ""){
+        hostname = "127.0.0.1"
+        apihost = "http://127.0.0.1:9999"
+     } else {
+        apihost = "http://"+host
+     }
+   
+      const VueApp = {
+        data() {
+            return {
+                load:0,
+                result:{},
+            }
+        },
+    
+        created() {
+            
+        },
+
+        mounted () {
+           var that = this
+            getDatas(that)
+       },
+        methods: {
+            refresh(e){
+             var that = this
+             getDatas(that)
+          }
+        }
+      }//VueApp
+      window.vue = Vue.createApp(VueApp).mount('#app')
+
+   </script>
+
+
+</body>
+</html>
