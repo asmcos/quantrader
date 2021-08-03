@@ -80,7 +80,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             content = call_after(self.path,resp)
 
             self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
+            self.send_resp_headers(resp,content)
             if body:
                 self.wfile.write(content)
             return
@@ -111,7 +111,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
             content = call_after(self.path,resp)
             self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
+            self.send_resp_headers(resp,content)
             if body:
                 self.wfile.write(content)
             return
@@ -132,14 +132,14 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         return self.headers #req_header
 
 
-    def send_resp_headers(self, resp):
+    def send_resp_headers(self, resp,content):
         respheaders = resp.headers
         print ('Response Header')
         for key in respheaders:
             if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
                 print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
-        self.send_header('Content-Length', len(resp.content))
+        self.send_header('Content-Length', len(content))
         self.end_headers()
 
 
@@ -169,8 +169,8 @@ def config():
 
     def modify_gn(path,resp):
         print(path,"modify resp")
-        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",str(resp.content),re.S|re.M)
-        return content.encode(encoding='utf-8') 
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,re.S|re.M)
+        return content.encode('gbk') 
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
