@@ -13,6 +13,16 @@
   <!-- Template Main CSS File -->
   <link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet">
 
+  <link href="http://www.zhanluejia.net.cn/corlate/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/font-awesome.min.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/animate.min.css" rel="stylesheet">
+    <link href="http://www.zhanluejia.net.cn/corlate/css/animation.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/prettyPhoto.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/main.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/responsive.css" rel="stylesheet">
+    <link href="http://www.zhanluejia.net.cn/zlj/css/style.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="http://www.zhanluejia.net.cn/static/css/site.css">
 
 
         <title>Klang(金浪)板块实时数据</title>
@@ -22,7 +32,24 @@
 
 <body>
 <div id="app">
-<div v-if="load" class="row" style="width:60%%;margin:100px;">
+<div class="row" style="width:80%;margin:100px;" id="content">
+
+</div>
+
+<div class="row" style="width:80%;margin:100px;" id="gnblock" >
+  <div v-for="a,index in gn50list">
+   <div class="alert alert-primary" role="alert">
+      <a @click="getbkcode(a.href,index)">{{index+1}}、 {{a.name}} </a>
+   </div>
+
+   <div v-bind:id="'bk'+index">
+
+   </div>
+ </div> <!-- for -->
+</div>
+
+<div id="window2">
+<iframe id="win2_iframe" src=""></iframe>
 </div>
 
 <div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
@@ -30,6 +57,11 @@
 </div>
 
 </div> <!--app -->
+
+    
+    <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
+<script src="http://www.zhanluejia.net.cn/corlate/js/bootstrap.min.js"></script>
+ <script type="text/javascript" src="http://www.zhanluejia.net.cn/static/js/jquery.fitvids.js?v=0e648b2512"></script>
 
 
 
@@ -49,18 +81,40 @@
          }
       }
   
-      
+      function getgn50(){
+
+        gn50data = $("#content table tr").slice(1,51)
+
+        for (i=0;i<50;i++){ 
+            var tr = gn50data[i]
+            var td = tr.cells[1]
+            var a = td.firstElementChild
+            vue.$data.gn50list.push({"href":a.href,"name":a.text})
+        
+        }
+        //setTimeout("getblock(0)",1500) 
+       }
+     
+     async function getbkdata(code,index){            
+           response = await axios.get("/gn/detail/field/199112/order/desc/page/1/ajax/1/code/"+code)
+           console.log(response.data)
+           $('#bk'+index).html(response.data)
+        
+           setTimeout("tableClass()",1000 );  
+     } 
 
       async function getDatas(that){
 
             response = await axios.get(apihost+"/funds/gnzjl/")
   
-            console.log(response)
+            content = document.getElementById('content')
+            content.innerHTML = response.data
       
             that.load = 1
 
          that.$nextTick(function(){
             tableClass()
+            getgn50()
          });
 
         setTimeout("tableClass()",1000 );  
@@ -81,6 +135,7 @@
             return {
                 load:0,
                 result:{},
+                gn50list:[],
             }
         },
     
@@ -94,9 +149,14 @@
        },
         methods: {
             refresh(e){
-             var that = this
-             getDatas(that)
-          }
+              var that = this
+              getDatas(that)
+            },
+            getbkcode(href,index){
+              var reg = /\d+\/$/
+              var code =  reg.exec(href)[0].replace('/','')
+              getbkdata(code,index)
+           }
         }
       }//VueApp
       window.vue = Vue.createApp(VueApp).mount('#app')

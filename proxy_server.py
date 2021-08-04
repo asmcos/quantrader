@@ -181,14 +181,28 @@ def main(argv=sys.argv[1:]):
 def config():
 
     def modify_gn(path,resp):
-        print(path,"modify resp")
+        print(path,"modify gn code")
         content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
         return content.encode('gbk') 
 
+    def modify_gnzjl(path,resp):
+        print(path,"get gn 50 table ")
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
+        content1 = re.findall("<table.*?table>",content,re.I|re.S)[0]
+        return content1.encode('gbk') 
+
+    def modify_bkcode(path,resp):
+        print(path,"get bkcode ")
+        content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
+        return resp.content #content.encode('gbk') 
+
+
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
+    set_after('/funds/gnzjl/$',modify_gnzjl)
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
     set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
+    set_after('/gn/detail/field/',modify_bkcode)
 
 if __name__ == '__main__':
     config()
