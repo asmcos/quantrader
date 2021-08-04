@@ -48,7 +48,7 @@
  </div> <!-- for -->
 </div>
 
-<div id="window2">
+<div id="window2" class="row" style="width:80%;margin:100px;min-height:300px;">
 <iframe id="win2_iframe" src=""></iframe>
 </div>
 
@@ -94,7 +94,10 @@
         }
         //setTimeout("getblock(0)",1500) 
        }
-     
+
+     function winiframe(href){
+            $("#win2_iframe").attr('src',href)
+     }     
      async function getbkdata(code,index){            
            response = await axios.get("/gn/detail/field/199112/order/desc/page/1/ajax/1/code/"+code)
            console.log(response.data)
@@ -155,6 +158,7 @@
             getbkcode(href,index){
               var reg = /\d+\/$/
               var code =  reg.exec(href)[0].replace('/','')
+              winiframe(href)
               getbkdata(code,index)
            }
         }
