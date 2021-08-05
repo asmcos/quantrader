@@ -233,7 +233,7 @@ def config():
         df['流通市值'] = df['流通市值'].apply(create_color_hqltgz) 
         df['筹码'] = df['代码'].apply(create_chouma) 
         df['代码'] = df['代码'].apply(create_clickable_code) 
-        print(df)
+
         return df.to_html(escape=False,float_format='%.2f').encode('gbk') #resp.content 
 
 
