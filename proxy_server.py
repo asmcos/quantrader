@@ -28,7 +28,7 @@ def create_color_hqltgz(hqltsz):
     return url_template
 
 def create_chouma(code):
-    chouma = str(get_chouma(code_list.get(str(code),code)))
+    chouma = str(get_chouma(code_list.get(code,code)))
     return chouma
 
 #tdx 板块信息只有 个股code对应板块名
@@ -226,7 +226,7 @@ def config():
     def modify_bkcode(path,resp):
         print(path,"get bkcode ")
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
-        df = pd.read_html(content)[0]
+        df = pd.read_html(content,converters={'代码': str})[0]
         df = df.drop(['涨跌',  '涨速(%)',  '换手(%)' ,    '量比',  '振幅(%)'  \
             ,'成交额'    ,'流通股'     ,'市盈率'  ,'加自选'],axis=True)
 
