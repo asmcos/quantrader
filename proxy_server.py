@@ -8,6 +8,38 @@ import sys
 import requests
 import re
 import traceback
+import pandas as pd
+
+from common.framework import init_stock_list, getstockinfo,get_chouma
+
+code_list = {}
+
+def create_clickable_code(code):
+    url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    return url_template
+
+def create_color_hqltgz(hqltsz):
+    
+    hqltsz = float(hqltsz.split('亿')[0])
+    if hqltsz >= 200.0:
+        url_template= '''<font color="#ef4136">{hqltsz}</font></a>'''.format(hqltsz=hqltsz)
+    else:
+        url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
+    return url_template
+
+def create_chouma(code):
+    chouma = str(get_chouma(code_list.get(str(code),code)))
+    return chouma
+
+#tdx 板块信息只有 个股code对应板块名
+#因此要获取code和股票名的 对应表
+alllist = init_stock_list()
+for i in alllist:
+    code,name,tdxbk,tdxgn = getstockinfo(i)
+    key = code.split('.')[1]
+    code_list[key] = code
+
+
 
 hostname = 'http://data.10jqka.com.cn'
 
@@ -194,7 +226,15 @@ def config():
     def modify_bkcode(path,resp):
         print(path,"get bkcode ")
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
-        return resp.content #content.encode('gbk') 
+        df = pd.read_html(content)[0]
+        df = df.drop(['涨跌',  '涨速(%)',  '换手(%)' ,    '量比',  '振幅(%)'  \
+            ,'成交额'    ,'流通股'     ,'市盈率'  ,'加自选'],axis=True)
+
+        df['流通市值'] = df['流通市值'].apply(create_color_hqltgz) 
+        df['筹码'] = df['代码'].apply(create_chouma) 
+        df['代码'] = df['代码'].apply(create_clickable_code) 
+        print(df)
+        return df.to_html(escape=False,float_format='%.2f').encode('gbk') #resp.content 
 
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
