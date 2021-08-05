@@ -15,6 +15,7 @@ from common.framework import init_stock_list, getstockinfo,get_chouma
 code_list = {}
 
 def create_clickable_code(code):
+    code = code_list.get(code,code).replace('.','')
     url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
@@ -226,7 +227,7 @@ def config():
     def modify_bkcode(path,resp):
         print(path,"get bkcode ")
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
-        df = pd.read_html(content,converters={'代码': str})[0]
+        df = pd.read_html(content,converters={'代码': str},index_col=0)[0]
         df = df.drop(['涨跌',  '涨速(%)',  '换手(%)' ,    '量比',  '振幅(%)'  \
             ,'成交额'    ,'流通股'     ,'市盈率'  ,'加自选'],axis=True)
 
