@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import argparse
 import os
@@ -9,6 +9,12 @@ import requests
 import re
 import traceback
 import pandas as pd
+
+
+
+class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
+    pass
+
 
 from common.framework import init_stock_list, getstockinfo,get_chouma
 
@@ -200,7 +206,7 @@ def main(argv=sys.argv[1:]):
     args = parse_args(argv)
     print('http server is starting on port {}...'.format(args.port))
     server_address = ('127.0.0.1', args.port)
-    httpd = HTTPServer(server_address, ProxyHTTPRequestHandler)
+    httpd = ThreadingSimpleServer(server_address, ProxyHTTPRequestHandler)
     print('http server is running as reverse proxy')
     httpd.serve_forever()
 
