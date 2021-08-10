@@ -67,11 +67,11 @@ def set_before(path,callback):
 
     before_call[path] = callback
 
-def call_before(path,headers):
+def call_before(self,headers):
 
     for k in before_call.keys():
-        if re.search(k,path) != None:
-            return before_call[k](path,headers)
+        if re.search(k,self.path) != None:
+            return before_call[k](self,headers)
 
     return headers
 
@@ -82,17 +82,17 @@ def set_after(path,callback):
 
     after_call[path] = callback
 
-def call_after(path,resp):
+def call_after(self,resp):
 
     for k in after_call.keys():
-        if re.search(k,path) != None:
-            return after_call[k](path,resp)
+        if re.search(k,self.path) != None:
+            return after_call[k](self,resp)
 
     return resp.content
 
 
 class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
-    protocol_version = 'HTTP/1.0'
+    protocol_version = 'HTTP/1.1'
     def do_HEAD(self):
         self.do_GET(body=False)
 
@@ -116,11 +116,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
             print(req_header)
             print(self.path)
-            req_header = call_before(self.path,req_header)
-            resp = requests.get(url, headers= req_header, verify=False)
+            req_header = call_before(self,req_header)
+            resp = requests.get(url, headers= req_header)
             sent = True
 
-            content = call_after(self.path,resp)
+            content = call_after(self,resp)
 
             self.send_response(resp.status_code)
             self.send_resp_headers(resp,content)
@@ -132,7 +132,6 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print ('str(Exception):\t', str(Exception))
             print ('str(e):\t\t', str(e))
             print ('repr(e):\t', repr(e))
-            #print ('e.message:\t', e.message)
             print ('traceback.print_exc():\n')
             traceback.print_exc()
             print ('traceback.format_exc():\n%s' % traceback.format_exc())
@@ -148,11 +147,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             post_body = self.rfile.read(content_len)
             req_header = self.parse_headers()
 
-            req_header = call_before(self.path,req_header)
-            resp = requests.post(url, data=post_body, headers= req_header, verify=False)
+            req_header = call_before(self,req_header)
+            resp = requests.post(url, data=post_body, headers= req_header)
             sent = True
 
-            content = call_after(self.path,resp)
+            content = call_after(self,resp)
             self.send_response(resp.status_code)
             self.send_resp_headers(resp,content)
             if body:
@@ -183,9 +182,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
+        self.send_header('Access-Control-Allow-Origin', '*');
+        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); 
         self.end_headers()
-        #self.send_header('Access-Control-Allow-Origin', '*')
-        #self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
 
 
 
@@ -213,18 +212,21 @@ def main(argv=sys.argv[1:]):
 
 def config():
 
-    def modify_gn(path,resp):
+    def modify_gn(self,resp):
+        path = self.path
         print(path,"modify gn code")
         content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
         return content.encode('gbk') 
 
-    def modify_gnzjl(path,resp):
+    def modify_gnzjl(self,resp):
+        path = self.path
         print(path,"get gn 50 table ")
         content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
         content1 = re.findall("<table.*?table>",content,re.I|re.S)[0]
         return content1.encode('gbk') 
 
-    def modify_bkcode(path,resp):
+    def modify_bkcode(self,resp):
+        path = self.path
         print(path,"get bkcode ")
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
         df = pd.read_html(content,converters={'代码': str},index_col=0)[0]
@@ -244,6 +246,9 @@ def config():
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
     set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
     set_after('/gn/detail/field/',modify_bkcode)
+
+    set_pathmap('list=','https://hq.sinajs.cn')
+
 
 if __name__ == '__main__':
     config()
