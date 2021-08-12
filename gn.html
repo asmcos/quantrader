@@ -69,10 +69,46 @@
    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
 
+
+   <script>
+
+
+    var codetree={}
+
+    function savemain(code){
+
+        codetree1 = localStorage.getItem("klangcodelist")
+
+        if (codetree1 != null){
+            codetree = JSON.parse(codetree1)
+        }
+        if (codetree[code]) {
+            return
+        }
+        codetree[code] = []
+        localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+    }
+
+
+    function savesub(code,subcode){
+        savemain(code)
+
+        if (codetree[code].includes(subcode) == false){
+            codetree[code].push(subcode)
+        }
+        localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+
+    }
+
+
+   </script>
+
+
     <script>
        var  win = window
  
 
+       
 
        function tableClass(){
          tables = document.getElementsByTagName('table')
@@ -102,7 +138,9 @@
            response = await axios.get("/gn/detail/field/199112/order/desc/page/1/ajax/1/code/"+code)
            console.log(response.data)
            $('#bk'+index).html(response.data)
-        
+
+           tableClass()
+ 
            setTimeout("tableClass()",1000 );  
      } 
 
@@ -120,6 +158,7 @@
             getgn50()
          });
 
+           tableClass()
         setTimeout("tableClass()",1000 );  
 
       }
