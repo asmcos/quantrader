@@ -105,8 +105,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, body=True):
         sent = False
         try:
-            if (self.path == '/gn.html'):
-                gncontent = open('gn.html').read()
+            if self.path in ['/gn.html','/zx.html']:
+                gncontent = open(self.path[1:]).read()
 
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+
+      <!-- Vendor CSS Files -->
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+
+
+  <!-- Template Main CSS File -->
+  <!--link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet"-->
+  <style>
+ .btn-Copy {
+    float:right;
+    right: .65rem;
+    z-index: 10;
+    display: block;
+    padding: .25rem .5rem;
+    font-size: .65em;
+    color: #0d6efd;
+    background-color: #fff;
+    border: 1px solid;
+    border-radius: .25rem;
+ }
+ 
+ .bg {
+    background: rgba(14, 22, 34, 0.02);
+ }
+
+
+ .spinner-stop {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: -.125em;
+    background-color: currentColor;
+    border-radius: 50%;
+    /* opacity: 0; */
+    /* -webkit-animation: .75s linear infinite spinner-grow; */
+    /* animation: .75s linear infinite spinner-grow; */
+   }
+
+  </style>
+
+
+        <title>Klang(金浪)语言在线试用</title>
+
+    </head>
+    <body class="bg">
+
+   <div id="app">
+   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
+   <div class="container-fluid">
+    <a class="navbar-brand" href="#">开始</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="http://www.klang.org.cn">主页</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">股票</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            知识
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">结构</a></li>
+            <li><a class="dropdown-item" href="#" id="resetcmd">复位列表和数据</a></li>
+            <li><a class="dropdown-item" href="#" id="resetstock">复位数据</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">波浪理论</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">和谐交易</a>
+        </li>
+      </ul>
+
+
+    <div class="spinner-border spinner-border-sm text-primary" role="status" v-if="busy">
+    <span class="visually-hidden">...</span>
+    </div>
+
+    <div class="form-check" style="margin-right:20px;margin-left:10px;">
+    
+    <input class="form-check-input" type="checkbox" value="" id="flexbusy" checked disabled>
+    <label class="form-check-label" for="flexbusy">
+        busy
+    </label>
+    </div>
+   
+
+    
+
+ 
+    <div class="form-check">
+
+    <input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" checked disabled>
+    <label class="form-check-label" for="flexCheckCheckedDisabled">
+        {{usercount}} Online
+    </label>
+
+
+    </div> <!-- form check-->
+  </div>
+  </div>
+</nav>
+
+<div class="container" style="margin-top:30px;">
+  <div class="row ">
+    <div class="col" >
+         <div class="shadow-sm p-3 mb-5 bg-white rounded" style="padding:20px;">
+  
+        
+           <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="ltszCheck" value="option1">
+            <label class="form-check-label" for="ltszCheck">剔除小市值</label>
+         </div>
+        <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="STCheck" value="option2" checked>
+        <label class="form-check-label" for="STCheck">剔除ST</label>
+        </div>
+
+
+
+           <div class="form">
+                <textarea id="content" style="min-height:200px;width:95%"></textarea>
+            </div>
+            <button type="button" class="btn btn-warning" style="margin-right:30px;"id="reset">清除</button>
+            <button type="button" class="btn btn-primary" id="run">运行公式</button>
+          </div> <!--shadow-sm-->
+        <p> </p>
+<div class="accordion shadow-sm rounded" id="accordionExample">
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        #1 涨停公式
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+      <pre style="background:#F8F9FA;padding:10px;" class="shadow-sm rounded ">
+      <button type="button" class="btn-Copy" onclick="CopyN('One')">复制公式</button>
+      <code id="preOne">
+        
+        涨停 = 9.9
+        今日收盘 = C
+        昨日收盘 = C[1]
+        日期范围 = date
+        显示 = DISPLAY
+        ###############################
+        # 参数涨停,表示涨幅的幅度
+        # 以上为参数的值可以修改
+        # 日期范围('2021-01-01','2021-06-25')
+        ###############################
+
+        实际涨幅 = (今日收盘-昨日收盘) / 昨日收盘
+        实际涨幅 = 实际涨幅 * 100
+        if 实际涨幅 > 涨停:
+            显示(实际涨幅)
+      </code>
+      </pre>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="accordion-item" v-for="(code,index) in codes">
+    <h2 class="accordion-header" v-bind:id="'heading'+index">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse'+index" aria-expanded="false" v-bind:aria-controls="'collapse'+index">
+        #{{index+2}} {{code.title}}
+      </button>
+    </h2>
+    <div v-bind:id="'collapse'+index" class="accordion-collapse collapse" v-bind:aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+      <pre style="background:#F8F9FA;padding:10px;" class="shadow-sm rounded"><button type="button" class="btn-Copy" v-bind:onclick="'CopyN('+index+')'">复制公式</button><code v-bind:id="'pre'+index">{{code.content}}</code>
+      </pre>
+
+      </div>
+    </div> <!--div id -->
+  </div> <!--item-->
+</div> <!--accordionExample-->
+
+
+  <p style="margin-bottom:40px;"> </p>
+
+    </div> <!-- col -->
+    <div class="col">
+        <div class="display">
+
+            <table class="table table-bordered" border="1">
+            <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">name</th>
+            <th scope="col">code</th>
+            <th scope="col">值</th>
+            <th scope="col">流通值(亿)</th>
+            <th scope="col">板块</th>
+            <th scope="col">概念板块</th>
+            <th scope="col">筹码</th>
+            </tr>
+            </thead>
+             <tbody>
+                <tr v-for="(item,index) in result">
+                <th scope="row" >{{index+1}}</th>
+                <td><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+item.code+'/nc.shtml'" target=_blank>{{item.name}}</a></td>
+                <td><a v-bind:href="'https://gu.qq.com/'+item.code" target=_blank ><font color=blue>{{item.code}}</font></a></td>
+                <td>{{item.value}}</td>
+                <td>{{item.hqltsz}}</td>
+                <td>{{item.tdxbk}}</td>
+                <td>{{item.tdxgn}}</td>
+                <td>{{item.chouma}}</td>
+                </tr>
+                </tbody>
+            </table> 
+        </div> <!--display-->
+      </div><!--col-->
+  </div> <!--row-->
+</div> <!-- container-->
+
+</div> <!-- app for vue-->
+
+    
+
+  <!-- Template Main JS File -->
+  <script src="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+
+      <script>
+
+
+    var codetree={}
+
+    function savemain(code){
+
+        codetree1 = localStorage.getItem("klangcodelist")
+
+        if (codetree1 != null){
+            codetree = JSON.parse(codetree1)
+        }
+        if (codetree[code]) {
+            return
+        }
+        codetree[code] = []
+        localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+    }
+
+
+    function savesub(code,subcode){
+        savemain(code)
+
+        if (codetree[code].includes(subcode) == false){
+            codetree[code].push(subcode)
+        }
+        localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+
+    }
+
+
+   </script>
+
+
+    <script>
+   var hostname = window.location.hostname
+   var host = window.location.host
+     if (hostname == ""){
+        hostname = "127.0.0.1"
+        apihost = "http://127.0.0.1:9999"
+     } else {
+        apihost = "http://"+host
+     }
+   
+      const VueApp = {
+        data() {
+            return {
+                online:0,
+                usercount:0,
+                busy:0,
+                result:[],
+                url:apihost+"/strategies",
+                codes:[{title:"均线向上",content:"ma1=MA(C,5);\nma2=MA(C,10);\nma3=MA(C,20);\nif ma1[-1] > ma2[-1] and ma2[-1]>ma3[-1]:\n        DISPLAY(C);"},
+                       {title:"收盘价金叉60日均线",content:"ret = CROSS(C,MA(C,60))\nif ret:\n    DISPLAY(C);\n"}]
+            }
+        },
+    
+        created() {
+            
+        },
+
+        mounted () {
+            var that = this
+            axios
+                .get(that.url)
+                .then(function(response){
+                        that.codes = response.data
+                })
+        },
+        methods: {
+        }
+      }//VueApp
+      window.vue = Vue.createApp(VueApp).mount('#app')
+
+
+           var run = document.querySelector('#run'),
+                reset = document.querySelector('#reset'),
+                resetcmd = document.querySelector('#resetcmd'),
+                resetstock = document.querySelector('#resetstock'),
+                content = document.querySelector('#content'),
+                display = document.querySelector('#display'),
+                flexbusy = document.querySelector('#flexbusy'),
+                connstate = document.querySelector('#flexCheckCheckedDisabled'),
+                ltszcheck = document.querySelector('#ltszCheck'),
+                STcheck = document.querySelector('#STCheck'),
+                websocket = new WebSocket("ws://"+hostname+":9099/");
+
+                preOne = document.querySelector('#preOne'),
+                content.value = preOne.textContent
+                connstate.checked = false
+            run.onclick = function (event) {
+                if (flexbusy.checked == true){
+                    alert("正在执行任务")
+                    return
+                }
+                if (connstate.checked == false){
+                    alert("请先链接,或者刷新页面链接服务器")
+                    return 
+                }
+                vue.$data.result = []
+                websocket.send(JSON.stringify({action: 'execute',content:content.value,loop:true}));
+            }
+
+            function CopyN(arg1){
+                preN = document.querySelector('#pre'+arg1),
+                title = ""
+                if (arg1 != "One") {
+                    title = "#  " + vue.$data.codes[arg1].title + "\n"
+                }
+                content.value = title +preN.textContent
+            }
+            reset.onclick = function (event) {
+                content.value = ""
+            }
+            resetcmd.onclick = function (event) {
+                websocket.send(JSON.stringify({action: 'cmd',content:"reset_all",pw:"Klang"}));
+            }
+            resetstock.onclick = function (event) {
+                websocket.send(JSON.stringify({action: 'cmd',content:"reset_stock",pw:"Klang"}));
+            }
+            websocket.onmessage = function (event) {
+                data = JSON.parse(event.data);
+                connstate.checked = true 
+                console.log(data)
+                switch (data.type) {
+                    case 'busy':
+                        if (data.op == false){
+                            alert("系统正在执行其他任务，请稍等");
+                        }
+
+                        if (data.value == true){
+                            flexbusy.checked= true
+                            vue.$data.busy = 1
+                        } else {
+
+                            flexbusy.checked= false 
+                            vue.$data.busy = 0
+                        }
+                        break;
+                    case 'users':
+                        vue.$data.usercount = data.count
+                        vue.$data.online = 1
+                        if (data.busy == 0){
+                            flexbusy.checked= false 
+                            vue.$data.busy = 0
+                        } else {
+                            flexbusy.checked= true
+                            vue.$data.busy = 1
+                        }
+                        break;
+                    case 'display':
+                        code = data.code.replace(".","")
+                        hqltsz = data.hqltsz.toFixed(2)
+                        tdxbk = data.tdxbk
+                        tdxgn = data.tdxgn
+                        chouma = data.chouma
+
+                        if (ltszcheck.checked == true && hqltsz < 100.0){
+                            break;
+                        }
+                        if (STcheck.checked == true && data.name.includes("ST")){
+                            break;
+                        }
+
+                        value = data.value
+                        if (String(parseFloat(value)) != "NaN"){ //NaN 是无法直接比较的
+                            value = parseFloat(value).toFixed(2)
+                        }
+                        vue.$data.result.push({name:data.name,code:code,value:value,hqltsz:hqltsz,tdxbk:tdxbk,tdxgn:tdxgn,chouma:chouma})
+                        break;
+                    default:
+                        console.error(
+                            "unsupported event", data);
+                }
+            };
+            websocket.onclose = function (e) {
+                    console.log('websocket 断开: ' + e.code + ' ' + e.reason + ' ' + e.wasClean)
+                    vue.$data.online = 0
+                    vue.$data.usercount = 0
+                    flexbusy.checked  = false 
+                    connstate.checked = false
+            }
+ 
+   </script>
+
+    </body>
+</html>
+<!--
+https://mdbootstrap.com/docs/b5/vue/getting-started/installation/
+-->
