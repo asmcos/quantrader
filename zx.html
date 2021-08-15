@@ -47,7 +47,7 @@
   </style>
 
 
-        <title>Klang(金浪)语言在线试用</title>
+        <title>Klang(金浪)自选股票</title>
 
     </head>
     <body class="bg">
@@ -93,23 +93,11 @@
     
     <input class="form-check-input" type="checkbox" value="" id="flexbusy" checked disabled>
     <label class="form-check-label" for="flexbusy">
-        busy
+        观察
     </label>
     </div>
    
 
-    
-
- 
-    <div class="form-check">
-
-    <input class="form-check-input" type="checkbox" value="" id="flexCheckCheckedDisabled" checked disabled>
-    <label class="form-check-label" for="flexCheckCheckedDisabled">
-        {{usercount}} Online
-    </label>
-
-
-    </div> <!-- form check-->
   </div>
   </div>
 </nav>
@@ -138,54 +126,38 @@
             <button type="button" class="btn btn-primary" id="run">运行公式</button>
           </div> <!--shadow-sm-->
         <p> </p>
+
+
+    <div class="input-group input-group-sm mb-3">
+  <input type="text" class="form-control" value="sh601012" id="maincode" aria-describedby="basic-addon2">
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" type="button" @click="addmain">加入自选</button>
+  </div>
+</div>
+
 <div class="accordion shadow-sm rounded" id="accordionExample">
 
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="headingOne">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        #1 涨停公式
-      </button>
-    </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-      <pre style="background:#F8F9FA;padding:10px;" class="shadow-sm rounded ">
-      <button type="button" class="btn-Copy" onclick="CopyN('One')">复制公式</button>
-      <code id="preOne">
-        
-        涨停 = 9.9
-        今日收盘 = C
-        昨日收盘 = C[1]
-        日期范围 = date
-        显示 = DISPLAY
-        ###############################
-        # 参数涨停,表示涨幅的幅度
-        # 以上为参数的值可以修改
-        # 日期范围('2021-01-01','2021-06-25')
-        ###############################
 
-        实际涨幅 = (今日收盘-昨日收盘) / 昨日收盘
-        实际涨幅 = 实际涨幅 * 100
-        if 实际涨幅 > 涨停:
-            显示(实际涨幅)
-      </code>
-      </pre>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="accordion-item" v-for="(code,index) in codes">
+  <div class="accordion-item" v-for="(code,index) in codelist">
     <h2 class="accordion-header" v-bind:id="'heading'+index">
       <button class="accordion-button" type="button" data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse'+index" aria-expanded="false" v-bind:aria-controls="'collapse'+index">
-        #{{index+2}} {{code.title}}
+        #{{index+1}} {{code}}
       </button>
     </h2>
     <div v-bind:id="'collapse'+index" class="accordion-collapse collapse" v-bind:aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-      <pre style="background:#F8F9FA;padding:10px;" class="shadow-sm rounded"><button type="button" class="btn-Copy" v-bind:onclick="'CopyN('+index+')'">复制公式</button><code v-bind:id="'pre'+index">{{code.content}}</code>
-      </pre>
 
+
+
+       <div class="input-group input-group-sm mb-3">
+        <input type="text" class="form-control" v-bind:id="'sub'+index" aria-describedby="button-addon4">
+        <div class="input-group-append" id="button-addon4">
+         <button class="btn btn-outline-secondary" type="button">增加关联</button>
+         <button class="btn btn-outline-secondary" @click="delmain(code)" type="button">删除自选</button>
+        </div>
+       </div> <!--input-group-->
+ 
       </div>
     </div> <!--div id -->
   </div> <!--item-->
@@ -234,6 +206,7 @@
     
 
   <!-- Template Main JS File -->
+  <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
   <script src="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
@@ -243,31 +216,57 @@
       <script>
 
 
-    var codetree={}
+    function getcodetree(){
+        var codetree={}
+        codetree1 = localStorage.getItem("klangcodelist")
+
+        if (codetree1 != null){
+            codetree = JSON.parse(codetree1)
+        }
+            
+        return codetree
+
+    }
 
     function savemain(code){
 
+        var codetree={}
         codetree1 = localStorage.getItem("klangcodelist")
 
         if (codetree1 != null){
             codetree = JSON.parse(codetree1)
         }
         if (codetree[code]) {
-            return
+            return codetree
         }
         codetree[code] = []
         localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+        return codetree
     }
 
+    function deletemain(code){
+        codetree = localStorage.getItem("klangcodelist")
+
+        if (codetree == null){
+            return {}
+        }
+
+        codetree = JSON.parse(codetree)
+
+        delete codetree[code] 
+        localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+        return codetree
+ 
+    }
 
     function savesub(code,subcode){
-        savemain(code)
+        codetree = savemain(code)
 
         if (codetree[code].includes(subcode) == false){
             codetree[code].push(subcode)
         }
         localStorage.setItem("klangcodelist",JSON.stringify(codetree))
-
+        return codetree
     }
 
 
@@ -291,9 +290,8 @@
                 usercount:0,
                 busy:0,
                 result:[],
-                url:apihost+"/strategies",
-                codes:[{title:"均线向上",content:"ma1=MA(C,5);\nma2=MA(C,10);\nma3=MA(C,20);\nif ma1[-1] > ma2[-1] and ma2[-1]>ma3[-1]:\n        DISPLAY(C);"},
-                       {title:"收盘价金叉60日均线",content:"ret = CROSS(C,MA(C,60))\nif ret:\n    DISPLAY(C);\n"}]
+                codetree:{},
+                codelist:[],
             }
         },
     
@@ -303,125 +301,32 @@
 
         mounted () {
             var that = this
-            axios
-                .get(that.url)
-                .then(function(response){
-                        that.codes = response.data
-                })
+            this.codetree = getcodetree()
+            this.codelist = Object.keys(this.codetree)
         },
         methods: {
+
+            delmain(code){
+
+               this.codetree =  deletemain(code)
+               this.codelist = Object.keys(this.codetree)
+            },
+
+            addmain(){
+                var code = $("#maincode").val()
+                if (code == ''){
+                        return
+                }
+                    
+                this.codetree = savemain(code)
+                this.codelist = Object.keys(this.codetree)
+
+                $("#maincode").val('')
+            }
         }
       }//VueApp
       window.vue = Vue.createApp(VueApp).mount('#app')
 
-
-           var run = document.querySelector('#run'),
-                reset = document.querySelector('#reset'),
-                resetcmd = document.querySelector('#resetcmd'),
-                resetstock = document.querySelector('#resetstock'),
-                content = document.querySelector('#content'),
-                display = document.querySelector('#display'),
-                flexbusy = document.querySelector('#flexbusy'),
-                connstate = document.querySelector('#flexCheckCheckedDisabled'),
-                ltszcheck = document.querySelector('#ltszCheck'),
-                STcheck = document.querySelector('#STCheck'),
-                websocket = new WebSocket("ws://"+hostname+":9099/");
-
-                preOne = document.querySelector('#preOne'),
-                content.value = preOne.textContent
-                connstate.checked = false
-            run.onclick = function (event) {
-                if (flexbusy.checked == true){
-                    alert("正在执行任务")
-                    return
-                }
-                if (connstate.checked == false){
-                    alert("请先链接,或者刷新页面链接服务器")
-                    return 
-                }
-                vue.$data.result = []
-                websocket.send(JSON.stringify({action: 'execute',content:content.value,loop:true}));
-            }
-
-            function CopyN(arg1){
-                preN = document.querySelector('#pre'+arg1),
-                title = ""
-                if (arg1 != "One") {
-                    title = "#  " + vue.$data.codes[arg1].title + "\n"
-                }
-                content.value = title +preN.textContent
-            }
-            reset.onclick = function (event) {
-                content.value = ""
-            }
-            resetcmd.onclick = function (event) {
-                websocket.send(JSON.stringify({action: 'cmd',content:"reset_all",pw:"Klang"}));
-            }
-            resetstock.onclick = function (event) {
-                websocket.send(JSON.stringify({action: 'cmd',content:"reset_stock",pw:"Klang"}));
-            }
-            websocket.onmessage = function (event) {
-                data = JSON.parse(event.data);
-                connstate.checked = true 
-                console.log(data)
-                switch (data.type) {
-                    case 'busy':
-                        if (data.op == false){
-                            alert("系统正在执行其他任务，请稍等");
-                        }
-
-                        if (data.value == true){
-                            flexbusy.checked= true
-                            vue.$data.busy = 1
-                        } else {
-
-                            flexbusy.checked= false 
-                            vue.$data.busy = 0
-                        }
-                        break;
-                    case 'users':
-                        vue.$data.usercount = data.count
-                        vue.$data.online = 1
-                        if (data.busy == 0){
-                            flexbusy.checked= false 
-                            vue.$data.busy = 0
-                        } else {
-                            flexbusy.checked= true
-                            vue.$data.busy = 1
-                        }
-                        break;
-                    case 'display':
-                        code = data.code.replace(".","")
-                        hqltsz = data.hqltsz.toFixed(2)
-                        tdxbk = data.tdxbk
-                        tdxgn = data.tdxgn
-                        chouma = data.chouma
-
-                        if (ltszcheck.checked == true && hqltsz < 100.0){
-                            break;
-                        }
-                        if (STcheck.checked == true && data.name.includes("ST")){
-                            break;
-                        }
-
-                        value = data.value
-                        if (String(parseFloat(value)) != "NaN"){ //NaN 是无法直接比较的
-                            value = parseFloat(value).toFixed(2)
-                        }
-                        vue.$data.result.push({name:data.name,code:code,value:value,hqltsz:hqltsz,tdxbk:tdxbk,tdxgn:tdxgn,chouma:chouma})
-                        break;
-                    default:
-                        console.error(
-                            "unsupported event", data);
-                }
-            };
-            websocket.onclose = function (e) {
-                    console.log('websocket 断开: ' + e.code + ' ' + e.reason + ' ' + e.wasClean)
-                    vue.$data.online = 0
-                    vue.$data.usercount = 0
-                    flexbusy.checked  = false 
-                    connstate.checked = false
-            }
  
    </script>
 
