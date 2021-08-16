@@ -132,7 +132,8 @@
   <div class="accordion-item" v-for="(code,index) in codelist">
     <h2 class="accordion-header" v-bind:id="'heading'+index">
       <button class="accordion-button" type="button" data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse'+index" aria-expanded="false" v-bind:aria-controls="'collapse'+index">
-        #{{index+1}} {{code}} <span v-if="result[code]">{{result[code][0]}} {{result[code][1]}} {{result[code][2]}}</span>
+        #{{index+1}} {{code}} <template v-if="result[code]">   <span style="margin-left:10px;"> {{result[code][0]}}</span>   
+                              <span style="margin-left:10px;">{{result[code][1]}}</span>  <span style="margin-left:10px;"> {{result[code][2]}}</span></template>
       </button>
     </h2>
     <div v-bind:id="'collapse'+index" class="accordion-collapse collapse" v-bind:aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
@@ -194,22 +195,14 @@
             <th scope="col">name</th>
             <th scope="col">code</th>
             <th scope="col">值</th>
-            <th scope="col">流通值(亿)</th>
-            <th scope="col">板块</th>
-            <th scope="col">概念板块</th>
-            <th scope="col">筹码</th>
             </tr>
             </thead>
              <tbody>
-                <tr v-for="(item,index) in result">
-                <th scope="row" >{{index+1}}</th>
-                <td><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+item.code+'/nc.shtml'" target=_blank>{{item.name}}</a></td>
-                <td><a v-bind:href="'https://gu.qq.com/'+item.code" target=_blank ><font color=blue>{{item.code}}</font></a></td>
-                <td>{{item.value}}</td>
-                <td>{{item.hqltsz}}</td>
-                <td>{{item.tdxbk}}</td>
-                <td>{{item.tdxgn}}</td>
-                <td>{{item.chouma}}</td>
+                <tr v-for="(item,index) in codelist">
+                <td>{{index+1}}</td>
+                <td v-if="result[item]"><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+item+'/nc.shtml'" target=_blank>{{result[item][0]}}</a></td>
+                <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <td v-if="result[item]">{{result[item][2]}}</td>
                 </tr>
                 </tbody>
             </table> 
