@@ -156,7 +156,7 @@
                 </tr>
  
                <tr v-for="(item,index) in codetree[code]">
-                <th scope="row" >{{index+1}}</th>
+                <th scope="row" @click="delsub(code,index)"> <font color="blue">X</font>  {{index+1}}</th>
                 <td v-if="result[item]"><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+item+'/nc.shtml'" target=_blank>{{result[item][0]}}</a></td>
                 <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
                 <td v-if="result[item]">{{result[item][2]}}</td>
@@ -295,6 +295,15 @@
         localStorage.setItem("klangcodelist",JSON.stringify(codetree))
         return codetree
     }
+    function deletesub(code,index){
+        codetree = savemain(code)
+
+        codetree[code].splice(index,1)
+        
+        localStorage.setItem("klangcodelist",JSON.stringify(codetree))
+        return codetree
+    }
+
 
     function treetolist(){
         codetree = localStorage.getItem("klangcodelist")
@@ -453,7 +462,13 @@
                 $('#sub'+index).val("")
                 
             },
+            delsub(code,index){
+                
+                this.codetree = deletesub(code,index)
+                this.stocklist = treetolist()
+                getDatas(this)
 
+            },
             addmain(){
                 var code = $("#maincode").val()
                 if (code == ''){
