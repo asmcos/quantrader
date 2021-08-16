@@ -437,6 +437,9 @@
             },
             refresh(){
                 var that = this
+                this.codetree = getcodetree()
+                this.codelist = Object.keys(this.codetree)
+                this.stocklist = treetolist()
                 getDatas(that)
  
             },
