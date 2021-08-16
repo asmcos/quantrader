@@ -108,22 +108,13 @@
          <div class="shadow-sm p-3 mb-5 bg-white rounded" style="padding:20px;">
   
         
-           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="ltszCheck" value="option1">
-            <label class="form-check-label" for="ltszCheck">剔除小市值</label>
-         </div>
-        <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="STCheck" value="option2" checked>
-        <label class="form-check-label" for="STCheck">剔除ST</label>
-        </div>
-
 
 
            <div class="form">
                 <textarea id="content" style="min-height:200px;width:95%"></textarea>
             </div>
-            <button type="button" class="btn btn-warning" style="margin-right:30px;"id="reset">清除</button>
-            <button type="button" class="btn btn-primary" id="run">运行公式</button>
+            <button type="button" class="btn btn-warning" style="margin-right:30px;" @click="readconfig">读取自选</button>
+            <button type="button" class="btn btn-primary" @click="saveall">保存</button>
           </div> <!--shadow-sm-->
         <p> </p>
 
@@ -141,19 +132,45 @@
   <div class="accordion-item" v-for="(code,index) in codelist">
     <h2 class="accordion-header" v-bind:id="'heading'+index">
       <button class="accordion-button" type="button" data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse'+index" aria-expanded="false" v-bind:aria-controls="'collapse'+index">
-        #{{index+1}} {{code}}
+        #{{index+1}} {{code}} <span v-if="result[code]">{{result[code][0]}} {{result[code][1]}} {{result[code][2]}}</span>
       </button>
     </h2>
     <div v-bind:id="'collapse'+index" class="accordion-collapse collapse" v-bind:aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-
+    
+            <table class="table table-bordered" border="1">
+            <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">name</th>
+            <th scope="col">code</th>
+            <th scope="col">涨幅</th>
+            </tr>
+            </thead>
+             <tbody>
+                 <tr>
+                <th scope="row" >  </th>
+                <td v-if="result[code]"><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+code+'/nc.shtml'" target=_blank>{{result[code][0]}}</a></td>
+                <td v-if="result[code]"><a v-bind:href="'https://gu.qq.com/'+code" target=_blank ><font color=blue>{{result[code][1]}}</font></a></td>
+                <td v-if="result[code]">{{result[code][2]}}</td>
+                </tr>
+ 
+               <tr v-for="(item,index) in codetree[code]">
+                <th scope="row" >{{index+1}}</th>
+                <td v-if="result[item]"><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+item+'/nc.shtml'" target=_blank>{{result[item][0]}}</a></td>
+                <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <td v-if="result[item]">{{result[item][2]}}</td>
+                </tr>
+                </tbody>
+            </table> 
+ 
 
 
 
        <div class="input-group input-group-sm mb-3">
         <input type="text" class="form-control" v-bind:id="'sub'+index" aria-describedby="button-addon4">
         <div class="input-group-append" id="button-addon4">
-         <button class="btn btn-outline-secondary" type="button">增加关联</button>
+         <button class="btn btn-outline-secondary" @click="addsub(code,index)" type="button">增加关联</button>
          <button class="btn btn-outline-secondary" @click="delmain(code)" type="button">删除自选</button>
         </div>
        </div> <!--input-group-->
@@ -199,6 +216,11 @@
         </div> <!--display-->
       </div><!--col-->
   </div> <!--row-->
+
+<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+<button class="btn btn-primary" @click="refresh">刷</button>
+</div>
+
 </div> <!-- container-->
 
 </div> <!-- app for vue-->
@@ -244,6 +266,11 @@
         return codetree
     }
 
+    function savebystr(str1){
+
+        localStorage.setItem("klangcodelist",str1)
+    }
+
     function deletemain(code){
         codetree = localStorage.getItem("klangcodelist")
 
@@ -269,11 +296,95 @@
         return codetree
     }
 
+    function treetolist(){
+        codetree = localStorage.getItem("klangcodelist")
+
+        if (codetree == null){
+            return []
+        }
+
+        codetree = JSON.parse(codetree)
+
+        var alllist = Object.keys(codetree)
+
+        Object.keys(codetree).forEach(function(item){
+            alllist = alllist.concat(codetree[item])
+        })
+        
+        return alllist
+    }
 
    </script>
 
 
     <script>
+    var win = window
+
+
+     function tableClass(){
+         tables = document.getElementsByTagName('table')
+         for (i=0;i<tables.length;i++){
+            tables[i].className = 'table table-bordered'
+         }
+      }
+
+  
+       function formatData(code,datas){
+            var name = datas[0]
+            var close1 = datas[2]
+            var close = datas[3]
+
+            var rise = 100 * (close - close1) / close1
+            if (String(parseFloat(rise)) != "NaN"){ //NaN 是无法直接比较的
+                rise = parseFloat(rise).toFixed(2)
+            } else {
+                rise = 0.000
+            } 
+            close = parseFloat(close).toFixed(2) 
+            vue.$data.result[code]=[name,close,rise]
+            console.log(name,close,rise)
+       }
+       
+
+      async function getDatas(that){
+        stocklist = that.stocklist
+        for (i=0 ; i < stocklist.length;i+=100){
+            params = stocklist.slice(i,i+100).join()
+            response = await axios.get(apihost+"/?list="+params)
+
+            var hq_str_sys_auth;
+ 
+            eval(response.data)
+
+            // 服务器返回错误，上面的定义就会在eval时候被赋值
+            if (hq_str_sys_auth=="FAILED"){
+                return
+            }
+            console.log(response)
+        }
+        stocklist.forEach(function(item){
+
+                  eval('win.'+item +'= hq_str_'+item)
+                  var datas= win[item].split(',')
+
+                  formatData(item,datas)
+
+                })
+         that.load = 1
+
+         that.$nextTick(function(){
+            tableClass()
+         });
+
+        setTimeout("tableClass()",1000 );  
+
+    }
+
+
+
+
+
+
    var hostname = window.location.hostname
    var host = window.location.host
      if (hostname == ""){
@@ -292,7 +403,12 @@
                 result:[],
                 codetree:{},
                 codelist:[],
+                stocklist:[],
             }
+        },
+        renderError (h, err) {
+             console.log(h,err)
+             console.log("renderError") 
         },
     
         created() {
@@ -303,13 +419,39 @@
             var that = this
             this.codetree = getcodetree()
             this.codelist = Object.keys(this.codetree)
+            this.stocklist = treetolist()
+            getDatas(that)
         },
         methods: {
 
+            readconfig(){
+                  var valstr = JSON.stringify(getcodetree())
+                  $("#content").val (valstr )
+            },
+            saveall(){
+               var valstr = $("#content").val()
+               savebystr(valstr) 
+
+            },
+            refresh(){
+                var that = this
+                getDatas(that)
+ 
+            },
             delmain(code){
 
                this.codetree =  deletemain(code)
                this.codelist = Object.keys(this.codetree)
+               this.stocklist = treetolist()
+               getDatas(this)
+            },
+            addsub(code,index){
+                subcode = $('#sub'+index).val()
+                this.codetree = savesub(code,subcode)
+                this.stocklist = treetolist()
+                getDatas(this)
+                $('#sub'+index).val("")
+                
             },
 
             addmain(){
@@ -320,18 +462,16 @@
                     
                 this.codetree = savemain(code)
                 this.codelist = Object.keys(this.codetree)
-
+                this.stocklist = treetolist()
+                getDatas(this)
                 $("#maincode").val('')
             }
         }
       }//VueApp
       window.vue = Vue.createApp(VueApp).mount('#app')
-
+      
  
    </script>
 
     </body>
 </html>
-<!--
-https://mdbootstrap.com/docs/b5/vue/getting-started/installation/
--->
