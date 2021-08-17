@@ -108,7 +108,7 @@
          <div class="shadow-sm p-3 mb-5 bg-white rounded" style="padding:20px;">
   
         
-
+            可以查看所有的自选配置JSON数据，手动更改 
 
            <div class="form">
                 <textarea id="content" style="min-height:200px;width:95%"></textarea>
@@ -118,13 +118,6 @@
           </div> <!--shadow-sm-->
         <p> </p>
 
-
-    <div class="input-group input-group-sm mb-3">
-  <input type="text" class="form-control" value="sh601012" id="maincode" aria-describedby="basic-addon2">
-  <div class="input-group-append">
-    <button class="btn btn-outline-secondary" type="button" @click="addmain">加入自选</button>
-  </div>
-</div>
 
 <div class="accordion shadow-sm rounded" id="accordionExample">
 
@@ -185,6 +178,16 @@
 
     </div> <!-- col -->
     <div class="col">
+
+    <div class="input-group input-group-sm mb-3">
+      <input type="text" class="form-control" value="sh601012" id="maincode" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" @click="addmain">加入自选</button>
+        </div>
+    </div>
+
+
+
         <div class="display">
 
             <table class="table table-bordered" border="1">
@@ -452,6 +455,10 @@
             },
             saveall(){
                var valstr = $("#content").val()
+
+               if (valstr.length < 8){
+                    return
+               }
                savebystr(valstr) 
 
             },
