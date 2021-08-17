@@ -193,8 +193,14 @@
             <th scope="col">#</th>
             <th scope="col">name</th>
             <th scope="col">code</th>
-            <th scope="col">值</th>
-            <th scope="col">操作</th>
+            <th scope="col">值
+           <a @click="openopt()">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8zm-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5z"/>
+            </svg>
+            </a> </th>
+            <th scope="col" v-if="opened">操作</th>
             </tr>
             </thead>
              <tbody>
@@ -203,7 +209,7 @@
                 <td v-if="result[item]"><a v-bind:href="'http://finance.sina.com.cn/realstock/company/'+item+'/nc.shtml'" target=_blank>{{result[item][0]}}</a></td>
                 <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
                 <td v-if="result[item]">{{result[item][2]}}</td>
-                <td >
+                <td v-if="opened">
                    <a @click="delmain(item)" class="text-decoration-none"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-x" viewBox="0 0 16 16">
   <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
   <path fill-rule="evenodd" d="M12.146 5.146a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
@@ -408,6 +414,7 @@
                 online:0,
                 usercount:0,
                 busy:0,
+                opened:0,
                 result:[],
                 codetree:{},
                 codelist:[],
@@ -431,7 +438,14 @@
             getDatas(that)
         },
         methods: {
-
+            openopt(){
+                if (this.opened == 0){
+                    this.opened = 1
+                } else {
+                    this.opened = 0
+                }
+            
+            },
             readconfig(){
                   var valstr = JSON.stringify(getcodetree())
                   $("#content").val (valstr )
