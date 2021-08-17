@@ -233,7 +233,11 @@ def config():
 
     def modify_bkcode(self,resp):
         path = self.path
-        print(path,"get bkcode ")
+        print(path,self.headers)
+        if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
+            return resp.content
+
+
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
         df = pd.read_html(content,converters={'代码': str},index_col=0)[0]
         df = df.drop(['涨跌',  '涨速(%)',  '换手(%)' ,    '量比',  '振幅(%)'  \
