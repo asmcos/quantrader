@@ -9,7 +9,21 @@ import json
 api = TdxHq_API(auto_retry=True)
 
 hostname="http://klang.org.cn"
-hostname="http://klang.zhanluejia.net.cn"
+#hostname="http://klang.zhanluejia.net.cn"
+
+filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
+filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
+
+def updatestocklist(stname=filename_sl):
+
+    json = requests.get(hostname+"/industries").json()
+    for i in json:
+        cm_dict[i['code']] = i.get('chouma','50')
+    df = pd.json_normalize(json)
+    df = df.drop(columns=['_id','updatedAt','id','createdAt'])
+    # 结果集输出到csv文件
+    df.to_csv(stname, index=False,columns=['updateDate','code','code_name','industry','industryClassification','tdxbk','tdxgn'])
+
 
 def get_bar(name,code):
     zone,code1 = code.split('.') 
@@ -48,6 +62,8 @@ def get_bar(name,code):
         requests.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
 
 if api.connect('119.147.212.81', 7709):
+
+    updatestocklist()
 
     init_stock_list()
 
