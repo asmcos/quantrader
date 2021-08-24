@@ -274,7 +274,12 @@ for i in range(0,len(hy1)):
 
 # 0 is name, 1 is sse
 def getmarket(code):
-    return hydict[code][1]
+    if hydict.get(code):
+        return hydict[code][1]
+    elif int(code)>=600000:
+        return 1
+    elif int(code)<600000:
+        return 0
 
 def gettdxbk(code):
     code = code.split('.')[1]

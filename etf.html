@@ -1,0 +1,197 @@
+<html>
+    <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+
+      <!-- Vendor CSS Files -->
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+
+
+  <!-- Template Main CSS File -->
+  <link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet">
+
+  <link href="http://www.zhanluejia.net.cn/corlate/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/font-awesome.min.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/animate.min.css" rel="stylesheet">
+    <link href="http://www.zhanluejia.net.cn/corlate/css/animation.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/prettyPhoto.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/main.css" rel="stylesheet">
+  <link href="http://www.zhanluejia.net.cn/corlate/css/responsive.css" rel="stylesheet">
+    <link href="http://www.zhanluejia.net.cn/zlj/css/style.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="http://www.zhanluejia.net.cn/static/css/site.css">
+
+
+        <title>Klang(金浪)板块实时数据</title>
+
+    </head>
+
+
+<body>
+<div id="app">
+<div class="row" style="width:80%;margin:100px;" id="content">
+
+<table>
+<thead>
+						<tr role="head" class="tr_hover">  
+							<th style="width: 36px;">序号</th>
+							<th style="width: 66px;"><span sort="code" style="color: rgb(35, 113, 174); cursor: pointer;">基金代码</span></th>
+							<th width="130px" style="width: 171px;"><span>基金名称</span></th>
+							<th width="130px" style="width: 171px;"><span>公司名称</span></th>
+							<th style="width: 76px;"><span sort="SYENDDATE" style="color: rgb(35, 113, 174); cursor: pointer;">更新日期</span></th>
+							<th style="width: 54px;"><span sort="F003N_FUND33" style="cursor: pointer; color: rgb(35, 113, 174);">周收益</span></th>
+							<th style="width: 54px;"><span sort="F008" style="cursor: pointer; color: rgb(35, 113, 174);">月收益</span></th>
+							<th style="width: 55px;"><span sort="F009" style="cursor: pointer; color: rgb(35, 113, 174);" class="desc">季收益<b class="desc_item"></b></span></th>
+							<th style="width: 55px;"><span sort="F011" style="cursor: pointer; color: rgb(35, 113, 174);">年收益</span></th>
+							<th style="width: 71px;"><span sort="F015N_FUND33" style="cursor: pointer; color: rgb(35, 113, 174);">三年收益</span></th>
+						    <th style="width: 63px;"><span sort="F012" style="cursor: pointer; color: rgb(35, 113, 174);">成立以来<br>收益率</span></th>
+						</tr>						
+					</thead>
+
+    <tbody>
+    <tr v-for="(e,index) in etflist">    
+    <td>{{index+1}}</td>
+    <td>{{e.code}}</td>
+    <td>{{e.name}}</td>
+    <td>{{e.orgname}}</td>
+    <td>{{e.SYENDDATE}}</td>
+    <td>
+            <font color="#ef3432" v-if="e.F003N_FUND33 >= 0">{{e.F003N_FUND33}}%</font>
+            <font color="#34ef32" v-if="e.F003N_FUND33 <0">{{e.F003N_FUND33}}%</font>
+    </td>
+    <td>
+            <font color="#ef3432" v-if="e.F008 >= 0">{{e.F008}}%</font>
+            <font color="#34ef32" v-if="e.F008 <0">{{e.F008}}%</font>
+    </td>
+     <td>
+            <font color="#ef3432" v-if="e.F009 >= 0">{{e.F009}}%</font>
+            <font color="#34ef32" v-if="e.F009 <0">{{e.F009}}%</font>
+    </td>
+     <td>
+            <font color="#ef3432" v-if="e.F011 >=0">{{e.F011}}%</font>
+            <font color="#34ef32" v-if="e.F011 <0">{{e.F011}}%</font>
+    </td>
+     <td>
+            <font color="#ef3432" v-if="e.F015N_FUND33 >= 0">{{e.F015N_FUND33}}%</font>
+            <font color="#34ef32" v-if="e.F015N_FUND33 <0">{{e.F015N_FUND33}}%</font>
+    </td>
+     <td>
+            <font color="#ef3432" v-if="e.F012 >= 0">{{e.F012}}%</font>
+            <font color="#34ef32" v-if="e.F012 <0">{{e.F012}}%</font>
+    </td>
+ 
+    </tr>
+    </tbody>
+
+
+</table>
+
+</div>
+
+<div class="row" style="width:80%;margin:100px;" id="gnblock" >
+  <div v-for="a,index in gn50list">
+   <div class="alert alert-primary" role="alert">
+      <a @click="getbkcode(a.href,index)">{{index+1}}、 {{a.name}} </a>
+   </div>
+
+   <div v-bind:id="'bk'+index">
+
+   </div>
+ </div> <!-- for -->
+</div>
+
+<div id="window2" class="row" style="width:80%;margin:100px;min-height:600px;">
+<iframe id="win2_iframe" src=""></iframe>
+</div>
+
+<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+<button class="btn btn-primary" @click="refresh">刷</button>
+</div>
+
+</div> <!--app -->
+
+    
+    <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
+<script src="http://www.zhanluejia.net.cn/corlate/js/bootstrap.min.js"></script>
+ <script type="text/javascript" src="http://www.zhanluejia.net.cn/static/js/jquery.fitvids.js?v=0e648b2512"></script>
+
+
+
+   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
+   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+
+
+    <script>
+       var  win = window
+ 
+
+       
+
+       function tableClass(){
+         tables = document.getElementsByTagName('table')
+         for (i=0;i<tables.length;i++){
+            tables[i].className = 'table table-bordered'
+            tables[i].border = '1'
+         }
+      }
+  
+      async function getDatas(that){
+
+            response = await axios.get(apihost+"/data/Net/info/ETF_F009_desc_0_0_1_9999_0_0_0_jsonp_g.html")
+  
+            content = document.getElementById('content')
+            console.log(response.data)
+            vue.$data.etflist = response.data
+      
+            that.load = 1
+
+
+            tableClass()
+            setTimeout("tableClass()",1000 );  
+
+      }
+
+   var hostname = window.location.hostname
+   var host = window.location.host
+     if (hostname == ""){
+        hostname = "127.0.0.1"
+        apihost = "http://127.0.0.1:9999"
+     } else {
+        apihost = "http://"+host
+     }
+   
+      const VueApp = {
+        data() {
+            return {
+                load:0,
+                result:{},
+                etflist:[],
+            }
+        },
+    
+        created() {
+            
+        },
+
+        mounted () {
+           var that = this
+            getDatas(that)
+       },
+        methods: {
+            refresh(e){
+              var that = this
+              getDatas(that)
+            }
+        }
+      }//VueApp
+      window.vue = Vue.createApp(VueApp).mount('#app')
+
+   </script>
+
+
+</body>
+</html>

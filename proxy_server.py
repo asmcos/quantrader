@@ -9,7 +9,7 @@ import requests
 import re
 import traceback
 import pandas as pd
-
+import json
 
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
@@ -105,7 +105,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, body=True):
         sent = False
         try:
-            if self.path in ['/gn.html','/zx.html']:
+            if self.path in ['/gn.html','/zx.html','/etf.html']:
                 gncontent = open(self.path[1:]).read()
 
                 self.send_response(200)
@@ -247,7 +247,22 @@ def config():
         df['筹码'] = df['代码'].apply(create_chouma) 
         df['代码'] = df['代码'].apply(create_clickable_code) 
 
+
+        pages = re.findall('page="(\d+)"',resp.text,re.I|re.S)
+        print(pages)
+
         return df.to_html(escape=False,float_format='%.2f').encode('gbk') #resp.content 
+
+    def modify_etf(self,resp):
+        path = self.path
+        print(path,"etf")
+        content = re.findall("g\(({.*})\)",resp.text,re.I|re.S)[0]
+        datas  = []
+        content = json.loads(content).get('data').get('data')
+        for d in content.keys():
+            datas.append(content[d])
+        return json.dumps(datas).encode('gbk') 
+
 
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
@@ -256,6 +271,9 @@ def config():
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
     set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
     set_after('/gn/detail/field/',modify_bkcode)
+
+    set_pathmap('/data/Net/info/ETF_F009_desc_0_0_1_9999_0_0_0_jsonp_g.html','http://fund.ijijin.cn')
+    set_after('/data/Net/info/ETF_F009_desc_0_0_1_9999_0_0_0_jsonp_g.html',modify_etf)
 
     set_pathmap('list=','https://hq.sinajs.cn')
 
