@@ -54,7 +54,7 @@
     <tbody>
     <tr v-for="(e,index) in etflist">    
     <td>{{index+1}}</td>
-    <td><a v-bind:href='"http://quote.eastmoney.com/sh"+e.code+".html"' target=_blank>{{e.code}}</a></td>
+    <td><a v-bind:href='"http://quote.eastmoney.com/"+e.code+".html"' target=_blank>{{e.code}}</a></td>
     <td>{{e.name}}</td>
     <td>{{e.orgname}}</td>
     <td>{{e.SYENDDATE}}</td>
