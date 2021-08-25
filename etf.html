@@ -89,8 +89,9 @@
     </td> 
     <td>
         <span v-if="result[e.code]">
-            <font color="#ef3432" v-if="result[e.code][2] >= 0">{{result[e.code][2]}}%</font>
+            <a v-bind:href='"https://gu.qq.com/"+e.code' target=_blank ><font color="#ef3432" v-if="result[e.code][2] >= 0">{{result[e.code][2]}}%</font>
             <font color="#34ef32" v-if="result[e.code][2] < 0">{{result[e.code][2]}}%</font>
+            </a>
         </span>
     </tr>
     </tbody>
