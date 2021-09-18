@@ -9,7 +9,7 @@ import json
 api = TdxHq_API(auto_retry=True)
 
 hostname="http://klang.org.cn"
-#hostname="http://klang.zhanluejia.net.cn"
+hostname="http://klang.zhanluejia.net.cn"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
@@ -34,7 +34,7 @@ def get_bar(name,code):
         zone = 1
     
     print(name,code1)
-    datas = api.get_security_bars(9,zone,code1, 0, 10)
+    datas = api.get_security_bars(9,zone,code1, 0, 2)
     info = api.get_finance_info(zone, code1)  
     datas = api.to_df(datas)
     if len(datas) < 2:
