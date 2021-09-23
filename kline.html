@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html style="height:100%;" >
+    <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+
+      <!-- Vendor CSS Files -->
+
+
+  <!-- Template Main CSS File -->
+  <!--link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet"-->
+
+
+        <title>Klang(金浪)自选股票</title>
+
+    </head>
+    <body style="margin: 0;height: 100%;min-height:600px;">
+
+   <div id="klinemain" style="height:100%;">
+
+
+    </div> <!-- app for vue-->
+
+    
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+  <!-- Template Main JS File -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/klinecharts@8.0.0-alpha4/dist/klinecharts.min.js"></script>
+      <script>
+       function getUrlParam(name){
+
+            var reg=new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r= window.location.search.substr(1).match(reg);
+
+            if(r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+     }
+ 
+
+       var hostname = window.location.hostname
+       var host = window.location.host
+       if (hostname == ""){
+            hostname = "127.0.0.1"
+            apihost = "http://127.0.0.1:9999"
+       } else {
+            apihost = "http://"+host
+       }
+
+    var datalist = []
+    var code = getUrlParam('code')
+    if (code == null ){
+        //中国电建
+        code = 'sh601669'
+    }
+
+    async function getLineQQData(code){
+        var reg = /"(.*?)"/
+        var page = 0
+        var i = 100
+        var today = new Date().toDateString()
+        datalist = []
+        while (i>0){
+            response = await axios.get(apihost+"/data/index.php?appn=detail&action=data&c="+code+"&p="+page)
+            page += 1
+            if(response.data=='')
+                break
+            i -= 1
+            var data = reg.exec(response.data)[0]
+            var datas = data.split('|')
+            datas.forEach(function(item){
+                items =item.split('/')
+                console.log(items)
+                close = parseFloat(items[2])
+                delta = parseFloat(items[3])
+                volume = parseFloat(items[4])
+                turnover = parseFloat(items[5])
+                if (delta > 0){
+                    high = close
+                    low = close
+                    open = close - delta
+                }else{
+                    high = close 
+                    low = close 
+                    open = close - delta
+                }
+
+                aline = {
+                    // 开盘价，必要字段
+                    open: open,
+                    // 收盘价，必要字段
+                    close: close,
+                    // 最高价，必要字段
+                    high: high,
+                    // 最低价，必要字段
+                    low: low,
+                    // 成交量，非必须字段
+                    volume: volume,
+                    // 成交额，非必须字段，如果需要展示技术指标'EMV'和'AVP'，则需要为该字段填充数据。
+                    turnover: turnover,
+                    // 时间戳，毫秒级别，必要字段
+                    timestamp: new Date(today +' ' + items[1]).getTime(),
+                }
+                //console.log(aline)
+                datalist.push(aline)
+            })// for
+
+        }//while
+        return datalist
+    }
+
+    async function getLineSinaData(code){
+
+        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen=280')
+        response.data.forEach(function(item){
+
+
+            datalist.push({
+                    open: parseFloat(item.open),
+                    close: parseFloat(item.close),
+                    high: parseFloat(item.high),
+                    low: parseFloat(item.low),
+                    volume: parseFloat(item.volume),
+                    timestamp:new Date(item.day).getTime(),
+                })
+        })
+
+    }
+
+    window.onload = async function () {
+        var chart = klinecharts.init('klinemain')
+
+
+        //chart.createTechnicalIndicator('MA', false, { id: 'candle_pane' })
+        // 创建一个副图技术指标VOL
+        chart.createTechnicalIndicator('VOL')
+        // 创建一个副图技术指标MACD
+        chart.createTechnicalIndicator('MACD')
+
+        window.chart = chart
+
+        var kLineDataList = []
+        var chartDataList = kLineDataList.map(function (data) {
+            return {
+                timestamp: new Date(data[0]).getTime(),
+                open: +data[1],
+                high: +data[2],
+                low: +data[3],
+                close: +data[4],
+                volume: Math.ceil(+data[5]),
+            }
+        })
+        //chart.applyNewData(chartDataList)
+
+       chart.setStyleOptions({
+        candle: {
+          type:'area'
+        }
+      })
+        await getLineSinaData(code)
+        
+        console.log(datalist)
+        chart.applyNewData(datalist)
+
+
+    }
+      
+ 
+   </script>
+
+    </body>
+</html>
