@@ -160,12 +160,14 @@
     }
 
     async function getLineSinaData(code){
+        var today = new Date().toDateString()
 
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen=280')
         response.data.forEach(function(item){
 
-
-            datalist.push({
+            //如果实时数据是今天，则显示
+            if(new Date(item.day).toDateString() == today){
+                datalist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
                     high: parseFloat(item.high),
@@ -173,6 +175,7 @@
                     volume: parseFloat(item.volume),
                     timestamp:new Date(item.day).getTime(),
                 })
+            }
         })
 
     }
