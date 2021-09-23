@@ -111,7 +111,9 @@
 
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen=280')
         response.data.forEach(function(item){
-
+            if (item.day.search('15:00:00') > 0){
+                console.log(item.close)
+            }
             //如果实时数据是今天，则显示
             if(new Date(item.day).toDateString() == today){
                 datalinelist.push({
