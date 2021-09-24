@@ -108,11 +108,11 @@
 
     async function getLineSinaData(code){
         var today = new Date().toDateString()
-
+        var close1 = ''
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen=280')
         response.data.forEach(function(item){
-            if (item.day.search('15:00:00') > 0){
-                console.log(item.close)
+            if (item.day.search('15:00:00') > 0 && close1==''){
+                close1 = item.close
             }
             //如果实时数据是今天，则显示
             if(new Date(item.day).toDateString() == today){
@@ -126,7 +126,7 @@
                 })
             }
         })
-
+        return close1
     }
 
 
@@ -148,7 +148,23 @@
 
     }
 
+   lastdayclose = {
 
+        name:'CLOSE',
+        calcParams:[0],
+        plots: [
+            { key: 'price', title: '昨日收盘价:', type: 'line' }
+        ],
+       calcTechnicalIndicator: (dataList,{params}) => {
+          return dataList.map(kLineData => {
+            const price = {}
+            price.price = params[0]
+            return  price
+    })
+  }
+ 
+
+   }
 
 
     window.onload = async function () {
@@ -160,6 +176,7 @@
         chartline.createTechnicalIndicator('VOL')
         // 创建一个副图技术指标MACD
         //chart.createTechnicalIndicator('MACD')
+
 
         window.chartline = chartline
 
@@ -180,8 +197,14 @@
           }
         },
       })
-        await getLineSinaData(code)
-        
+        //获取昨天的收盘价
+        close1 = await getLineSinaData(code)
+        lastdayclose.calcParams[0] = close1
+
+        //画一条收盘价的线 
+        chartline.addTechnicalIndicatorTemplate(lastdayclose)
+        chartline.createTechnicalIndicator('CLOSE',false ,{id:'candle_pane'})
+
         chartline.applyNewData(datalinelist)
         chartline.zoomAtCoordinate(-4)
 
