@@ -115,7 +115,7 @@
                 close1 = item.close
             }
             //如果实时数据是今天，则显示
-            if(new Date(item.day).toDateString() == today){
+            if(new Date(item.day).toDateString() === today){
                 datalinelist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
@@ -148,25 +148,7 @@
 
     }
 
-   lastdayclose = {
-
-        name:'CLOSE',
-        calcParams:[0],
-        plots: [
-            { key: 'price', title: '昨日收盘价:', type: 'line' }
-        ],
-       calcTechnicalIndicator: (dataList,{params}) => {
-          return dataList.map(kLineData => {
-            const price = {}
-            price.price = params[0]
-            return  price
-    })
-  }
  
-
-   }
-
-
     window.onload = async function () {
         var chartline = klinecharts.init('klinelinemain')
 
@@ -199,11 +181,22 @@
       })
         //获取昨天的收盘价
         close1 = await getLineSinaData(code)
-        lastdayclose.calcParams[0] = close1
 
-        //画一条收盘价的线 
-        chartline.addTechnicalIndicatorTemplate(lastdayclose)
-        chartline.createTechnicalIndicator('CLOSE',false ,{id:'candle_pane'})
+
+         chartline.createTag([
+          {
+            id: 'close1',
+            mark: 'close',
+            text: close1,
+            point: { value: close1 },
+            styles: {
+              line: { color: '#98cc12' },
+              mark: { backgroundColor: '#f0f' },
+              text: { backgroundColor: '#00f' }
+            }
+          }
+         ])
+
 
         chartline.applyNewData(datalinelist)
         chartline.zoomAtCoordinate(-4)
