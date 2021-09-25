@@ -100,6 +100,7 @@
 
     var datalinelist = []
     var datadaylist = []
+    var linebar = 255
     var code = getUrlParam('code')
     if (code == null ){
         //中国电建
@@ -109,7 +110,7 @@
     async function getLineSinaData(code){
         var today = new Date().toDateString()
         var close1 = ''
-        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen=280')
+        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+(linebar-100))
         response.data.forEach(function(item){
             if (item.day.search('15:00:00') > 0 && close1==''){
                 close1 = item.close
@@ -197,9 +198,14 @@
           }
          ])
 
+        // linebar 每天的分时线个数 每分钟一个，245个
+        barsize = chartline._chartPane._chartData._timeScaleStore._totalDataSpace / (linebar+10)
+        // 每个的空间
+        chartline._chartPane._chartData._timeScaleStore._dataSpace = barsize
+        // 靠左显示
+        chartline.setOffsetRightSpace((linebar-datalinelist.length) * barsize) 
 
         chartline.applyNewData(datalinelist)
-        chartline.zoomAtCoordinate(-4)
 
         var chartday = klinecharts.init('klinedaymain')
 
