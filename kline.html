@@ -108,15 +108,19 @@
     }
 
     async function getLineSinaData(code){
-        var today = new Date().toDateString()
         var close1 = ''
-        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+(linebar-100))
+        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+linebar)
+
+        //
+        data = response.data
+        var lastday = new Date(data[data.length-1].day).toDateString()
+
         response.data.forEach(function(item){
             if (item.day.search('15:00:00') > 0 && close1==''){
                 close1 = item.close
             }
             //如果实时数据是今天，则显示
-            if(new Date(item.day).toDateString() === today){
+            if(new Date(item.day).toDateString() === lastday){
                 datalinelist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
