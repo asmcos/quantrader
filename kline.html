@@ -141,7 +141,13 @@
 
       </div> <!-- k-line-chart-light -->
       </div> <!-- boardmain -->
-    </div> <!-- app -->
+  
+
+<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+<button class="btn btn-primary" @click="refresh">刷</button>
+</div>
+
+   </div> <!-- app -->
     
     <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
@@ -209,7 +215,8 @@
 
 
     async function getDaySinaData(code){
-
+        var lastday1
+        //日K数据结构不包含正在交易的日K数据
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=240&ma=no&datalen=280')
         response.data.forEach(function(item){
 
@@ -221,9 +228,27 @@
                     volume: parseFloat(item.volume),
                     timestamp:new Date(item.day).getTime(),
                 })
-            
+            lastday1 = item
         })
-
+        
+        //用实时数据补齐当日的日K
+        response1 = await axios.get(apihost+"/?list="+code)
+        var lastday = response1.data.split(",")
+        if (lastday.length>30){
+            ldate = lastday[30]
+            if(ldate !=lastday1.day){
+                //如果不包含就补齐
+                datadaylist.push({
+                    open:parseFloat(lastday[1]),
+                    close:parseFloat(lastday[3]),//当前日期的实施数据为当今收盘价
+                    high:parseFloat(lastday[4]),
+                    low:parseFloat(lastday[5]),
+                    volume:parseFloat(lastday[8]),
+                    timestamp:new Date(ldate).getTime(),
+                })
+                
+            }
+        } 
     }
 
  
@@ -234,6 +259,8 @@
              data() {
                 return {
                 lineorder:'one',
+                chartline:'',
+                chartday:'',
                 codelist:[],
                 stocklist:[],
             }
@@ -257,17 +284,28 @@
                 lineup(){
                     this.lineorder="one"
                     localStorage.setItem("lineorder",this.lineorder)
-                }
-         }
+                },
+                async refresh(){
+                    await getDaySinaData(code)
+                    this.chartday.applyNewData(datadaylist)
+ 
+                    //获取昨天的收盘价
+                    await getLineSinaData(code)
+
+                    barsize = this.chartline._chartPane._chartData._timeScaleStore._dataSpace 
+                    // 靠左显示
+                    this.chartline.setOffsetRightSpace((linebar-datalinelist.length) * barsize)
+
+                    this.chartline.applyNewData(datalinelist)
+ 
+                } //refresh
+         } //methods
         }
 
         window.vue = Vue.createApp(VueApp).mount('#app')
 
 
-
-
         var chartline = klinecharts.init('klinelinemain')
-
 
         //chart.createTechnicalIndicator('MA', false, { id: 'candle_pane' })
         // 创建一个副图技术指标VOL
@@ -277,7 +315,7 @@
 
 
         window.chartline = chartline
-
+        
        chartline.setStyleOptions({
         candle: {
           type:'area',
@@ -332,6 +370,9 @@
         chartday.createTechnicalIndicator('MACD')
 
         window.chartday = chartday
+
+        window.vue.$data.chartday = chartday
+        window.vue.$data.chartline = chartline
 
        chartday.setStyleOptions({
         candle: {
