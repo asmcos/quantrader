@@ -286,6 +286,8 @@
                     localStorage.setItem("lineorder",this.lineorder)
                 },
                 async refresh(){
+                    datadaylist = []
+                    datalinelist = []
                     await getDaySinaData(code)
                     this.chartday.applyNewData(datadaylist)
  
