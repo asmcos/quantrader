@@ -291,12 +291,12 @@ def gettdxgn(code):
 
 
 def create_clickable_code(code):
-    url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    url_template= '''<a href="http://klang.org.cn/kline.html?code={code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
 def create_close_code(code):
     url_template= '''result['{code}'][1]'''.format(code=code)
-    return '''<a href="http://klang.org.cn/kline.html?code='''+ code + '''" target="_blank">'''+ '{{'+url_template+'}}' + "</a>"
+    return '''<a href="https://gu.qq.com/'''+ code + '''" target="_blank">'''+ '{{'+url_template+'}}' + "</a>"
 
 def create_rise_code(code):
     url_template= '''result['{code}'][2]'''.format(code=code)

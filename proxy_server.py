@@ -22,7 +22,7 @@ code_list = {}
 
 def create_clickable_code(code):
     code = code_list.get(code,code).replace('.','')
-    url_template= '''<a href="https://gu.qq.com/{code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    url_template= '''<a href="http://klang.org.cn/kline.html?code={code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
 def create_color_hqltgz(hqltsz):
@@ -36,7 +36,8 @@ def create_color_hqltgz(hqltsz):
 
 def create_chouma(code):
     chouma = str(get_chouma(code_list.get(code,code)))
-    return chouma
+    code = code_list.get(code,code).replace('.','')
+    return """<a href="https://gu.qq.com/"""+code+'''" target="_blank">''' +chouma+"""</a>"""
 
 #tdx 板块信息只有 个股code对应板块名
 #因此要获取code和股票名的 对应表
