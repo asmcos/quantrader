@@ -112,7 +112,7 @@
       <div class="boardmain col-10" style="height:100%;">
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
-            <span v-if="stocklist.length" style="margin-right:10px;">{{stocklist[0]}}</span>
+            <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
             <i class="fa fa-sort-amount-down" v-if="lineorder=='one'" @click="linedown"></i>
             <i class="fa fa-sort-amount-up" v-if="lineorder=='three'" @click="lineup"></i>
 
@@ -130,7 +130,7 @@
 
       <div class="k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded two">
           <div class="top-bar"> 
-            <span v-if="stocklist.length" style="margin-right:10px;">{{stocklist[0]}}</span>
+            <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
           </div>
 
           <div class="row stock-chart k-line-chart-container"> 

@@ -296,7 +296,7 @@ def create_clickable_code(code):
 
 def create_close_code(code):
     url_template= '''result['{code}'][1]'''.format(code=code)
-    return '{{'+url_template+'}}'
+    return '''<a href="http://klang.org.cn/kline.html?code='''+ code + '''" target="_blank">'''+ '{{'+url_template+'}}' + "</a>"
 
 def create_rise_code(code):
     url_template= '''result['{code}'][2]'''.format(code=code)
