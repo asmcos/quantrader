@@ -42,7 +42,7 @@
     .k-line-chart-light {
         position: relative;
         height: 100%;
-        width: 80%;
+        width: 100%;
         min-height:600px;
         margin:10px;
         background-color: #fff;
@@ -109,7 +109,7 @@
     </head>
     <body class="bg" style="height: 100%;min-height:600px;">
      <div id="app" style="height:100%;">
-      <div class="boardmain col-10" style="height:100%;">
+      <div class="boardmain" style="height:100%;width:70%;float:left;">
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
             <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
@@ -145,7 +145,8 @@
       </div> <!-- boardmain -->
  
  
-      <div class="shadow-sm p-3 mb-5 bg-white rounded col-3" style="z-index:9999;position:fixed; right: 10px; top: 10px; margin:10px;">
+      <div class="shadow-sm p-3 mb-5 bg-white rounded col-3" style="float:right;margin:10px;overflow-y:scroll;max-height:600px;">
+    
             <h3>最近访问</h3>
             <table class="table table-bordered" border="1">
             <thead>
@@ -176,7 +177,6 @@
                 </tr>
                 </tbody>
             </table>
-
       </div>
 
 <div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
@@ -341,7 +341,7 @@
         var lastday = new Date(data[data.length-1].day).toDateString()
 
         response.data.forEach(function(item){
-            if (item.day.search('15:00:00') > 0 && close1==''){
+            if (item.day.search('15:00:00') > 0 && item.day.search(lastday) < 0){
                 close1 = item.close
             }
             //如果实时数据是今天，则显示
