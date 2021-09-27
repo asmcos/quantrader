@@ -339,9 +339,11 @@
         //
         data = response.data
         var lastday = new Date(data[data.length-1].day).toDateString()
-
+        var lastday1 = new Date(data[data.length-1].day).toISOString().slice(0,10)
+        
         response.data.forEach(function(item){
-            if (item.day.search('15:00:00') > 0 && item.day.search(lastday) < 0){
+            
+            if (item.day.search('15:00:00') > 0 && item.day.search(lastday1) < 0){
                 close1 = item.close
             }
             //如果实时数据是今天，则显示
