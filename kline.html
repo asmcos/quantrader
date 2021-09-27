@@ -274,6 +274,12 @@
             var close1 = datas[2]
             var close = datas[3]
 
+
+                        //开盘前价格为零
+            if (close == 0){
+                close = close1
+            } 
+
             var rise = 100 * (close - close1) / close1
             if (String(parseFloat(rise)) != "NaN"){ //NaN 是无法直接比较的
                 rise = parseFloat(rise).toFixed(2)
