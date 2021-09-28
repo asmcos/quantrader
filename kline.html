@@ -334,6 +334,8 @@
 
     async function getLineSinaData(code){
         var close1 = ''
+        var lclose = 0 //low
+        var hclose = 0 //high
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+linebar)
 
         //
@@ -344,10 +346,17 @@
         response.data.forEach(function(item){
             
             if (item.day.search('15:00:00') > 0 && item.day.search(lastday1) < 0){
-                close1 = item.close
+                close1 = parseFloat(item.close)
             }
             //如果实时数据是今天，则显示
             if(new Date(item.day).toDateString() === lastday){
+                c = parseFloat(item.close)
+                if(lclose > c|| lclose==0){
+                    lclose = c
+                }
+                if (hclose < c){
+                    hclose = c
+                }
                 datalinelist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
@@ -358,7 +367,8 @@
                 })
             }
         })
-        return close1
+        
+        return [close1,hclose,lclose]
     }
 
 
@@ -459,7 +469,26 @@
                     this.chartday.applyNewData(datadaylist)
  
                     //获取昨天的收盘价
-                    close1 = await getLineSinaData(code)
+                    arrayclose1 = await getLineSinaData(code)
+                    close1 = arrayclose1[0]
+                    hclose = arrayclose1[1]
+                    lclose = arrayclose1[2]
+
+
+                    if(hclose-close1>close-lclose){
+                        lclose = close1 * 2 - hclose
+                    } else {
+                        hclose = close1 * 2 - lclose
+                    }     
+
+                    chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax = function (){
+                        mm = this.oldMinMax()
+                        mm.min = lclose
+                        mm.max = hclose
+                        return mm
+                    }
+
+
 
                     chartline.createTag([
                     {
@@ -527,10 +556,29 @@
           }
         },
       })
-        //获取昨天的收盘价
-        close1 = await getLineSinaData(code)
 
-       
+       //save origin compute
+       chartline._chartPane._panes.get('candle_pane')._yAxis.oldMinMax = chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax
+
+        //获取昨天的收盘价
+        arrayclose1 = await getLineSinaData(code)
+        close1 = arrayclose1[0]
+        hclose = arrayclose1[1]
+        lclose = arrayclose1[2]
+
+
+        if(hclose-close1>close-lclose){
+            lclose = close1 * 2 - hclose
+        } else {
+            hclose = close1 * 2 - lclose
+        }      
+
+       chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax = function (){
+            mm = this.oldMinMax()
+            mm.min = lclose
+            mm.max = hclose
+            return mm
+        }
 
          chartline.createTag([
           {
@@ -545,6 +593,9 @@
             }
           }
          ])
+
+
+
 
         // linebar 每天的分时线个数 每分钟一个，245个
         barsize = chartline._chartPane._chartData._timeScaleStore._totalDataSpace / (linebar+10)
