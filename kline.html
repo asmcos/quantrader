@@ -344,7 +344,11 @@
         var lastday1 = new Date(data[data.length-1].day).toISOString().slice(0,10)
         
         response.data.forEach(function(item){
-            
+ 
+            if (item.day.search('14:57:00') > 0 && item.day.search(lastday1) < 0){
+                close1 = parseFloat(item.close)
+            }
+            //有时候最后一个数据不是15:00:00,而是14:57:00
             if (item.day.search('15:00:00') > 0 && item.day.search(lastday1) < 0){
                 close1 = parseFloat(item.close)
             }
