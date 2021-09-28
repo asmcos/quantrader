@@ -365,6 +365,9 @@
             //如果实时数据是今天，则显示
             if(new Date(item.day).toDateString() === lastday){
                 c = parseFloat(item.close)
+                if (close1 == ''){
+                    close1 = c
+                }
                 if(lclose > c|| lclose==0){
                     lclose = c
                 }
