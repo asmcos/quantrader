@@ -144,10 +144,19 @@
       </div> <!-- k-line-chart-light -->
       </div> <!-- boardmain -->
  
- 
-      <div class="shadow-sm p-3 mb-5 bg-white rounded col-3" style="float:right;margin:10px;overflow-y:scroll;max-height:600px;">
+      <div class="col-3" style="float:right;margin:10px;">
+
+
+           <div  class="shadow-sm p-3 mb-5 bg-white rounded" style="overflow-y:scroll;max-height:600px;">
     
-            <h3>最近访问</h3>
+            <input class="form-control" type="text" @input="search" v-model="keyword">
+            <ul class="dropdown-menu " style="background:#F5F5F5;"> 
+                  <template v-for="item in searchlist">
+                  <li @click="clickresult(item.code)" style="margin:5px;">{{item.name}} - {{item.code}}</li>
+                  </template>
+            </ul>
+
+            <h5 style="margin-top:5px;">最近访问</h5>
             <table class="table table-bordered" border="1">
             <thead>
             <tr>
@@ -177,6 +186,7 @@
                 </tr>
                 </tbody>
             </table>
+       </div>
       </div>
 
 <div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
@@ -436,6 +446,8 @@
                 reloadlock:0,
                 result:[],
                 stocklist:[],
+                keyword:"",
+                searchlist:[],
             }
           },
           watch:{
@@ -524,7 +536,32 @@
                     this.stocklist = savebrowserlist(code)
                     await this.refresh()
                     this.reloadlock = 0
-                }   
+                },
+                async search(){
+                    var that = this
+                    t = new Date().getTime()
+                    var recode = new RegExp(/(sh~\d{6})~(.*?)~|(sz~\d{6})~(.*?)~/,"g")
+                    response = await axios.get("/s3/?v=2&q="+that.keyword+"&t=all&_=" + t)
+                    eval(response.data)
+                    result = v_hint.match(recode)
+                    searchlist = []
+                    
+                    result.forEach(function(item){
+                        datas = item.split("~")
+                        name = datas[2].toLocaleString()
+                        searchlist.push({code:datas[0]+datas[1],name:name})
+                    })
+                    that.searchlist = searchlist
+                    
+                    console.log(searchlist)
+
+                    $(".dropdown-menu").show()
+                },
+                async clickresult(code){
+                    this.keyword=""
+                    this.reload(code)
+                    $(".dropdown-menu").hide()
+                }
          } //methods
         }
 

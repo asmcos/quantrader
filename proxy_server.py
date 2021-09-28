@@ -105,7 +105,6 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self, body=True):
         sent = False
-        print(self)
         try: #split("?") 删除参数
             if self.path.split("?")[0] in ['/gn.html','/zx.html','/etf.html','/kline.html']:
                 gncontent = open(self.path.split("?")[0][1:]).read()
@@ -280,6 +279,7 @@ def config():
     set_pathmap('list=','https://hq.sinajs.cn')
     set_pathmap('data/index.php','https://stock.gtimg.cn')
     set_pathmap('cn/api/json_v2.php','https://quotes.sina.cn')
+    set_pathmap('s3/','https://smartbox.gtimg.cn')
 
 if __name__ == '__main__':
     config()
