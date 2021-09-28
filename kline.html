@@ -367,7 +367,6 @@
                 })
             }
         })
-        
         return [close1,hclose,lclose]
     }
 
@@ -475,7 +474,7 @@
                     lclose = arrayclose1[2]
 
 
-                    if(hclose-close1>close-lclose){
+                    if(hclose-close1>close1-lclose){
                         lclose = close1 * 2 - hclose
                     } else {
                         hclose = close1 * 2 - lclose
@@ -567,7 +566,7 @@
         lclose = arrayclose1[2]
 
 
-        if(hclose-close1>close-lclose){
+        if(hclose-close1>close1-lclose){
             lclose = close1 * 2 - hclose
         } else {
             hclose = close1 * 2 - lclose
