@@ -541,7 +541,7 @@
                     var that = this
                     t = new Date().getTime()
                     var recode = new RegExp(/(sh~\d{6})~(.*?)~|(sz~\d{6})~(.*?)~/,"g")
-                    response = await axios.get("/s3/?v=2&q="+that.keyword+"&t=all&_=" + t)
+                    response = await axios.get(apihost+"/s3/?v=2&q="+that.keyword+"&t=all&_=" + t)
                     eval(response.data)
                     result = v_hint.match(recode)
                     searchlist = []
