@@ -109,6 +109,38 @@
     </head>
     <body class="bg" style="height: 100%;min-height:600px;">
      <div id="app" style="height:100%;">
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
+   <div class="container-fluid">
+    <a class="navbar-brand" href="/online.html">公式选股</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="http://www.klang.org.cn">主页</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/gushen/index.html">股神</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="/kline.html?code=sh000001" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            看盘软件
+          </a>
+       </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">和谐交易</a>
+        </li>
+      </ul>
+     </div>
+    </div>
+   </nav>
+
+  
+
+
+
       <div class="boardmain" style="height:100%;width:70%;float:left;">
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
