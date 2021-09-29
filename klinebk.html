@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html style="height:100%;" >
+    <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+
+ <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+     <!-- font awesome CSS -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+      <!-- Vendor CSS Files -->
+   <style>
+    .stock-chart {
+        width: 100%;
+        height: 100%;
+        position: relative
+    }
+
+    .k-line-chart-dark {
+        position: relative;
+        height: 100%;
+        background-color: #1e2126;
+        transition: all .5s
+    }
+
+    .top-bar {
+        font-size: 14px;
+        height: 38px;
+        color: #929aa5;
+        border-bottom: 1px solid #393a3e;
+        padding: 0 20px 0 12px
+    }
+    .tools {
+        width: 48px;
+        height: 100%;
+        border-right: 1px solid #393a3e
+    }
+    .chart-widget {
+        width: calc(100% - 48px);
+        height: 100%;
+        position: relative
+    }
+
+    .k-line-chart-light {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        min-height:600px;
+        margin:10px;
+        background-color: #fff;
+        transition: all .5s
+    }
+
+    .k-line-chart-container {
+        height: calc(100% - 38px)
+    }
+    .bg {
+        background: rgba(14, 22, 34, 0.02);
+    }
+
+
+   .boardmain {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-align: start;
+        -webkit-align-items: flex-start;
+        align-items: flex-start;
+    }   
+
+    .boardmain > div.three{
+        -webkit-box-ordinal-group: 3;
+        -moz-box-ordinal-group: 3;
+        -ms-flex-order: 3;
+        -webkit-order: 3;
+        order: 3;
+        overflow:visible;
+    } 
+
+    .boardmain > div.two{
+        -webkit-box-ordinal-group: 2;
+        -moz-box-ordinal-group: 2;
+        -ms-flex-order: 2;
+        -webkit-order: 2;
+        order: 2;
+        overflow:visible;
+    }
+
+    .boardmain > div.one{
+        -webkit-box-ordinal-group: 1;
+        -moz-box-ordinal-group: 1;
+        -ms-flex-order: 1;
+        -webkit-order: 1;
+        order: 1;
+    }   
+
+
+
+
+   </style>
+
+  <!-- Template Main CSS File -->
+  <!--link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet"-->
+
+
+        <title>Klang(金浪)自选股票</title>
+
+    </head>
+    <body class="bg" style="height: 100%;min-height:600px;">
+     <div id="app" style="height:100%;">
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
+   <div class="container-fluid">
+    <a class="navbar-brand" href="/online.html">公式选股</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="http://www.klang.org.cn">主页</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/gushen/index.html">股神</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="/kline.html?code=sh000001" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            看盘软件
+          </a>
+       </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">和谐交易</a>
+        </li>
+      </ul>
+     </div>
+    </div>
+   </nav>
+
+  
+
+
+
+      <div class="boardmain" style="height:100%;width:70%;float:left;">
+      <!--div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
+          <div class="top-bar"> 
+            <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
+            <i class="fa fa-sort-amount-down" v-if="lineorder=='one'" @click="linedown"></i>
+            <i class="fa fa-sort-amount-up" v-if="lineorder=='three'" @click="lineup"></i>
+
+          </div>
+
+          <div class="row stock-chart k-line-chart-container"> 
+              <div class="col tools"> </div>
+
+              <div class="chart-widget">
+                <div id="klinelinemain" style="width:100%;height:100%;"> </div>
+              </div>
+          </div>
+
+      </div--> <!-- k-line-chart-light -->
+
+      <div class="k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded two">
+          <div class="top-bar"> 
+            <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
+          </div>
+
+          <div class="row stock-chart k-line-chart-container"> 
+              <div class="col tools"> </div>
+
+              <div class="chart-widget">
+                <div id="klinedaymain" style="width:100%;height:100%;"> </div>
+              </div>
+          </div>
+
+      </div> <!-- k-line-chart-light -->
+      </div> <!-- boardmain -->
+ 
+      <div class="col-3" style="float:right;margin:10px;">
+
+
+           <div  class="shadow-sm p-3 mb-5 bg-white rounded" style="overflow-y:scroll;max-height:600px;">
+    
+            <input class="form-control" type="text" @input="search" v-model="keyword">
+            <ul class="dropdown-menu " style="background:#F5F5F5;"> 
+                  <template v-for="item in searchlist">
+                  <li @click="clickresult(item.code)" style="margin:5px;">{{item.name}} - {{item.code}}</li>
+                  </template>
+            </ul>
+
+            <h5 style="margin-top:5px;">最近访问</h5>
+            <table class="table table-bordered" border="1">
+            <thead>
+            <tr>
+            <th scope="col">name</th>
+            <th scope="col">code</th>
+            <th scope="col">值
+            </tr>
+            </thead>
+             <tbody>
+                <tr v-for="(item,index) in stocklist">
+                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a></td>
+                <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+       </div>
+      </div>
+
+<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+<button class="btn btn-primary" @click="refresh">刷</button>
+</div>
+
+   </div> <!-- app -->
+    
+    <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+  <!-- Template Main JS File -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/klinecharts@8.0.0-alpha4/dist/klinecharts.min.js"></script>
+      <script>
+       function getUrlParam(name){
+
+            var reg=new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r= window.location.search.substr(1).match(reg);
+
+            if(r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+     }
+ 
+
+       var hostname = window.location.hostname
+       var host = window.location.host
+       if (hostname == ""||hostname=="127.0.0.1"){
+            hostname = "127.0.0.1"
+            apihost = "http://127.0.0.1:9999"
+       } else {
+            apihost = "http://api.klang.org.cn"
+       }
+
+
+
+
+
+
+
+          function formatData(code,datas){
+        
+            d1 = datas[datas.length-1]
+            d2 = datas[datas.length-2]
+
+            close = d1.close
+            close1 = d2.close
+            name = d1.name
+                        //开盘前价格为零
+            if (close == 0){
+                close = close1
+            } 
+
+            var rise = 100 * (close - close1) / close1
+            if (String(parseFloat(rise)) != "NaN"){ //NaN 是无法直接比较的
+                rise = parseFloat(rise).toFixed(2)
+            } else {
+                rise = 0.000
+            } 
+            close = parseFloat(close).toFixed(2) 
+            vue.$data.result[code]=[name,close,rise]
+            console.log(name,close,rise)
+       }
+       
+
+      async function getDatas(that){
+        response = await axios.get(apihost+"/bk.json")
+        that.allbkdatas = response.data
+        that.stocklist = Object.keys(response.data)
+        that.stocklist.forEach(function(item){
+            formatData(item,that.allbkdatas[item])
+        })
+      }
+
+
+
+
+
+    var datalinelist = []
+    var datadaylist = []
+    var linebar = 255
+    var code = getUrlParam('code')
+    if (code == null ){
+        //中国电建
+        code = 'sh601669'
+    }
+
+
+    async function getDayData(code){
+        //日K数据结构不包含正在交易的日K数据
+        datas = vue.$data.allbkdatas[code]
+        datas.forEach(function(item){
+
+                datadaylist.push({
+                    open: parseFloat(item.open),
+                    close: parseFloat(item.close),
+                    high: parseFloat(item.high),
+                    low: parseFloat(item.low),
+                    volume: parseFloat(item.volume),
+                    timestamp:new Date(item.date).getTime(),
+                })
+        })
+        
+    }
+
+ 
+    window.onload = async function () {
+
+
+        const VueApp = {
+             data() {
+                return {
+                lineorder:'one',
+                chartline:'',
+                chartday:'',
+                reloadlock:0,
+                result:[],
+                stocklist:[],
+                allbkdatas:"",
+            }
+          },
+          watch:{
+
+
+          }, 
+          created() {
+                 var lineorder = localStorage.getItem("lineorder")
+                 if (lineorder == 'one' || lineorder == 'three'){
+                    this.lineorder = lineorder
+                }
+         },
+
+         async mounted () {
+            var that = this
+            await getDatas(that)
+            await getDayData(vue.$data.stocklist[0])
+            chartday.applyNewData(datadaylist)
+         },
+         methods: {
+                linedown(){
+                    this.lineorder="three"
+                    localStorage.setItem("lineorder",this.lineorder)
+                },
+                lineup(){
+                    this.lineorder="one"
+                    localStorage.setItem("lineorder",this.lineorder)
+                },
+                async reload(newcode){
+                    if (this.reloadlock == 1){
+                        return
+                    }
+                    this.reloadlock = 1
+                    code = newcode
+
+                    blist = this.stocklist
+                    i = blist.indexOf(code) 
+        
+                    if(i >= 0){
+                     //更换顺序
+                        blist.splice(i,1)
+                     }    
+                    //添加到开头
+                    blist.unshift(code)
+                    this.stocklist = blist
+
+                    await getDayData(code)
+                    
+                    chartday.applyNewData(datadaylist)
+                    this.reloadlock = 0
+                },
+                async search(){
+                },
+                async clickresult(code){
+                    this.keyword=""
+                    this.reload(code)
+                    $(".dropdown-menu").hide()
+                }
+         } //methods
+        }
+
+        window.vue = Vue.createApp(VueApp).mount('#app')
+
+
+        var chartday = klinecharts.init('klinedaymain')
+
+
+        chartday.createTechnicalIndicator('MA', false, { id: 'candle_pane' })
+        // 创建一个副图技术指标VOL
+        chartday.createTechnicalIndicator('VOL')
+        // 创建一个副图技术指标MACD
+        chartday.createTechnicalIndicator('MACD')
+
+        window.chartday = chartday
+
+        window.vue.$data.chartday = chartday
+
+       chartday.setStyleOptions({
+        candle: {
+          bar: {
+           downColor: '#26A69A',
+           upColor: '#EF5350',
+           noChangeColor: '#888888'
+          }
+         },
+        technicalIndicator: {
+           bar: {
+           downColor: '#26A69A',
+           upColor: '#EF5350',
+           noChangeColor: '#888888'
+          }
+        },
+      })
+
+        
+
+
+    }
+      
+ 
+   </script>
+
+    </body>
+</html>

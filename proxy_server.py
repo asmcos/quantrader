@@ -106,7 +106,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, body=True):
         sent = False
         try: #split("?") 删除参数
-            if self.path.split("?")[0] in ['/gn.html','/zx.html','/etf.html','/kline.html']:
+            if self.path.split("?")[0] in ['/gn.html','/zx.html',
+                                           '/klinebk.html','/bk.json','/etf.html','/kline.html']:
                 gncontent = open(self.path.split("?")[0][1:]).read()
 
                 self.send_response(200)
