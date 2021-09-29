@@ -162,7 +162,7 @@
 
       <div class="k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded two">
           <div class="top-bar"> 
-            <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
+            <span v-if="stocklist.length" style="margin-right:10px;">{{result[code][0]}}:{{code}}</span>
           </div>
 
           <div class="row stock-chart k-line-chart-container"> 
@@ -193,13 +193,20 @@
             <thead>
             <tr>
             <th scope="col">name</th>
-            <th scope="col">code</th>
-            <th scope="col">值
+            <th scope="col">价格</th>
+            <th scope="col">排序</th>
+            <th scope="col">涨幅</th>
             </tr>
             </thead>
              <tbody>
                 <tr v-for="(item,index) in stocklist">
-                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a></td>
+                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a>
+                </td>
+                <td>
+                 <i class="fa fa-sort-amount-up"   @click="sortup(item)" style="margin-left:10px; margin-right:10px;"></i>
+                 <i class="fa fa-sort-amount-down" @click="sortdown(item)"></i>
+
+                </td>
                 <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
                 <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
                 </td>
@@ -328,6 +335,8 @@
                 result:[],
                 stocklist:[],
                 allbkdatas:"",
+                code:"",
+                name:"",
             }
           },
           watch:{
@@ -346,15 +355,46 @@
             await getDatas(that)
             await getDayData(vue.$data.stocklist[0])
             chartday.applyNewData(datadaylist)
+            this.code = this.stocklist[0]
          },
          methods: {
-                linedown(){
-                    this.lineorder="three"
-                    localStorage.setItem("lineorder",this.lineorder)
+                display(){
+                    result = ''
+                    for (i=0;i<this.stocklist.length;i++){
+                        code = this.stocklist[i]
+                        result += "['" +this.allbkdatas[code][0].name +"','" + code+ "'],"
+                    }
+                    console.log(result)
                 },
-                lineup(){
-                    this.lineorder="one"
-                    localStorage.setItem("lineorder",this.lineorder)
+                sortdown(code){
+                    blist = this.stocklist
+                    i = blist.indexOf(code) 
+                    if (i == this.stocklist.lenght-1){
+
+                        return
+                    }
+                    if(i >= 0){
+                     //更换顺序
+                        blist.splice(i,1)
+                     }    
+                     blist.splice(i+1,0,code)
+                     this.stocklist = blist
+                     this.display()
+                },
+                sortup(code){
+                    blist = this.stocklist
+                    i = blist.indexOf(code) 
+                    if (i == 0){
+
+                        return
+                    }
+                    if(i >= 0){
+                       //更换顺序
+                        blist.splice(i,1)
+                     }    
+                     blist.splice(i-1,0,code)
+                     this.stocklist = blist
+                     this.display()
                 },
                 async reload(newcode){
                     if (this.reloadlock == 1){
@@ -362,7 +402,9 @@
                     }
                     this.reloadlock = 1
                     code = newcode
-
+                    this.code = newcode
+                    this.name = this.result[code][0]
+                    /*
                     blist = this.stocklist
                     i = blist.indexOf(code) 
         
@@ -373,7 +415,7 @@
                     //添加到开头
                     blist.unshift(code)
                     this.stocklist = blist
-
+                    */
                     await getDayData(code)
                     
                     chartday.applyNewData(datadaylist)
