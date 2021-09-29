@@ -181,12 +181,6 @@
 
            <div  class="shadow-sm p-3 mb-5 bg-white rounded" style="overflow-y:scroll;max-height:600px;">
     
-            <input class="form-control" type="text" @input="search" v-model="keyword">
-            <ul class="dropdown-menu " style="background:#F5F5F5;"> 
-                  <template v-for="item in searchlist">
-                  <li @click="clickresult(item.code)" style="margin:5px;">{{item.name}} - {{item.code}}</li>
-                  </template>
-            </ul>
 
             <h5 style="margin-top:5px;">最近访问</h5>
             <table class="table table-bordered" border="1">
@@ -283,8 +277,13 @@
 
       async function getDatas(that){
         response = await axios.get(apihost+"/bk.json")
-        that.allbkdatas = response.data
-        that.stocklist = Object.keys(response.data)
+        var datadict = {}
+        response.data.forEach(function(item){
+             code = Object.keys(item)[0]
+             datadict[code] = item[code]
+            that.stocklist.push(code)
+        })
+        that.allbkdatas = datadict
         that.stocklist.forEach(function(item){
             formatData(item,that.allbkdatas[item])
         })
