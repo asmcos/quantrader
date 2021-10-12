@@ -284,7 +284,7 @@
         }    
         //添加到开头
         blist.unshift(code1)
-        localStorage.setItem("klangbrowserlist",JSON.stringify(blist))
+        localStorage.setItem("klangbrowserlist",JSON.stringify(blist.slice(0,100)))
         return blist
     }
 
