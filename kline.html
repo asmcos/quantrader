@@ -5,7 +5,7 @@
 
  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
      <!-- font awesome CSS -->
-    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
       <!-- Vendor CSS Files -->
    <style>
     .stock-chart {
@@ -195,25 +195,30 @@
             <th scope="col">name</th>
             <th scope="col">code</th>
             <th scope="col">值
-           <a @click="openopt()">
-
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8zm-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5z"/>
-            </svg>
-            </a> </th>
             <th scope="col" v-if="opened">操作</th>
             </tr>
             </thead>
              <tbody>
-                <tr v-for="(item,index) in stocklist">
-                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a></td>
-                <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+
+                <tr v-for="(item,index) in stocktoplist">
+                <td v-if="result[item]"><a @click="reloadtop(item)" target=_blank>{{result[item][0]}}</a></td>
+                <td v-if="result[item]">
+
+                <i class="fa fa-ban fa-fw" style="margin-right:5px;color:red;" @click="downtop(item)"></i>
+                <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
                 <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
-                <td v-if="opened">
-                   <a @click="delmain(item)" class="text-decoration-none"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-x" viewBox="0 0 16 16">
-  <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-  <path fill-rule="evenodd" d="M12.146 5.146a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
-</svg> </a>
+                </tr>
+ 
+
+
+                <tr v-for="(item,index) in stocklist">
+                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a>
+                </td>
+                <td v-if="result[item]">
+
+                <i class="fa fa-hand-o-up" style="margin-right:5px;" @click="uptop(item)"></i>
+                <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
                 </td>
                 </tr>
                 </tbody>
@@ -257,9 +262,35 @@
 
 
 
+
        function getbrowserlist(){
+            return getlist('klangbrowserlist')
+       }
+
+       function savebrowserlist(code1){
+            return savelist('klangbrowserlist',code1)
+       }
+
+       function deletebrowserlist(code){
+            return deletelist('klangbrowserlist',code)
+       }
+
+       function gettoplist(){
+            return getlist('klangtoplist')
+       }
+
+       function savetoplist(code1){
+            return savelist('klangtoplist',code1)
+       }
+
+       function deletetoplist(code){
+            return deletelist('klangtoplist',code)
+       }
+
+ 
+       function getlist(name){
          var blist=[]
-         blist1 = localStorage.getItem("klangbrowserlist")
+         blist1 = localStorage.getItem(name)
 
          if (blist1 != null){
             blist = JSON.parse(blist1)
@@ -269,9 +300,9 @@
 
        }
 
-     function savebrowserlist(code1){
+     function savelist(name,code1){
          var blist=[]
-         blist1 = localStorage.getItem("klangbrowserlist")
+         blist1 = localStorage.getItem(name)
 
          if (blist1 != null){
             blist = JSON.parse(blist1)
@@ -284,24 +315,24 @@
         }    
         //添加到开头
         blist.unshift(code1)
-        localStorage.setItem("klangbrowserlist",JSON.stringify(blist.slice(0,100)))
+        localStorage.setItem(name,JSON.stringify(blist.slice(0,100)))
         return blist
     }
 
 
-    function deletebrowserlist(code){
+    function deletelist(name,code){
          var blist=[]
-         blist1 = localStorage.getItem("klangbrowserlist")
+         blist1 = localStorage.getItem(name)
 
          if (blist1 != null){
             blist = JSON.parse(blist1)
          }
         
         i = blist.indexOf(code) 
-        if (i>0){
+        if (i>=0){
             blist.splice(i,1)
         }
-        localStorage.setItem("klangbrowserlist",JSON.stringify(blist))
+        localStorage.setItem(name,JSON.stringify(blist))
         return blist
  
     }
@@ -335,7 +366,7 @@
        
 
       async function getDatas(that){
-        stocklist = that.stocklist
+        stocklist = that.stocklist.concat(that.stocktoplist)
         for (i=0 ; i < stocklist.length;i+=100){
             params = stocklist.slice(i,i+100).join()
             response = await axios.get(apihost+"/?list="+params)
@@ -482,6 +513,7 @@
                 reloadlock:0,
                 result:[],
                 stocklist:[],
+                stocktoplist:[],
                 keyword:"",
                 searchlist:[],
             }
@@ -502,6 +534,7 @@
 
          mounted () {
             var that = this
+            that.stocktoplist = gettoplist()
             getDatas(that)
          },
          methods: {
@@ -563,6 +596,27 @@
  
                     getDatas(this)
                 } ,//refresh
+                async reloadtop(newcode){
+                    if (this.reloadlock == 1){
+                        return
+                    }
+                    this.reloadlock = 1
+                    code = newcode
+                    this.stocklist = getbrowserlist( )
+                    this.stocktoplist = savetoplist(code)
+
+                    await this.refresh()
+                    this.reloadlock = 0
+                },
+ 
+                async uptop(code){
+                     deletebrowserlist(code)
+                     this.reloadtop(code)
+                },
+                async downtop(code){
+                     deletetoplist(code)
+                     this.reload(code)
+                },
                 async reload(newcode){
                     if (this.reloadlock == 1){
                         return
@@ -570,6 +624,8 @@
                     this.reloadlock = 1
                     code = newcode
                     this.stocklist = savebrowserlist(code)
+                    this.stocktoplist = gettoplist()
+
                     await this.refresh()
                     this.reloadlock = 0
                 },
