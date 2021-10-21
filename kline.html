@@ -522,8 +522,10 @@
           },
           watch:{
 
-            stocklist(){
-                getDatas(this)
+            async stocklist(){
+                await getDatas(this)
+                this.stockcode = code
+                this.stockname = this.result[code][0]
             },
 
           }, 
@@ -534,10 +536,12 @@
                 }
          },
 
-         mounted () {
+         async mounted () {
             var that = this
             that.stocktoplist = gettoplist()
-            getDatas(that)
+            await getDatas(that)
+            this.stockcode = code
+            this.stockname = this.result[code][0]
          },
          methods: {
                 linedown(){
