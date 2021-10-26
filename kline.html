@@ -398,6 +398,7 @@
 
     var datalinelist = []
     var datadaylist = []
+    var loaddata = 0
     var linebar = 255
     var code = getUrlParam('code')
     if (code == null ){
@@ -410,7 +411,11 @@
         var lclose = 0 //low
         var hclose = 0 //high
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+linebar)
-
+    
+        if (loaddata==1){
+            return
+        }
+        loaddata = 1
         //
         data = response.data
         var lastday = new Date(data[data.length-1].day).toDateString()
@@ -447,6 +452,7 @@
                 })
             }
         })
+        loaddata = 0
         return [close1,hclose,lclose]
     }
 
