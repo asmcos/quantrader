@@ -145,8 +145,8 @@
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
-            <i class="fa fa-arrow-circle-o-down" v-if="lineorder=='one'" @click="linedown"></i>
-            <i class="fa fa-arrow-circle-o-up" v-if="lineorder=='three'" @click="lineup"></i>
+            <i class="fa fa-arrow-down"  v-if="lineorder=='one'" @click="linedown"></i>
+            <i class="fa fa-arrow-up" v-if="lineorder=='three'" @click="lineup"></i>
 
           </div>
 
