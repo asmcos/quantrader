@@ -145,8 +145,8 @@
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
-            <i class="fa fa-sort-amount-down" v-if="lineorder=='one'" @click="linedown"></i>
-            <i class="fa fa-sort-amount-up" v-if="lineorder=='three'" @click="lineup"></i>
+            <i class="fa fa-arrow-circle-o-down" v-if="lineorder=='one'" @click="linedown"></i>
+            <i class="fa fa-arrow-circle-o-up" v-if="lineorder=='three'" @click="lineup"></i>
 
           </div>
 
@@ -540,8 +540,13 @@
             var that = this
             that.stocktoplist = gettoplist()
             await getDatas(that)
+
+            var timer = setInterval(this.refresh, 5000);
+
             this.stockcode = code
-            this.stockname = this.result[code][0]
+            if (this.result[code]){
+                this.stockname = this.result[code][0]
+            }
          },
          methods: {
                 linedown(){
