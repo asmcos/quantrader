@@ -412,11 +412,7 @@
         var hclose = 0 //high
         response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+linebar)
     
-        if (loaddata==1){
-            return
-        }
-        loaddata = 1
-        //
+       //
         data = response.data
         var lastday = new Date(data[data.length-1].day).toDateString()
         var lastday1 = new Date(data[data.length-1].day).toISOString().slice(0,10)
@@ -452,7 +448,6 @@
                 })
             }
         })
-        loaddata = 0
         return [close1,hclose,lclose]
     }
 
@@ -564,8 +559,16 @@
                     localStorage.setItem("lineorder",this.lineorder)
                 },
                 async refresh(){
+
+                    if (loaddata==1){
+                        return
+                    }
+                    loaddata = 1
+ 
+
                     datadaylist = []
                     datalinelist = []
+
                     await getDaySinaData(code)
                     this.chartday.applyNewData(datadaylist)
  
@@ -616,6 +619,7 @@
 
                     this.stockcode = code
                     this.stockname = this.result[code][0]
+                    loaddata = 0
 
                 } ,//refresh
                 async reloadtop(newcode){
@@ -714,6 +718,7 @@
        //save origin compute
        chartline._chartPane._panes.get('candle_pane')._yAxis.oldMinMax = chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax
 
+        loaddata = 1
         //获取昨天的收盘价
         arrayclose1 = await getLineSinaData(code)
         close1 = arrayclose1[0]
@@ -801,6 +806,7 @@
         
         chartday.applyNewData(datadaylist)
 
+        loaddata = 0
 
     }
       
