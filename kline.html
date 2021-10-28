@@ -416,7 +416,8 @@
         data = response.data
         var lastday = new Date(data[data.length-1].day).toDateString()
         var lastday1 = new Date(data[data.length-1].day).toISOString().slice(0,10)
-        
+       
+        var templist = [] 
         response.data.forEach(function(item){
  
             if (item.day.search('14:57:00') > 0 && item.day.search(lastday1) < 0){
@@ -438,7 +439,7 @@
                 if (hclose < c){
                     hclose = c
                 }
-                datalinelist.push({
+                templist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
                     high: parseFloat(item.high),
@@ -448,6 +449,7 @@
                 })
             }
         })
+        datalinelist = templist
         return [close1,hclose,lclose]
     }
 
