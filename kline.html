@@ -519,6 +519,7 @@
                 searchlist:[],
                 stockname:"",
                 stockcode:"",
+                timer:'',
             }
           },
           watch:{
@@ -542,7 +543,7 @@
             that.stocktoplist = gettoplist()
             await getDatas(that)
 
-            //var timer = setInterval(this.refresh, 2800);
+            this.timer = setInterval(this.update, 3000);
 
             this.stockcode = code
             if (this.result[code]){
@@ -558,14 +559,21 @@
                     this.lineorder="one"
                     localStorage.setItem("lineorder",this.lineorder)
                 },
-                async refresh(){
 
-                    if (loaddata==1){
+                async update(){
+                    getDatas(this)
+                    if (loaddata == 1){
                         return
                     }
+ 
+                    datalinelist = []
+                    await getLineSinaData(code)
+                    this.chartline.applyNewData(datalinelist)
+                },
+                async refresh(){
+ 
                     loaddata = 1
  
-
                     datadaylist = []
                     datalinelist = []
 
