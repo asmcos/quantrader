@@ -192,7 +192,7 @@ def loop_60all(callback,stlist=stocklist):
 
 
 hostname="http://klang.org.cn"
-#hostname="http://klang.zhanluejia.net.cn"
+hostname="http://klang.zhanluejia.net.cn"
 
 #
 #stock list
