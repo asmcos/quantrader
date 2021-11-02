@@ -190,10 +190,13 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
-        scheme = urlparse(self.headers['Referer']).scheme
-        netloc = urlparse(self.headers['Referer']).netloc
-        self.send_header('Access-Control-Allow-Origin', scheme+"://"+netloc);
-        self.send_header('Access-Control-Allow-Credentials','true');
+        try:
+            scheme = urlparse(self.headers['Referer']).scheme
+            netloc = urlparse(self.headers['Referer']).netloc
+            self.send_header('Access-Control-Allow-Origin', scheme+"://"+netloc);
+            self.send_header('Access-Control-Allow-Credentials','true');
+        except:
+            self.send_header('Access-Control-Allow-Origin', "*");
 
         self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); 
         self.end_headers()

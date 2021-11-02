@@ -253,7 +253,7 @@
 
        var hostname = window.location.hostname
        var host = window.location.host
-       if (hostname == ""){
+       if (hostname == "" ||hostname == '127.0.0.1'){
             hostname = "127.0.0.1"
             apihost = "http://127.0.0.1:9999"
        } else {
