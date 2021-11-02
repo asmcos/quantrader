@@ -190,7 +190,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
-        self.send_header('Access-Control-Allow-Origin', '*');
+        print(self.headers['Referer'])
+        self.send_header('Access-Control-Allow-Origin', self.headers['Referer']);
+        self.send_header('Access-Control-Allow-Credentials','true');
+
         self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); 
         self.end_headers()
 
