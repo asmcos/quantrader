@@ -10,7 +10,7 @@ import re
 import traceback
 import pandas as pd
 import json
-
+from urllib.parse import urlparse
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
@@ -190,8 +190,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
-        print(self.headers['Referer'])
-        self.send_header('Access-Control-Allow-Origin', self.headers['Referer']);
+        scheme = urlparse(self.headers['Referer']).scheme
+        netloc = urlparse(self.headers['Referer']).netloc
+        self.send_header('Access-Control-Allow-Origin', scheme+"://"+netloc);
         self.send_header('Access-Control-Allow-Credentials','true');
 
         self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); 
