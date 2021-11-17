@@ -42,7 +42,7 @@ def main_loop(start,endday):
         if start is None:
             Kl.date(end=endday)
         else:
-            Kl.data(start=start,end=endday)
+            Kl.date(start=start,end=endday)
         try:
             if len(C) < 70:
                 continue
@@ -66,8 +66,12 @@ def main_loop(start,endday):
                 ma30 = MA(C,30)
                 ma60 = MA(C,60)
                 v20 =  MA(V,20)
-                valv1 = V / v20 
+                valv20 = V / v20 
                 valc1 = ((C-C[1]) / C[1]) * 100
+                valo1 = ((O-O[1]) / O[1]) * 100
+                valh1 = ((H-H[1]) / H[1]) * 100
+                vall1 = ((L-L[1]) / L[1]) * 100
+                valv1 = ((V-V[1]) / V[1]) * 100
                 valc5 = C / ma5  
                 valc10 = C / ma10  
                 valc60 = C / ma60 
@@ -80,15 +84,17 @@ def main_loop(start,endday):
                     label = 0
                 if(valc1 > 8):
                     #print(C.data[-1],allC[-11-i],maxc10)
-                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valv1,tran,label)
-                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valv1,tran,label])
+                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label)
+                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
+fields = ['name','code','日期','5日均线比','10日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡','是否涨幅10%']
+
+
 main_loop(start=None,endday='2021-07-01')
-fields = ['name','code','日期','5日均线比','10日均线比','60日均线比','涨幅','20日量比','60日震荡','是否涨幅10%']
 df = pd.DataFrame(all_list,columns=fields)
 df.to_csv('transverse_train'+today+'.csv',index=False)
 
