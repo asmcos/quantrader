@@ -11,12 +11,6 @@ import linecache
 import pandas as pd
 
 
-is10CM = 1
-
-rise = 15
-if is10CM:
-    rise = 9.9
-
 
 def getpyglobals(name):
     return globals().get(name)
@@ -45,17 +39,6 @@ def main_loop(start,endday):
 
     #for df in Kl.df_all[:500]:
     for df in Kl.df_all:
-
-        # 是否是 涨幅10CM       
-        if 'sh.60' in df['code'] or  'sz.0' in df['code']:
-                CM10 = True
-        else:
-                CM10 = False
-
-        if is10CM == 1 and CM10 == False:
-                continue
-        if is10CM == 0  and CM10 == True:
-                continue
 
         Kl.code(df["code"])
 
