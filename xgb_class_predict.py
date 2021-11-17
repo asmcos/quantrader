@@ -9,58 +9,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
+import talib
 
 # 1. 获取数据
 # stock data 例子
 end = '2021-11-17'
-hostname= "http://klang.zhanluejia.net.cn"
-def get_stock_data(code):
-    try:
-        json = requests.get(hostname+"/dayks",
-            params={"code":code,"end":end,"limit":200},timeout=1000).json()
-    except:
-        json = requests.get(hostname+"/dayks",
-            params={"code":code,"end":end,"limit":200},timeout=1000).json()
-
-    df = pd.json_normalize(json)
-
-    if len(df) < 1:
-       return []
-
-    df = df.drop(columns=['_id','codedate','id'])
-    datas = df.sort_values(by="date",ascending=True)
-
-    datas['datetime'] = datas['date']
-    close  = datas['close'].iloc[-1]
-    volume = datas['volume'].iloc[-1]
-    turn   = datas['turn'].iloc[-1]
-    try :
-        datas['hqltsz'] = float(volume) * float(close)/ float(turn) / 1000000
-    except:
-        datas['hqltsz'] = 0.0001 #没有交易量
-    datas.rename(columns={'volume':'vol'},inplace = True)
-    datas = datas.loc[:,['close','high', 'low','vol','turn']]                                                                                                                                                   
-    return datas
-
-# 600111 北方稀土
-#data = get_stock_data('sh.600111')
-#print(data)
-
-
-
-#2. 准备训练的标签
-
-# 股票例子
-def get_label(data):
-    label = []
-    for i in range(1,len(data)):
-        if data['close'].iloc[i] > data['close'].iloc[i-1]:
-            label.append(1)
-        else:
-            label.append(0)
-    return label
-
-#label = get_label(data)
 
 
 datas = pd.read_csv('transverse'+end+'.csv')
