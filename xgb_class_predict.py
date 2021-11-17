@@ -11,6 +11,9 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
 import talib
 
+
+from common.framework import save_df_tohtml
+
 # 1. 获取数据
 # stock data 例子
 end = '2021-11-18'
@@ -74,11 +77,17 @@ png = xgb.to_graphviz(model,num_trees=0)
 preds = pd.read_csv('transverse_pred'+end+'.csv')
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
+pred_list = []
 for i in range(0,len(y_pred)):
     if y_pred[i] == 1 and preds['日期'].values[i] > '2021-11-12':
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
+        pred_list.append([preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i]])
 
+df_pred = pd.DataFrame(pred_list,columns=['name','code','日期'])
+df_pred['流通股值'] = 10
 
+print('file://'+os.getcwd()+ '/' + './datas/tree_pred'+end+'.html' )
+save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
 
 params = {
     'booster': 'gbtree',
