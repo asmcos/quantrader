@@ -42,8 +42,8 @@ def main_loop(start,endday):
     if pred_data == 1:
         check_day = 0
 
-    for df in Kl.df_all[:500]:
-    #for df in Kl.df_all:
+    #for df in Kl.df_all[:500]:
+    for df in Kl.df_all:
 
         Kl.code(df["code"])
 
@@ -69,13 +69,16 @@ def main_loop(start,endday):
             d = datelist[i]
             Kl.date(end=d)
             try:
+                valc1 = ((C-C[1]) / C[1]) * 100
+                if(valc1 < 8) or V[1] == 0 or V == 0:
+                        continue
+
                 ma5  = MA(C,5)
                 ma10 = MA(C,10)
                 ma30 = MA(C,30)
                 ma60 = MA(C,60)
                 v40 =  MA(V,40)
                 valv40 = V / v40 
-                valc1 = ((C-C[1]) / C[1]) * 100
                 valo1 = ((O-O[1]) / O) * 100
                 valh1 = ((H-H[1]) / H) * 100
                 vall1 = ((L-C) / L) * 100
@@ -96,10 +99,9 @@ def main_loop(start,endday):
                     label = 1
                 else:
                     label = 0
-                if(valc1 > 8) and V[1] > 0 and V > 0:
-                    #print(C.data[-1],allC[-11-i],maxc10)
-                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label)
-                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label])
+                #print(C.data[-1],allC[-11-i],maxc10)
+                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label)
+                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
