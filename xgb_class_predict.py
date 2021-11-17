@@ -13,7 +13,7 @@ import talib
 
 # 1. 获取数据
 # stock data 例子
-end = '2021-11-17'
+end = '2021-11-18'
 
 
 datas = pd.read_csv('transverse_train'+end+'.csv')
@@ -73,7 +73,7 @@ png = xgb.to_graphviz(model,num_trees=0)
 
 preds = pd.read_csv('transverse_pred'+end+'.csv')
 preds1 = preds.loc[:,fields]
-y_pred = model.predict(pred1s)
+y_pred = model.predict(preds1)
 for i in range(0,len(y_pred)):
     if y_pred[i] == 1:
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
