@@ -34,8 +34,11 @@ def PrintException():
     print ('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
 all_list = []
+pred_data = 0
 def main_loop(start,endday):
     offset = 60 #要计算MA60，所以之前的60不能计算
+    check_day = 10
+
 
     for df in Kl.df_all[:500]:
     #for df in Kl.df_all:
@@ -54,7 +57,7 @@ def main_loop(start,endday):
 
             datelist = []
         
-            for i in range(10,len(C)-offset):
+            for i in range(check_day,len(C)-offset):
                 datelist.append(str(DATETIME[i]))
 
         except:
@@ -79,8 +82,12 @@ def main_loop(start,endday):
                 valc10 = C / ma10  
                 valc30 = C / ma30  
                 valc60 = C / ma60 
-                maxc10 = talib.MAX(allC[-10-i:-i-1],9)[-1]
-                target = ((maxc10- C.data[-1] ) / C.data[-1] )* 100
+                if pred_data == 0:
+                    maxc10 = talib.MAX(allC[-check_day-i:-i-1],check_day-1)[-1]
+                    target = ((maxc10- C.data[-1] ) / C.data[-1] )* 100
+                else:
+                    target = 0
+
                 tran = TRANSVERSE() #60日波动，<15判定为横盘震荡
 
                 if target > 10:
@@ -108,5 +115,11 @@ all_list = []
 main_loop(start='2021-07-15',endday=today)
 df = pd.DataFrame(all_list,columns=fields)
 df.to_csv('transverse_test'+today+'.csv',index=False)
+
+all_list = []
+pred_data = 1
+main_loop(start='2021-07-15',endday=today)
+df = pd.DataFrame(all_list,columns=fields)
+df.to_csv('transverse_pred'+today+'.csv',index=False)
 
 

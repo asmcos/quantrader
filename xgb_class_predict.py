@@ -20,9 +20,12 @@ datas = pd.read_csv('transverse_train'+end+'.csv')
 label = datas['是否涨幅10%']
 print(label.values)
 
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡']
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','V涨幅','20日量比','60日震荡']
-datas = datas.loc[:,fields]                                                                                                                                                   
+
+
+
+
+fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡']
+datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
 # 
@@ -34,14 +37,15 @@ X_train, X_test, y_train, y_test = train_test_split(datas, label.values, test_si
 model = XGBClassifier(learning_rate=0.1,
                       use_label_encoder=False,
                       booster='gbtree',             # 分类树
-                      n_estimators=500,             # 树的个数--1000棵树建立xgboost
+                      n_estimators=300,             # 树的个数--1000棵树建立xgboost
                       max_depth= 6,                 # 树的深度
                       min_child_weight = 1,         # 叶子节点最小权重
                       gamma=0.,                     # 惩罚项中叶子结点个数前的参数
                       subsample=0.8,                # 随机选择80%样本建立决策树
                       objective='reg:squarederror', # 指定损失函数
                       scale_pos_weight=1,           # 解决样本个数不平衡的问题
-                      random_state=27               # 随机数
+                      random_state=27,               # 随机数
+                      colsample_bytree=0.7,
                       )
 model.fit(X_train,
           y_train,
@@ -56,12 +60,23 @@ tests = pd.read_csv('transverse_test'+end+'.csv')
 label = tests['是否涨幅10%']
 print(label.values)
 
-tests = tests.loc[:,fields]                                                                                                                                                   
+tests1 = tests.loc[:,fields]
 
-ans = model.predict_proba(tests)
-y_pred = model.predict(tests)
+ans = model.predict_proba(tests1)
+y_pred = model.predict(tests1)
 accuracy = accuracy_score(label.values, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+png = xgb.to_graphviz(model,num_trees=0)
+#png.view("stock.png")
+
+
+preds = pd.read_csv('transverse_pred'+end+'.csv')
+preds1 = preds.loc[:,fields]
+y_pred = model.predict(pred1s)
+for i in range(0,len(y_pred)):
+    if y_pred[i] == 1:
+        print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
 
 png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
