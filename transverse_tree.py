@@ -39,6 +39,8 @@ def main_loop(start,endday):
     offset = 60 #要计算MA60，所以之前的60不能计算
     check_day = 10
 
+    if pred_data == 1:
+        check_day = 0
 
     for df in Kl.df_all[:500]:
     #for df in Kl.df_all:
