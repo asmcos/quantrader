@@ -34,7 +34,7 @@ print(datas)
 X_train, X_test, y_train, y_test = train_test_split(datas, label.values, test_size=0.2, random_state=0)
 
 ### fit model for train data
-model = XGBClassifier(learning_rate=0.1,
+model = XGBClassifier(learning_rate=0.01,
                       use_label_encoder=False,
                       booster='gbtree',             # 分类树
                       n_estimators=300,             # 树的个数--1000棵树建立xgboost
@@ -78,11 +78,50 @@ for i in range(0,len(y_pred)):
     if y_pred[i] == 1 and preds['日期'].values[i] > '2021-11-12':
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
 
+
+
+params = {
+    'booster': 'gbtree',
+    'objective': 'multi:softmax',
+    'num_class': 3,
+    'gamma': 0.1,
+    'max_depth': 6,
+    'lambda': 2,
+    'subsample': 0.7,
+    'colsample_bytree': 0.7,
+    'min_child_weight': 1,
+    'eta': 0.1,
+    'seed': 1000,
+    'nthread': 4,
+    'eval_metric':'mlogloss'
+}
+
+plst = params.items()
+
+
+dtrain = xgb.DMatrix(X_train, y_train)
+num_rounds = 500
+model = xgb.train(params, dtrain, num_rounds)
+
+# 对测试集进行预测
+dtest = xgb.DMatrix(X_test)
+ans = model.predict(dtest)
+
+cnt1 = 0
+cnt2 = 0
+for i in range(len(y_test)):
+    if ans[i] == y_test[i]:
+        cnt1 += 1
+    else:
+        cnt2 += 1
+
+print("Accuracy: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)))
+
 #png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
 
 
 #显示
-plot_importance(model)
-plt.show()
+#plot_importance(model)
+#plt.show()
 
