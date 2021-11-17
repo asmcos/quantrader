@@ -8,7 +8,7 @@ import talib
 
 import sys
 import linecache
-
+import pandas as pd
 
 def getpyglobals(name):
     return globals().get(name)
@@ -31,7 +31,7 @@ def PrintException():
     line = linecache.getline(filename, lineno, f.f_globals)
     print ('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
-
+all_list = []
 def main_loop():
     offset = 60 #要计算MA60，所以之前的60不能计算
 
@@ -72,11 +72,24 @@ def main_loop():
                 maxc10 = talib.MAX(allC[-10-i:-i-1],9)[-1]
                 target = ((maxc10- C.data[-1] ) / C.data[-1] )* 100
                 tran = TRANSVERSE() #60日波动，<15判定为横盘震荡
+                if target > 10:
+                    label = 1
+                else:
+                    label = 0
                 if(valc1 > 8):
                     #print(C.data[-1],allC[-11-i],maxc10)
-                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valv1,tran,target)
+                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valv1,tran,label)
+                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valv1,tran,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 main_loop()
+
+fields = ['name','code','日期','5日均线比','10日均线比','60日均线比','涨幅','20日量比','60日震荡','是否涨幅10%']
+datas = []
+
+
+df = pd.DataFrame(all_list,columns=fields)
+
+df.to_csv('transverse'+today+'.csv',index=False)
