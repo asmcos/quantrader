@@ -32,15 +32,17 @@ def PrintException():
     print ('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
 all_list = []
-def main_loop():
+def main_loop(start,endday):
     offset = 60 #要计算MA60，所以之前的60不能计算
 
     #for df in Kl.df_all[:100]:
     for df in Kl.df_all:
         
         Kl.code(df["code"])
-        Kl.date(end=today)
-
+        if start is None:
+            Kl.date(end=endday)
+        else:
+            Kl.data(start=start,end=endday)
         try:
             if len(C) < 70:
                 continue
@@ -84,12 +86,16 @@ def main_loop():
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
-main_loop()
 
+main_loop(start=None,endday='2021-07-01')
 fields = ['name','code','日期','5日均线比','10日均线比','60日均线比','涨幅','20日量比','60日震荡','是否涨幅10%']
-datas = []
-
-
 df = pd.DataFrame(all_list,columns=fields)
+df.to_csv('transverse_train'+today+'.csv',index=False)
 
-df.to_csv('transverse'+today+'.csv',index=False)
+
+all_list = []
+main_loop(start='2021-07-15',endday=today)
+df = pd.DataFrame(all_list,columns=fields)
+df.to_csv('transverse_test'+today+'.csv',index=False)
+
+

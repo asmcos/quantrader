@@ -16,7 +16,7 @@ import talib
 end = '2021-11-17'
 
 
-datas = pd.read_csv('transverse'+end+'.csv')
+datas = pd.read_csv('transverse_train'+end+'.csv')
 label = datas['是否涨幅10%']
 print(label.values)
 
@@ -48,9 +48,15 @@ model.fit(X_train,
           verbose = True)
 
 # 对测试集进行预测
-ans = model.predict_proba(X_test)
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+
+tests = pd.read_csv('transverse_test'+end+'.csv')
+tests = tests.loc[:,['5日均线比'  ,'10日均线比'  ,'60日均线比'    ,'涨幅'  ,'20日量比'  ,'60日震荡']]                                                                                                                                                   
+label = tests['是否涨幅10%']
+print(label.values)
+
+ans = model.predict_proba(tests)
+y_pred = model.predict(tests)
+accuracy = accuracy_score(label.values, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
 png = xgb.to_graphviz(model,num_trees=0)
@@ -59,7 +65,6 @@ png = xgb.to_graphviz(model,num_trees=0)
 for i in ans:
     print(i)
 
-print(X_test)
 
 
 #显示
