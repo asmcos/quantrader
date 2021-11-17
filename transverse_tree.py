@@ -37,8 +37,8 @@ all_list = []
 def main_loop(start,endday):
     offset = 60 #要计算MA60，所以之前的60不能计算
 
-    #for df in Kl.df_all[:500]:
-    for df in Kl.df_all:
+    for df in Kl.df_all[:500]:
+    #for df in Kl.df_all:
 
         Kl.code(df["code"])
 
@@ -68,12 +68,12 @@ def main_loop(start,endday):
                 ma10 = MA(C,10)
                 ma30 = MA(C,30)
                 ma60 = MA(C,60)
-                v20 =  MA(V,20)
-                valv20 = V / v20 
+                v40 =  MA(V,40)
+                valv40 = V / v40 
                 valc1 = ((C-C[1]) / C[1]) * 100
                 valo1 = ((O-O[1]) / O) * 100
                 valh1 = ((H-H[1]) / H) * 100
-                vall1 = ((L-L[1]) / L) * 100
+                vall1 = ((L-C) / L) * 100
                 valv1 = ((V-V[1]) / V[1]) * 100
                 valc5 = C / ma5  
                 valc10 = C / ma10  
@@ -87,16 +87,16 @@ def main_loop(start,endday):
                     label = 1
                 else:
                     label = 0
-                if(valc1 > rise) and V[1] > 0 and V > 0:
+                if(valc1 > 8) and V[1] > 0 and V > 0:
                     #print(C.data[-1],allC[-11-i],maxc10)
-                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label)
-                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label])
+                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label)
+                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')
