@@ -1,7 +1,7 @@
 from Klang.lang import kparser,setPY,Kexec
 from Klang import (Kl,
     C,O,V,H,L, CLOSE,HIGH,DATETIME,
-    MA,CROSS,BARSLAST,HHV,COUNT,
+    MA,CROSS,BARSLAST,HHV,COUNT,BARSLASTFIND,
     MAX,MIN,MACD,TRANSVERSE)
 from Klang.common import end as today
 import talib 
@@ -42,8 +42,8 @@ def main_loop(start,endday):
     if pred_data == 1:
         check_day = 0
 
-    #for df in Kl.df_all[:500]:
-    for df in Kl.df_all:
+    for df in Kl.df_all[:500]:
+    #for df in Kl.df_all:
 
         Kl.code(df["code"])
 
@@ -87,6 +87,8 @@ def main_loop(start,endday):
                 valc10 = C / ma10  
                 valc30 = C / ma30  
                 valc60 = C / ma60 
+   
+                HDAY = BARSLASTFIND(C,HHV(C,40));
                 if pred_data == 0:
                     maxc10 = talib.MAX(allC[-check_day-i:-i-1],check_day-1)[-1]
                     target = ((maxc10- C.data[-1] ) / C.data[-1] )* 100
@@ -100,14 +102,14 @@ def main_loop(start,endday):
                 else:
                     label = 0
                 #print(C.data[-1],allC[-11-i],maxc10)
-                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label)
-                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,label])
+                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,HDAY,label)
+                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,HDAY,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','40日新高','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')
