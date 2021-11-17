@@ -20,8 +20,7 @@ datas = pd.read_csv('transverse_train'+end+'.csv')
 label = datas['是否涨幅10%']
 print(label.values)
 
-fields = ['5日均线比','10日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡']
-fields = ['5日均线比','10日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','20日量比','60日震荡']
+fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡']
 datas = datas.loc[:,fields]                                                                                                                                                   
 print(datas)
 # 准备预测的数据

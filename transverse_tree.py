@@ -10,6 +10,14 @@ import sys
 import linecache
 import pandas as pd
 
+
+is10CM = 1
+
+rise = 15
+if is10CM:
+    rise = 9.9
+
+
 def getpyglobals(name):
     return globals().get(name)
 
@@ -35,10 +43,22 @@ all_list = []
 def main_loop(start,endday):
     offset = 60 #要计算MA60，所以之前的60不能计算
 
-    #for df in Kl.df_all[:100]:
+    #for df in Kl.df_all[:500]:
     for df in Kl.df_all:
-        
+
+        # 是否是 涨幅10CM       
+        if 'sh.60' in df['code'] or  'sz.0' in df['code']:
+                CM10 = True
+        else:
+                CM10 = False
+
+        if is10CM == 1 and CM10 == False:
+                continue
+        if is10CM == 0  and CM10 == True:
+                continue
+
         Kl.code(df["code"])
+
         if start is None:
             Kl.date(end=endday)
         else:
@@ -68,30 +88,32 @@ def main_loop(start,endday):
                 v20 =  MA(V,20)
                 valv20 = V / v20 
                 valc1 = ((C-C[1]) / C[1]) * 100
-                valo1 = ((O-O[1]) / O[1]) * 100
-                valh1 = ((H-H[1]) / H[1]) * 100
-                vall1 = ((L-L[1]) / L[1]) * 100
+                valo1 = ((O-O[1]) / O) * 100
+                valh1 = ((H-H[1]) / H) * 100
+                vall1 = ((L-L[1]) / L) * 100
                 valv1 = ((V-V[1]) / V[1]) * 100
                 valc5 = C / ma5  
                 valc10 = C / ma10  
+                valc30 = C / ma30  
                 valc60 = C / ma60 
                 maxc10 = talib.MAX(allC[-10-i:-i-1],9)[-1]
                 target = ((maxc10- C.data[-1] ) / C.data[-1] )* 100
                 tran = TRANSVERSE() #60日波动，<15判定为横盘震荡
+
                 if target > 10:
                     label = 1
                 else:
                     label = 0
-                if(valc1 > 8):
+                if(valc1 > rise) and V[1] > 0 and V > 0:
                     #print(C.data[-1],allC[-11-i],maxc10)
-                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label)
-                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label])
+                    print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label)
+                    all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv20,tran,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','20日量比','60日震荡','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')
