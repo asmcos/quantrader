@@ -24,7 +24,7 @@ print(label.values)
 
 
 
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','40日新高','macd']
+fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd']
 datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
@@ -78,11 +78,11 @@ for i in range(0,len(y_pred)):
     if y_pred[i] == 1:
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
 
-png = xgb.to_graphviz(model,num_trees=0)
+#png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
 
 
 #显示
-#plot_importance(model)
-#plt.show()
+plot_importance(model)
+plt.show()
 
