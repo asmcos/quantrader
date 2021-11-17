@@ -24,7 +24,7 @@ print(label.values)
 
 
 
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅']
+fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高',]
 datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
@@ -75,7 +75,7 @@ preds = pd.read_csv('transverse_pred'+end+'.csv')
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
 for i in range(0,len(y_pred)):
-    if y_pred[i] == 1:
+    if y_pred[i] == 1 and preds['日期'].values[i] > '2021-11-12':
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
 
 #png = xgb.to_graphviz(model,num_trees=0)
