@@ -27,7 +27,7 @@ print(label.values)
 
 
 
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高',]
+fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高','3next','5next']
 datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
@@ -73,13 +73,12 @@ print("Accuracy: %.2f%%" % (accuracy * 100.0))
 png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
 
-
 preds = pd.read_csv('transverse_pred'+end+'.csv')
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
 pred_list = []
 for i in range(0,len(y_pred)):
-    if y_pred[i] == 1 and preds['日期'].values[i] > '2021-11-12':
+    if y_pred[i] == 1 and preds['日期'].values[i] > '2021-11-01':
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
         pred_list.append([preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i]])
 
@@ -118,13 +117,25 @@ ans = model.predict(dtest)
 
 cnt1 = 0
 cnt2 = 0
+pcnt1 = 0
+pcnt2 = 0
 for i in range(len(y_test)):
-    if ans[i] == y_test[i]:
+
+    if 1 == y_test[i] :
         cnt1 += 1
     else:
         cnt2 += 1
 
-print("Accuracy: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)))
+    if ans[i] == 0:
+        continue
+
+    if ans[i] == y_test[i]:
+        pcnt1 += 1
+    else:
+        pcnt2 += 1
+
+print("origin: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)),len(y_test))
+print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 
 #png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
