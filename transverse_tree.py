@@ -111,7 +111,9 @@ def main_loop(start,endday):
                 diff,dea,macd = MACD(C) 
                 HDAY = BARSLASTFIND(C,HHV(C,45))
                 if pred_data == 0:
-                    target = (allC[-i-1] - allC[-7-i]) / allC[-i-7] * 100
+                    maxc10 = talib.MAX(allC[-7-i:-i-1],7-1)[-1]
+                    target = ((maxc10- allC[-7-i] ) / allC[-i-7] )* 100
+                    #target = (allC[-i-1] - allC[-7-i]) / allC[-i-7] * 100
                 else:
                     target = 0
 
