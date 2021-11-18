@@ -76,6 +76,7 @@ def main_loop(start,endday):
 
                 ma5  = MA(C,5)
                 ma10 = MA(C,10)
+                ma20 = MA(C,20)
                 ma30 = MA(C,30)
                 v40 =  MA(V,40)
  
@@ -83,6 +84,7 @@ def main_loop(start,endday):
                 valv40 = V / v40 
                 valc5 = C / ma5  
                 valc10 = C / ma10  
+                valc20 = C / ma20  
                 valc30 = C / ma30  
                 valc60 = C / ma60 
 
@@ -105,17 +107,17 @@ def main_loop(start,endday):
                     label = 0
                 #print(C.data[-1],allC[-11-i],maxc10)
                 print(Kl.currentdf['name'],Kl.currentdf['code'],d,
-                    valc5,valc10,valc30,valc60,valc1,
+                    valc5,valc10,valc20,valc30,valc60,valc1,
                     valv1,valv40,valnc3,valnc5,label)
                 all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,
-                    valc5,valc10,valc30,valc60,valc1,
+                    valc5,valc10,valc20,valc30,valc60,valc1,
                     valv1,valv40,valnc3,valnc5,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','V涨幅','40日量比','3next','5next','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','20日均线比','30日均线比','60日均线比','C涨幅','V涨幅','40日量比','3next','5next','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')
