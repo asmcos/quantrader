@@ -56,6 +56,8 @@ def main_loop(start,endday):
                 continue
 
             allC = C.data
+            allV = V.data
+            allDate = DATETIME.data
 
             datelist = []
         
@@ -76,48 +78,58 @@ def main_loop(start,endday):
 
                 ma5  = MA(C,5)
                 ma10 = MA(C,10)
-                ma20 = MA(C,20)
                 ma30 = MA(C,30)
                 v40 =  MA(V,40)
- 
-                valv1 = ((V-V[1]) / V[1]) * 100
                 valv40 = V / v40 
+                valo1 = ((O-O[1]) / O) * 100
+                valh1 = ((H-H[1]) / H) * 100
+                vall1 = ((L-C) / L) * 100
+                valv1 = ((V-V[1]) / V[1]) * 100
                 valc5 = C / ma5  
                 valc10 = C / ma10  
-                valc20 = C / ma20  
                 valc30 = C / ma30  
                 valc60 = C / ma60 
 
                 #
-                cnext5 = allC[-5-i]
-                cnext3 = allC[-3-i]
-                valnc3 = (C.data[-1] - cnext3 ) / C.data[-1] * 100
-                valnc5 = (C.data[-1] - cnext5 ) / C.data[-1] * 100
-                valnc3 = round(valnc3,2)
-                valnc5 = round(valnc5,2)
+                cnext4 = allC[-7-i]
+                cnext2 = allC[-9-i]
+                valnc2 = (C.data[-1] - cnext2 ) / C.data[-1] * 100
+                valnc4 = (C.data[-1] - cnext4 ) / C.data[-1] * 100
+                valnc2 = round(valnc2,2)
+                valnc4 = round(valnc4,2)
+
+                vnext4 = allV[-7-i]
+                vnext2 = allV[-9-i]
+                valnv2 = vnext2/V.data[-1]
+                valnv4 = vnext4/V.data[-1]
+                valnv2 = round(valnv2,2)
+                valnv4 = round(valnv4,2)
+
+
+
+                r5 = (C[1] - LLV(C,5))/LLV(C,5) * 100
+                diff,dea,macd = MACD(C) 
+                HDAY = BARSLASTFIND(C,HHV(C,45))
                 if pred_data == 0:
-                    target = (allC[-i-1] - allC[-5-i]) / allC[-5-i] * 100
+                    target = (allC[-i-1] - allC[-7-i]) / allC[-i-7] * 100
                 else:
                     target = 0
 
+                tran = TRANSVERSE() #60日波动，<15判定为横盘震荡
 
                 if target > 10:
                     label = 1
                 else:
                     label = 0
                 #print(C.data[-1],allC[-11-i],maxc10)
-                print(Kl.currentdf['name'],Kl.currentdf['code'],d,
-                    valc5,valc10,valc20,valc30,valc60,valc1,
-                    valv1,valv40,valnc3,valnc5,label)
-                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,
-                    valc5,valc10,valc20,valc30,valc60,valc1,
-                    valv1,valv40,valnc3,valnc5,label])
+                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,valnc2,valnc4,valnv2,valnv4,label)
+                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,valnc2,valnc4,valnv2,valnv4,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','20日均线比','30日均线比','60日均线比','C涨幅','V涨幅','40日量比','3next','5next','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高','2next','4next','2nextv','4nextv','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')
