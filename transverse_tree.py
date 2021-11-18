@@ -78,11 +78,9 @@ def main_loop(start,endday):
                 ma10 = MA(C,10)
                 ma30 = MA(C,30)
                 v40 =  MA(V,40)
-                valv40 = V / v40 
-                valo1 = ((O-O[1]) / O) * 100
-                valh1 = ((H-H[1]) / H) * 100
-                vall1 = ((L-C) / L) * 100
+ 
                 valv1 = ((V-V[1]) / V[1]) * 100
+                valv40 = V / v40 
                 valc5 = C / ma5  
                 valc10 = C / ma10  
                 valc30 = C / ma30  
@@ -95,31 +93,29 @@ def main_loop(start,endday):
                 valnc5 = (C.data[-1] - cnext5 ) / C.data[-1] * 100
                 valnc3 = round(valnc3,2)
                 valnc5 = round(valnc5,2)
-                r5 = (C[1] - LLV(C,5))/LLV(C,5) * 100
-                diff,dea,macd = MACD(C) 
-                HDAY = BARSLASTFIND(C,HHV(C,45))
                 if pred_data == 0:
-                    maxc10 = talib.MAX(allC[-check_day-i:-i-1],check_day-1)[-1]
-                    target = ((maxc10- C.data[-1] ) / C.data[-1] )* 100
                     target = (allC[-i-1] - allC[-5-i]) / allC[-5-i] * 100
                 else:
                     target = 0
 
-                tran = TRANSVERSE() #60日波动，<15判定为横盘震荡
 
                 if target > 10:
                     label = 1
                 else:
                     label = 0
                 #print(C.data[-1],allC[-11-i],maxc10)
-                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,valnc3,valnc5,label)
-                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,valnc3,valnc5,label])
+                print(Kl.currentdf['name'],Kl.currentdf['code'],d,
+                    valc5,valc10,valc30,valc60,valc1,
+                    valv1,valv40,valnc3,valnc5,label)
+                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,
+                    valc5,valc10,valc30,valc60,valc1,
+                    valv1,valv40,valnc3,valnc5,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高','3next','5next','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','V涨幅','40日量比','3next','5next','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')
