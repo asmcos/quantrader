@@ -11,15 +11,16 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
 import talib
 
-
 from common.framework import save_df_tohtml
 
 # 1. 获取数据
 # stock data 例子
-end = '2021-11-18'
+end = '2021-11-19'
 
 
 datas = pd.read_csv('transverse_train'+end+'.csv')
+#datas = datas[datas['tran']>40.0]  
+#datas = datas[datas['40日量比']>2.0]  
 label = datas['是否涨幅10%']
 print(label.values)
 
@@ -27,7 +28,9 @@ print(label.values)
 
 
 
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高','2next','4next','2nextv','4nextv']
+fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅',
+        'H涨幅','O涨幅','L涨幅','V涨幅','40日量比','macd','5日涨幅','45日新高']
+fields = ['tran']
 datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
@@ -41,7 +44,7 @@ model = XGBClassifier(learning_rate=0.01,
                       use_label_encoder=False,
                       booster='gbtree',             # 分类树
                       n_estimators=300,             # 树的个数--1000棵树建立xgboost
-                      max_depth= 6,                 # 树的深度
+                      max_depth= 2,                 # 树的深度
                       min_child_weight = 1,         # 叶子节点最小权重
                       gamma=0.,                     # 惩罚项中叶子结点个数前的参数
                       subsample=0.8,                # 随机选择80%样本建立决策树
@@ -60,8 +63,9 @@ model.fit(X_train,
 # 对测试集进行预测
 
 tests = pd.read_csv('transverse_test'+end+'.csv')
+#tests = tests[tests['tran']>40.0]  
+#tests = tests[tests['40日量比']>2.0]  
 label = tests['是否涨幅10%']
-print(label.values)
 
 tests1 = tests.loc[:,fields]
 
@@ -70,72 +74,49 @@ y_pred = model.predict(tests1)
 accuracy = accuracy_score(label.values, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
-png = xgb.to_graphviz(model,num_trees=0)
-#png.view("stock.png")
-
-preds = pd.read_csv('transverse_pred'+end+'.csv')
-preds1 = preds.loc[:,fields]
-y_pred = model.predict(preds1)
-pred_list = []
-for i in range(0,len(y_pred)):
-    if y_pred[i] == 1 and preds['日期'].values[i] > '2021-11-01':
-        print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
-        pred_list.append([preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i]])
-
-df_pred = pd.DataFrame(pred_list,columns=['name','code','日期'])
-df_pred['流通股值'] = 10
-
-print('file://'+os.getcwd()+ '/' + './datas/tree_pred'+end+'.html' )
-save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
-
-params = {
-    'booster': 'gbtree',
-    'objective': 'multi:softmax',
-    'num_class': 3,
-    'gamma': 0.1,
-    'max_depth': 6,
-    'lambda': 2,
-    'subsample': 0.7,
-    'colsample_bytree': 0.7,
-    'min_child_weight': 1,
-    'eta': 0.1,
-    'seed': 1000,
-    'nthread': 4,
-    'eval_metric':'mlogloss'
-}
-
-plst = params.items()
-
-
-dtrain = xgb.DMatrix(X_train, y_train)
-num_rounds = 500
-model = xgb.train(params, dtrain, num_rounds)
-
-# 对测试集进行预测
-dtest = xgb.DMatrix(X_test)
-ans = model.predict(dtest)
-
 cnt1 = 0
 cnt2 = 0
 pcnt1 = 0
 pcnt2 = 0
-for i in range(len(y_test)):
+for i in range(len(y_pred)):
 
-    if 1 == y_test[i] :
+    if 1 == label.values[i] :
         cnt1 += 1
     else:
         cnt2 += 1
 
-    if ans[i] == 0:
+    if y_pred[i] == 0:
         continue
 
-    if ans[i] == y_test[i]:
+    if y_pred[i] == label.values[i]:
         pcnt1 += 1
     else:
         pcnt2 += 1
 
-print("origin: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)),len(y_test))
+print("origin: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)),len(y_pred))
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
+
+
+
+png = xgb.to_graphviz(model,num_trees=0)
+png.view("stock.png")
+
+preds = pd.read_csv('transverse_pred'+end+'.csv')
+#preds = preds[preds['tran']>40.0]  
+#preds = preds[preds['40日量比']>2.0]  
+preds1 = preds.loc[:,fields]
+y_pred = model.predict(preds1)
+pred_list = []
+for i in range(0,len(y_pred)):
+    if y_pred[i] == 1 : #and preds['日期'].values[i] > '2021-11-01':
+        print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
+        pred_list.append([preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i]])
+
+df_pred = pd.DataFrame(pred_list,columns=['name','code','日期'])
+
+print('file://'+os.getcwd()+ '/' + './datas/tree_pred'+end+'.html' )
+save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
+
 
 #png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
