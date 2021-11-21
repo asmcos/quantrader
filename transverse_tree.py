@@ -71,14 +71,14 @@ def main_loop(start,endday):
                 ma30 = MA(C,30)
                 v40 =  MA(V,40)
                 valv40 = V / v40 
-                valo1 = ((O-O[1]) / O) * 100
-                valh1 = ((H-H[1]) / H) * 100
-                vall1 = ((L-C) / L) * 100
+                valo1 = ((O-C[1]) / C[1]) * 100
+                valh1 = ((H-C[1]) / C[1]) * 100
+                vall1 = ((L-C[1]) / C[1]) * 100
                 valv1 = ((V-V[1]) / V[1]) * 100
-                valc5 = C / ma5  
-                valc10 = C / ma10  
-                valc30 = C / ma30  
-                valc60 = C / ma60 
+                valc5 =  C[1] / ma5  
+                valc10 = C[1] / ma10  
+                valc30 = C[1] / ma30  
+                valc60 = C[1] / ma60 
 
 
 
@@ -94,7 +94,7 @@ def main_loop(start,endday):
                 else:
                     target = 0
 
-                tran = TRANSVERSE(C,O,80) #80日波动，<15判定为横盘震荡
+                tran = TRANSVERSE(C,O,60) #60日波动，<15判定为横盘震荡
 
                 if target > 10:
                     label = 1
