@@ -111,13 +111,12 @@ def main_loop(start,endday):
                 diff,dea,macd = MACD(C) 
                 HDAY = BARSLASTFIND(C,HHV(C,45))
                 if pred_data == 0:
-                    maxc10 = talib.MAX(allC[-7-i:-i-1],7-1)[-1]
-                    target = ((maxc10- allC[-7-i] ) / allC[-i-7] )* 100
-                    #target = (allC[-i-1] - allC[-7-i]) / allC[-i-7] * 100
+                    maxc10 = talib.MAX(allC[-10-i:-i-1],9)[-1]
+                    target = ((maxc10- allC[-11-i] ) / allC[-i-11] )* 100
                 else:
                     target = 0
 
-                tran = TRANSVERSE() #60日波动，<15判定为横盘震荡
+                tran = TRANSVERSE(C,O,80) #80日波动，<15判定为横盘震荡
 
                 if target > 10:
                     label = 1

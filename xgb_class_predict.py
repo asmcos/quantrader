@@ -29,7 +29,7 @@ def DisplayOriginalLabel(values):
 
 # 1. 获取数据
 # stock data 例子
-end = '2021-11-20'
+end = '2021-11-21'
 
 
 datas = pd.read_csv('transverse_train'+end+'.csv')
@@ -103,15 +103,15 @@ DisplayOriginalLabel(label.values)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 print(ans)
 
-"""
 preds = pd.read_csv('transverse_pred'+end+'.csv')
-#preds = preds[preds['tran']>40.0]  
+preds = preds[preds['60日震荡']>40.0]  
 #preds = preds[preds['40日量比']>2.0]  
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
+ans = model.predict_proba(preds1)
 pred_list = []
 for i in range(0,len(y_pred)):
-    if y_pred[i] == 1 : #and preds['日期'].values[i] > '2021-11-01':
+    if y_pred[i] == 1 and ans[i][1] > 0.65: #and preds['日期'].values[i] > '2021-11-01':
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
         pred_list.append([preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i]])
 
@@ -119,7 +119,6 @@ df_pred = pd.DataFrame(pred_list,columns=['name','code','日期'])
 
 print('file://'+os.getcwd()+ '/' + './datas/tree_pred'+end+'.html' )
 save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
-"""
 
 #png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
