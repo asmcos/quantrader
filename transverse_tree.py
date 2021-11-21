@@ -90,21 +90,6 @@ def main_loop(start,endday):
                 valc30 = C / ma30  
                 valc60 = C / ma60 
 
-                #
-                cnext4 = allC[-7-i]
-                cnext2 = allC[-9-i]
-                valnc2 = (C.data[-1] - cnext2 ) / C.data[-1] * 100
-                valnc4 = (C.data[-1] - cnext4 ) / C.data[-1] * 100
-                valnc2 = round(valnc2,2)
-                valnc4 = round(valnc4,2)
-
-                vnext4 = allV[-7-i]
-                vnext2 = allV[-9-i]
-                valnv2 = vnext2/V.data[-1]
-                valnv4 = vnext4/V.data[-1]
-                valnv2 = round(valnv2,2)
-                valnv4 = round(valnv4,2)
-
 
 
                 r5 = (C[1] - LLV(C,5))/LLV(C,5) * 100
@@ -123,14 +108,14 @@ def main_loop(start,endday):
                 else:
                     label = 0
                 #print(C.data[-1],allC[-11-i],maxc10)
-                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,valnc2,valnc4,valnv2,valnv4,label)
-                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,valnc2,valnc4,valnv2,valnv4,label])
+                print(Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,label)
+                all_list.append([Kl.currentdf['name'],Kl.currentdf['code'],d,valc5,valc10,valc30,valc60,valc1,valh1,valo1,vall1,valv1,valv40,tran,macd,r5,HDAY,label])
             except :
                 print("Klang ERROR",df['code'],df['name'])
 
                 PrintException()
 
-fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高','2next','4next','2nextv','4nextv','是否涨幅10%']
+fields = ['name','code','日期','5日均线比','10日均线比','30日均线比','60日均线比','C涨幅','H涨幅','O涨幅','L涨幅','V涨幅','40日量比','60日震荡','macd','5日涨幅','45日新高','是否涨幅10%']
 
 
 main_loop(start=None,endday='2021-07-01')

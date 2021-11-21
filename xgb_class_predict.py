@@ -33,7 +33,7 @@ end = '2021-11-21'
 
 
 datas = pd.read_csv('transverse_train'+end+'.csv')
-datas = datas[datas['60日震荡']>40.0]  
+#datas = datas[datas['60日震荡']>40.0]  
 #datas = datas[datas['40日量比']>2.0]  
 label = datas['是否涨幅10%']
 print(label.values)
@@ -91,7 +91,7 @@ pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] == 0 or ans[i][1] < 0.65:
+    if y_pred[i] == 0 or ans[i][1] < 0.6:
         continue
 
     print(ans[i][1])
@@ -104,14 +104,14 @@ print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 print(ans)
 
 preds = pd.read_csv('transverse_pred'+end+'.csv')
-preds = preds[preds['60日震荡']>40.0]  
+#preds = preds[preds['60日震荡']>40.0]  
 #preds = preds[preds['40日量比']>2.0]  
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
 ans = model.predict_proba(preds1)
 pred_list = []
 for i in range(0,len(y_pred)):
-    if y_pred[i] == 1 and ans[i][1] > 0.65: #and preds['日期'].values[i] > '2021-11-01':
+    if y_pred[i] == 1 and ans[i][1] > 0.6: #and preds['日期'].values[i] > '2021-11-01':
         print(preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i],y_pred[i])
         pred_list.append([preds['name'].values[i],preds['code'].values[i],preds['日期'].values[i]])
 
