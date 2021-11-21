@@ -1,4 +1,3 @@
-from Klang.lang import kparser,setPY,Kexec
 from Klang import (Kl,
     C,O,V,H,L, CLOSE,HIGH,DATETIME,
     MA,CROSS,BARSLAST,HHV,LLV,COUNT,BARSLASTFIND,
@@ -10,19 +9,6 @@ import sys
 import linecache
 import pandas as pd
 
-
-
-def getpyglobals(name):
-    return globals().get(name)
-
-def setpyglobals(name,val):
-    globals()[name]=val
-
-
-setPY(getpyglobals,setpyglobals)
-
-def getstockinfo(a):
-    return Kl.currentdf['name'] + "-" + Kl.currentdf['code']
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
@@ -36,11 +22,14 @@ def PrintException():
 all_list = []
 pred_data = 0
 def main_loop(start,endday):
-    offset = 60 #要计算MA60，所以之前的60不能计算
-    check_day = 10
+    offset = 60    #要计算MA60，所以头60天不能计算
+    check_day = 10 #后10天（未来）用来预判 是否增长，需要做对比
+                   #因此在train和test的时候，需要留后10天数据
 
+    # 如果是预测，需要计算当天，不做未来数据对比
+    # 当天实际上是买点所以不能预留未来数据空间
     if pred_data == 1:
-        check_day = 5
+        check_day = 0 
 
     #for df in Kl.df_all[:500]:
     for df in Kl.df_all:
@@ -52,7 +41,8 @@ def main_loop(start,endday):
         else:
             Kl.date(start=start,end=endday)
         try:
-            if len(C) < 70:
+            #如果数据太小，或者是空数据就跳过
+            if len(C) < 70 :
                 continue
 
             allC = C.data
@@ -96,7 +86,10 @@ def main_loop(start,endday):
                 diff,dea,macd = MACD(C) 
                 HDAY = BARSLASTFIND(C,HHV(C,45))
                 if pred_data == 0:
-                    maxc10 = talib.MAX(allC[-10-i:-i-1],9)[-1]
+                    if i == 0:
+                        maxc10 = talib.MAX(allC[-10:],10)[-1]
+                    else :
+                        maxc10 = talib.MAX(allC[-10-i:-i],10)[-1]
                     target = ((maxc10- allC[-11-i] ) / allC[-i-11] )* 100
                 else:
                     target = 0
