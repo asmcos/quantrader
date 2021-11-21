@@ -13,24 +13,36 @@ import talib
 
 from common.framework import save_df_tohtml
 
+def DisplayOriginalLabel(values):
+  cnt1 = 0
+  cnt2 = 0
+  for i in range(len(values)):
+    if 1 == values[i] :
+        cnt1 += 1
+    else:
+        cnt2 += 1
+
+  print("origin: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)),len(values))
+
+
+
+
 # 1. 获取数据
 # stock data 例子
-end = '2021-11-19'
+end = '2021-11-20'
 
 
 datas = pd.read_csv('transverse_train'+end+'.csv')
-#datas = datas[datas['tran']>40.0]  
+datas = datas[datas['60日震荡']>40.0]  
 #datas = datas[datas['40日量比']>2.0]  
 label = datas['是否涨幅10%']
 print(label.values)
 
-
-
+DisplayOriginalLabel(label.values)
 
 
 fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅',
-        'H涨幅','O涨幅','L涨幅','V涨幅','40日量比','macd','5日涨幅','45日新高']
-fields = ['tran']
+        'H涨幅','O涨幅','L涨幅','V涨幅','40日量比','macd','5日涨幅','60日震荡','45日新高']
 datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
@@ -44,7 +56,7 @@ model = XGBClassifier(learning_rate=0.01,
                       use_label_encoder=False,
                       booster='gbtree',             # 分类树
                       n_estimators=300,             # 树的个数--1000棵树建立xgboost
-                      max_depth= 2,                 # 树的深度
+                      max_depth= 6,                 # 树的深度
                       min_child_weight = 1,         # 叶子节点最小权重
                       gamma=0.,                     # 惩罚项中叶子结点个数前的参数
                       subsample=0.8,                # 随机选择80%样本建立决策树
@@ -58,7 +70,7 @@ model.fit(X_train,
           eval_set = [(X_test,y_test)],
           eval_metric=['rmse'],
           early_stopping_rounds = 10,
-          verbose = True)
+          verbose = False)
 
 # 对测试集进行预测
 
@@ -73,34 +85,25 @@ ans = model.predict_proba(tests1)
 y_pred = model.predict(tests1)
 accuracy = accuracy_score(label.values, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
+print(y_pred)
 
-cnt1 = 0
-cnt2 = 0
 pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if 1 == label.values[i] :
-        cnt1 += 1
-    else:
-        cnt2 += 1
-
-    if y_pred[i] == 0:
+    if y_pred[i] == 0 or ans[i][1] < 0.65:
         continue
 
+    print(ans[i][1])
     if y_pred[i] == label.values[i]:
         pcnt1 += 1
     else:
         pcnt2 += 1
-
-print("origin: %.2f %% " % (100 * cnt1 / (cnt1 + cnt2)),len(y_pred))
+DisplayOriginalLabel(label.values)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
+print(ans)
 
-
-
-png = xgb.to_graphviz(model,num_trees=0)
-png.view("stock.png")
-
+"""
 preds = pd.read_csv('transverse_pred'+end+'.csv')
 #preds = preds[preds['tran']>40.0]  
 #preds = preds[preds['40日量比']>2.0]  
@@ -116,7 +119,7 @@ df_pred = pd.DataFrame(pred_list,columns=['name','code','日期'])
 
 print('file://'+os.getcwd()+ '/' + './datas/tree_pred'+end+'.html' )
 save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
-
+"""
 
 #png = xgb.to_graphviz(model,num_trees=0)
 #png.view("stock.png")
