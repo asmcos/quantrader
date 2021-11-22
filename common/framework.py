@@ -83,7 +83,10 @@ def create_color_hqltgz(hqltsz):
 def save_df_tohtml(filename,df):
         df['代码'] = df['code'].apply(create_clickable_code)
         df['名称'] = df['name'].apply(create_clickable_name)
-        df['流通股值'] = df['流通股值'].apply(create_color_hqltgz)
+
+        if '流通股值' in df.columns :
+            df['流通股值'] = df['流通股值'].apply(create_color_hqltgz)
+
         del df['code']
         del df['name']
         content = df.to_html(escape=False)
