@@ -34,6 +34,17 @@ def create_color_hqltgz(hqltsz):
         url_template = '''{hqltsz}'''.format(hqltsz=hqltsz)
     return url_template
 
+def create_color_rise(rise):
+    
+    rise = float(rise)
+    if rise >= 0.0:
+        url_template= '''<font color="#ef4136">+{rise}</font></a>'''.format(rise=rise)
+    else:
+        url_template= '''<font color="#41ef36">{rise}</font></a>'''.format(rise=rise)
+    return url_template
+
+
+
 def create_chouma(code):
     chouma = str(get_chouma(code_list.get(code,code)))
     code = code_list.get(code,code).replace('.','')
@@ -143,6 +154,22 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print ('traceback.print_exc():\n')
             traceback.print_exc()
             print ('traceback.format_exc():\n%s' % traceback.format_exc())
+
+            # 发现有些网站第一次不成功需要第二次才能成功。所以再试一次
+            resp = requests.get(url, headers= req_header)
+            sent = True
+
+            content = call_after(self,resp)
+
+            self.send_response(resp.status_code)
+            self.send_resp_headers(resp,content)
+            if body:
+                self.wfile.write(content)
+            return
+
+
+
+
 
 
     def do_POST(self, body=True):
@@ -255,7 +282,7 @@ def config():
         df['流通市值'] = df['流通市值'].apply(create_color_hqltgz) 
         df['筹码'] = df['代码'].apply(create_chouma) 
         df['代码'] = df['代码'].apply(create_clickable_code) 
-
+        df['涨跌幅(%)'] = df['涨跌幅(%)'].apply(create_color_rise)
 
         pages = re.findall('page="(\d+)"',resp.text,re.I|re.S)
         print(pages)
