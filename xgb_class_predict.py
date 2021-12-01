@@ -103,11 +103,11 @@ pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] == 0 or ans[i][1] < 0.5:
+    if y_pred[i] == 0 or ans[i][1] < 0.8:
         continue
 
     print(ans[i][1])
-    if y_pred[i] == label.values[i]:
+    if y_pred[i] == y_test:
         pcnt1 += 1
     else:
         pcnt2 += 1
