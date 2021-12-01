@@ -32,10 +32,12 @@ def DisplayOriginalLabel(values):
 end = '2021-11-21'
 
 
-datas = pd.read_csv('transverse_train'+end+'.csv')
-#datas = datas[datas['60日震荡']>40.0]  
-#datas = datas[datas['40日量比']>2.0]  
-label = datas['是否涨幅10%']
+#datas = pd.read_csv('transverse_train'+end+'.csv')
+datas = pd.read_csv('~/.test_feat.csv')
+datas = datas[~datas.isin([np.nan, np.inf, -np.inf]).any(1)]
+print(datas.columns)
+
+label = datas['target']
 print(label.values)
 
 DisplayOriginalLabel(label.values)
@@ -43,6 +45,23 @@ DisplayOriginalLabel(label.values)
 
 fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅',
         'H涨幅','O涨幅','L涨幅','V涨幅','40日量比','macd','5日涨幅','60日震荡','45日新高']
+fields = ['abs_energy.close', 'cid_ce.close',
+       'fist_location_of_max.close', 'fist_location_of_min.close',
+       'freq_of_max.close', 'freq_of_min.close', 'ndex_mass_quantile_50.close',
+       'ndex_mass_quantile_75.close', '_ndex_mass_quantile_25.close',
+       'kurtosis.close', 'last_location_of_max.close',
+       'last_location_of_min.close', 'length.close', 'ma.close', 'macd.close',
+       'max.close', 'mean.close', 'min_change.close', 'median.close',
+       'median_mean_distance.close', 'min.close', 'none_rate.close',
+       'duplicates_count.close', 'number_peaks_1.close',
+       'number_peaks_2.close', 'number_peaks_3.close',
+       'percentage_below_mean.close',
+       'percentage_of_most_reoccuring_value_to_all_values.close',
+       'percentage_of_most_reoocuring_value_to_all_datapoints.close',
+       'ratio_value_number_to_seq_length.close', 'rise.close',
+       'skewness.close', 'standard_deviation.close', 'uniqueCount.close',
+       'variance.close', 'ma10.close', 'ma20.close', 'ma30.close', 'rise.vol',
+       'ma20.vol']
 datas = datas.loc[:,fields]
 print(datas)
 # 准备预测的数据
@@ -74,16 +93,9 @@ model.fit(X_train,
 
 # 对测试集进行预测
 
-tests = pd.read_csv('transverse_test'+end+'.csv')
-#tests = tests[tests['tran']>40.0]  
-#tests = tests[tests['40日量比']>2.0]  
-label = tests['是否涨幅10%']
-
-tests1 = tests.loc[:,fields]
-
-ans = model.predict_proba(tests1)
-y_pred = model.predict(tests1)
-accuracy = accuracy_score(label.values, y_pred)
+ans = model.predict_proba(X_test)
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
 print(y_pred)
 
@@ -91,7 +103,7 @@ pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] == 0 or ans[i][1] < 0.6:
+    if y_pred[i] == 0 or ans[i][1] < 0.5:
         continue
 
     print(ans[i][1])
@@ -99,13 +111,12 @@ for i in range(len(y_pred)):
         pcnt1 += 1
     else:
         pcnt2 += 1
-DisplayOriginalLabel(label.values)
+DisplayOriginalLabel(y_test)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 print(ans)
 
+"""
 preds = pd.read_csv('transverse_pred'+end+'.csv')
-#preds = preds[preds['60日震荡']>40.0]  
-#preds = preds[preds['40日量比']>2.0]  
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
 ans = model.predict_proba(preds1)
@@ -127,4 +138,4 @@ save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
 #显示
 #plot_importance(model)
 #plt.show()
-
+"""
