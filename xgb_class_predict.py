@@ -28,24 +28,20 @@ def DisplayOriginalLabel(values):
 
 
 # 1. 获取数据
-# stock data 例子
-end = '2021-11-21'
 
-
-#datas = pd.read_csv('transverse_train'+end+'.csv')
-datas = pd.read_csv('~/.test_feat.csv')
-datas = datas[~datas.isin([np.nan, np.inf, -np.inf]).any(1)]
-print(datas.columns)
-
+df = pd.read_csv('~/.test_feat.csv')
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
+print(df.columns)
+l = int(len(df) * 0.1)
+l1 = int(len(df) * 0.9)
+datas = df.iloc[:l,]
 label = datas['target']
 print(label.values)
 
 DisplayOriginalLabel(label.values)
 
 
-fields = ['5日均线比','10日均线比','30日均线比','60日均线比','C涨幅',
-        'H涨幅','O涨幅','L涨幅','V涨幅','40日量比','macd','5日涨幅','60日震荡','45日新高']
-fields = ['abs_energy.close', 'cid_ce.close',
+fields = [
        'fist_location_of_max.close', 'fist_location_of_min.close',
        'freq_of_max.close', 'freq_of_min.close', 'ndex_mass_quantile_50.close',
        'ndex_mass_quantile_75.close', '_ndex_mass_quantile_25.close',
@@ -93,27 +89,30 @@ model.fit(X_train,
 
 # 对测试集进行预测
 
-ans = model.predict_proba(X_test)
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+test = df.iloc[l1:,]
+label = test['target'].values
+test = test.loc[:,fields]
+ans = model.predict_proba(test)
+y_pred = model.predict(test)
+accuracy = accuracy_score(label, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
 print(y_pred)
+print(ans)
 
 pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] == 0 or ans[i][1] < 0.8:
+    if y_pred[i] == 0 or ans[i][1] < 0.6 :
         continue
 
     print(ans[i][1])
-    if y_pred[i] == y_test:
+    if y_pred[i] == label[i]:
         pcnt1 += 1
     else:
         pcnt2 += 1
-DisplayOriginalLabel(y_test)
+DisplayOriginalLabel(label)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
-print(ans)
 
 """
 preds = pd.read_csv('transverse_pred'+end+'.csv')
