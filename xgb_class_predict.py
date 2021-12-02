@@ -45,22 +45,18 @@ DisplayOriginalLabel(label.values)
 
 
 fields = [
-       'fist_location_of_max.close', 'fist_location_of_min.close',
-       'freq_of_max.close', 'freq_of_min.close', 'ndex_mass_quantile_50.close',
+       'fist_location_of_max.close',
+       'fist_location_of_min.close', 'ndex_mass_quantile_50.close',
        'ndex_mass_quantile_75.close', '_ndex_mass_quantile_25.close',
        'kurtosis.close', 'last_location_of_max.close',
-       'last_location_of_min.close', 'length.close', 'ma.close', 'macd.close',
-       'max.close', 'mean.close', 'min_change.close', 'median.close',
-       'median_mean_distance.close', 'min.close', 'none_rate.close',
-       'duplicates_count.close', 'number_peaks_1.close',
-       'number_peaks_2.close', 'number_peaks_3.close',
-       'percentage_below_mean.close',
-       'percentage_of_most_reoccuring_value_to_all_values.close',
-       'percentage_of_most_reoocuring_value_to_all_datapoints.close',
-       'ratio_value_number_to_seq_length.close', 'rise.close',
-       'skewness.close', 'standard_deviation.close', 'uniqueCount.close',
-       'variance.close', 'ma10.close', 'ma20.close', 'ma30.close', 'rise.vol',
-       'ma20.vol']
+       'last_location_of_min.close', 'ma.close', 'macd.close', 'max.close',
+       'mean.close', 'min_change.close', 'min.close', 'none_rate.close',
+       'number_peaks_1.close', 'number_peaks_2.close', 'number_peaks_3.close',
+       'percentage_below_mean.close', 'ratio_value_number_to_seq_length.close',
+       'skewness.close', 'standard_deviation.close', 'variance.close',
+       'ma10.close', 'ma20.close', 'ma30.close', 'rise.vol', 'ma20.vol']
+
+
 datas = datas.loc[:,fields]
 print(datas)
 
