@@ -53,6 +53,9 @@ def get_bar(name,code):
     rise = (datas['close'].values[1:]/datas['close'].values[:-1] - 1) * 100
     rise = np.insert(rise,0,np.NaN)
 
+    mavol5 = talib.MA(datas.vol,5)
+    risevol = datas.vol / mavol5
+ 
     func = lambda name :getattr(talib,name)(datas.open, datas.high, datas.low, datas.close)
     
     talibdict = {i:func(i) for i in ['CDL2CROWS','CDL3BLACKCROWS','CDL3INSIDE','CDL3LINESTRIKE','CDL3OUTSIDE','CDL3STARSINSOUTH','CDL3WHITESOLDIERS',
@@ -76,6 +79,7 @@ def get_bar(name,code):
                             'ma60':ma60,
                             'ma120':ma120,
                             'rise':rise,
+                            'risevol':risevol,
                             'date':datas.date})
 
     print(len(datas),datas.iloc[-1].date)
