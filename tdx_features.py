@@ -11,8 +11,7 @@ import numpy as np
 api = TdxHq_API(auto_retry=True)
 
 hostname="http://klang.org.cn"
-hostname="http://127.0.0.1:1337"
-#hostname="http://klang.zhanluejia.net.cn"
+#hostname="http://127.0.0.1:1337"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
@@ -20,7 +19,7 @@ filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
 def updatestocklist(stname=filename_sl):
 
     json = requests.get(hostname+"/industries").json()
-    json = requests.get('http://klang.org.cn'+"/industries").json()
+    #json = requests.get('http://klang.org.cn'+"/industries").json()
     for i in json:
         cm_dict[i['code']] = i.get('chouma','50')
     df = pd.json_normalize(json)
