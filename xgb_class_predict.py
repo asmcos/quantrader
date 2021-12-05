@@ -32,39 +32,40 @@ def DisplayOriginalLabel(values):
 df = pd.read_csv('~/.test_feat.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
-l = int(len(df) * 0.1)
-l1 = int(len(df) * 0.9)
-datas = df.iloc[:l,]
+
+df1 = df[df['datetime']<'2021-07-30']
+df2 = df[df['datetime']>'2021-07-30']
+
+datas = df1
 label = datas['target']
+label2 = df2['target']
 print(label.values)
 
 DisplayOriginalLabel(label.values)
 
 
 fields = [
-       'fist_location_of_max.close', 'fist_location_of_min.close',
-       'freq_of_max.close', 'freq_of_min.close', 'ndex_mass_quantile_50.close',
+       'fist_location_of_max.close',
+       'fist_location_of_min.close', 'ndex_mass_quantile_50.close',
        'ndex_mass_quantile_75.close', '_ndex_mass_quantile_25.close',
        'kurtosis.close', 'last_location_of_max.close',
-       'last_location_of_min.close', 'length.close', 'ma.close', 'macd.close',
-       'max.close', 'mean.close', 'min_change.close', 'median.close',
-       'median_mean_distance.close', 'min.close', 'none_rate.close',
-       'duplicates_count.close', 'number_peaks_1.close',
-       'number_peaks_2.close', 'number_peaks_3.close',
-       'percentage_below_mean.close',
-       'percentage_of_most_reoccuring_value_to_all_values.close',
-       'percentage_of_most_reoocuring_value_to_all_datapoints.close',
-       'ratio_value_number_to_seq_length.close', 'rise.close',
-       'skewness.close', 'standard_deviation.close', 'uniqueCount.close',
-       'variance.close', 'ma10.close', 'ma20.close', 'ma30.close', 'rise.vol',
-       'ma20.vol']
+       'last_location_of_min.close', 'ma.close', 'macd.close', 'max.close',
+       'mean.close', 'min_change.close', 'min.close', 'none_rate.close',
+       'number_peaks_1.close', 'number_peaks_2.close', 'number_peaks_3.close',
+       'percentage_below_mean.close', 'ratio_value_number_to_seq_length.close',
+       'skewness.close', 'standard_deviation.close', 'variance.close',
+       'ma10.close', 'ma20.close', 'ma30.close', 'rise.vol', 'ma20.vol']
+
+
 datas = datas.loc[:,fields]
 print(datas)
+
 # 准备预测的数据
 # 
 
 #使用sklearn数据
 X_train, X_test, y_train, y_test = train_test_split(datas, label.values, test_size=0.2, random_state=0)
+X2_train, X2_test, y2_train, y2_test = train_test_split(df2, label2.values, test_size=0.2, random_state=0)
 
 ### fit model for train data
 model = XGBClassifier(learning_rate=0.01,
@@ -89,12 +90,9 @@ model.fit(X_train,
 
 # 对测试集进行预测
 
-test = df.iloc[l1:,]
-label = test['target'].values
-test = test.loc[:,fields]
-ans = model.predict_proba(test)
-y_pred = model.predict(test)
-accuracy = accuracy_score(label, y_pred)
+ans = model.predict_proba(X2_test.loc[:,fields])
+y_pred = model.predict(X2_test.loc[:,fields])
+accuracy = accuracy_score(y2_test, y_pred)
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
 print(y_pred)
 print(ans)
@@ -103,15 +101,15 @@ pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] == 0 or ans[i][1] < 0.6 :
+    if y_pred[i] == 0 or ans[i][1] < 0.5 :
         continue
 
-    print(ans[i][1])
-    if y_pred[i] == label[i]:
+    print(ans[i][1],X2_test['datetime'].values[i],X2_test['code'].values[i])
+    if y_pred[i] == y2_test[i]:
         pcnt1 += 1
     else:
         pcnt2 += 1
-DisplayOriginalLabel(label)
+DisplayOriginalLabel(y2_test)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 
 """
