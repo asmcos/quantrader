@@ -59,7 +59,7 @@ def main_loop(start,endday):
 
             featureday = allDate[-target_day]
             datas = get_features(df['code'],featureday)   
-
+            print(df['code'],df['name'])
             datas = datas[(datas['date'] >= allDate[0]) & (datas['date'] < featureday)]
 
             #print(datas.date,len(datas),C.data[:-target_day])
@@ -68,7 +68,6 @@ def main_loop(start,endday):
             rise_target = (talib.MAX(C.data,target_day)[target_day:].values / C.data[:-target_day].values - 1) * 100
 
             datas['target'] = rise_target > 10
-            print(df['code'],df['name'])
             all_list += datas.values.tolist()
 
         except KeyboardInterrupt:
