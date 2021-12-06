@@ -29,12 +29,12 @@ def DisplayOriginalLabel(values):
 
 # 1. 获取数据
 
-df = pd.read_csv('~/.test_feat.csv')
+df = pd.read_csv('transverse_train2021-12-6.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
 
-df1 = df[df['datetime']<'2021-07-30']
-df2 = df[df['datetime']>'2021-07-30']
+df1 = df[df['date']<'2021-04-30']
+df2 = df[df['date']>'2021-04-30']
 
 datas = df1
 label = datas['target']
@@ -45,17 +45,25 @@ DisplayOriginalLabel(label.values)
 
 
 fields = [
-       'fist_location_of_max.close',
-       'fist_location_of_min.close', 'ndex_mass_quantile_50.close',
-       'ndex_mass_quantile_75.close', '_ndex_mass_quantile_25.close',
-       'kurtosis.close', 'last_location_of_max.close',
-       'last_location_of_min.close', 'ma.close', 'macd.close', 'max.close',
-       'mean.close', 'min_change.close', 'min.close', 'none_rate.close',
-       'number_peaks_1.close', 'number_peaks_2.close', 'number_peaks_3.close',
-       'percentage_below_mean.close', 'ratio_value_number_to_seq_length.close',
-       'skewness.close', 'standard_deviation.close', 'variance.close',
-       'ma10.close', 'ma20.close', 'ma30.close', 'rise.vol', 'ma20.vol']
-
+       'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3INSIDE', 'CDL3LINESTRIKE',
+       'CDL3OUTSIDE', 'CDL3STARSINSOUTH', 'CDL3WHITESOLDIERS',
+       'CDLABANDONEDBABY', 'CDLADVANCEBLOCK', 'CDLBELTHOLD', 'CDLBREAKAWAY',
+       'CDLCLOSINGMARUBOZU', 'CDLCONCEALBABYSWALL', 'CDLCOUNTERATTACK',
+       'CDLDARKCLOUDCOVER', 'CDLDOJI', 'CDLDOJISTAR', 'CDLDRAGONFLYDOJI',
+       'CDLENGULFING', 'CDLEVENINGDOJISTAR', 'CDLEVENINGSTAR',
+       'CDLGAPSIDESIDEWHITE', 'CDLGRAVESTONEDOJI', 'CDLHAMMER',
+       'CDLHANGINGMAN', 'CDLHARAMI', 'CDLHARAMICROSS', 'CDLHIGHWAVE',
+       'CDLHIKKAKE', 'CDLHIKKAKEMOD', 'CDLHOMINGPIGEON', 'CDLIDENTICAL3CROWS',
+       'CDLINNECK', 'CDLINVERTEDHAMMER', 'CDLKICKING', 'CDLKICKINGBYLENGTH',
+       'CDLLADDERBOTTOM', 'CDLLONGLEGGEDDOJI', 'CDLLONGLINE', 'CDLMARUBOZU',
+       'CDLMATCHINGLOW', 'CDLMATHOLD', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR',
+       'CDLONNECK', 'CDLPIERCING', 'CDLRICKSHAWMAN', 'CDLRISEFALL3METHODS',
+       'CDLSEPARATINGLINES', 'CDLSHOOTINGSTAR', 'CDLSHORTLINE',
+       'CDLSPINNINGTOP', 'CDLSTALLEDPATTERN', 'CDLSTICKSANDWICH', 'CDLTAKURI',
+       'CDLTASUKIGAP', 'CDLTHRUSTING', 'CDLTRISTAR', 'CDLUNIQUE3RIVER',
+       'CDLUPSIDEGAP2CROWS', 'CDLXSIDEGAP3METHODS', 'ma10',
+       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol',
+       ]
 
 datas = datas.loc[:,fields]
 print(datas)
@@ -104,7 +112,7 @@ for i in range(len(y_pred)):
     if y_pred[i] == 0 or ans[i][1] < 0.5 :
         continue
 
-    print(ans[i][1],X2_test['datetime'].values[i],X2_test['code'].values[i])
+    print(ans[i][1],X2_test['date'].values[i],X2_test['code'].values[i])
     if y_pred[i] == y2_test[i]:
         pcnt1 += 1
     else:
