@@ -9,7 +9,7 @@ import json
 api = TdxHq_API(auto_retry=True)
 
 hostname="http://klang.org.cn"
-hostname="http://klang.zhanluejia.net.cn"
+#hostname="http://klang.zhanluejia.net.cn"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
