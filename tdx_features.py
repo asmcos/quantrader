@@ -44,12 +44,12 @@ def get_bar(name,code):
 
     datas = datas.assign(date=datas['datetime'].apply(lambda x: str(x)[0:10])).drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)
 
-    ma5 = talib.MA(datas.close,5)
-    ma10 = talib.MA(datas.close,10)
-    ma20 = talib.MA(datas.close,20)
-    ma30 = talib.MA(datas.close,30)
-    ma60 = talib.MA(datas.close,60)
-    ma120 = talib.MA(datas.close,120)
+    ma5 = talib.MA(datas.close,5) / C
+    ma10 = talib.MA(datas.close,10) / C
+    ma20 = talib.MA(datas.close,20) / C
+    ma30 = talib.MA(datas.close,30) / C
+    ma60 = talib.MA(datas.close,60) / C  
+    ma120 = talib.MA(datas.close,120) / C
     rise = (datas['close'].values[1:]/datas['close'].values[:-1] - 1) * 100
     rise = np.insert(rise,0,np.NaN)
 
