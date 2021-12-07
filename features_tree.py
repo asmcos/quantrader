@@ -22,9 +22,9 @@ def PrintException():
 all_list = []
 target_day = 10 #收盘价之后的几天内最高价格，判断是否有涨价空间
 hostname = "http://klang.org.cn"
+hostname = "http://klang.zhanluejia.net.cn"
 
 def get_features(code,end):
-    print("get_features")
     try:
         json = requests.get(hostname+"/features",
             params={"code":code,"end":end,"limit":200},timeout=1000).json()
@@ -32,7 +32,6 @@ def get_features(code,end):
         time.sleep(2)
         json = requests.get(hostname+"/features",
             params={"code":code,"end":end,"limit":200},timeout=1000).json()
-    print("get return ")
 
     df = pd.json_normalize(json)
     if len(df) < 1:
@@ -45,8 +44,8 @@ def get_features(code,end):
 def main_loop(start,endday):
     global all_list
 
-    for df in Kl.df_all[:1000]:
-    #for df in Kl.df_all:
+    #for df in Kl.df_all[:1000]:
+    for df in Kl.df_all:
 
         Kl.code(df["code"])
 
@@ -71,7 +70,7 @@ def main_loop(start,endday):
             #print(pd.DataFrame({"max":talib.MAX(C.data,target_day)[target_day:].values,"close":C.data[:-target_day].values}))
             #  计算涨幅空间
             max_target = talib.MAX(C.data,target_day)
-            rise_target = max_target[target_day:].values / C.data[:-target_day].values
+            rise_target = (max_target[target_day:].values / C.data[:-target_day].values - 1 ) * 100
             datas['target'] = rise_target > 10
             for i in datas.values.tolist():
                 all_list.append(i)
