@@ -53,6 +53,9 @@ def main_loop(start,endday):
         else:
             Kl.date(start=start,end=endday)
         try:
+            if len(Kl.currentdf['df']) <= target_day:
+                continue
+
             allDate = DATETIME.data
             # 如果target_day = N,表示，最后的N 天数据不能作为训练或者测试数据
             # 我们会计算这个 N 天的最大值作为目标值，计算涨幅空间
