@@ -44,6 +44,8 @@ def get_bar(name,code):
 
     datas = datas.assign(date=datas['datetime'].apply(lambda x: str(x)[0:10])).drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)
 
+    C = datas.close
+
     ma5 = talib.MA(datas.close,5) / C
     ma10 = talib.MA(datas.close,10) / C
     ma20 = talib.MA(datas.close,20) / C
