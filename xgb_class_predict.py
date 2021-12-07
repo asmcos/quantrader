@@ -29,12 +29,12 @@ def DisplayOriginalLabel(values):
 
 # 1. 获取数据
 
-df = pd.read_csv('transverse_train2021-12-6.csv')
+df = pd.read_csv('transverse_train2021-12-8.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
 
-df1 = df[df['date']<'2021-04-30']
-df2 = df[df['date']>'2021-04-30']
+df1 = df[df['date']<'2021-07-15']
+df2 = df[df['date']>'2021-07-30']
 
 datas = df1
 label = datas['target']
@@ -73,7 +73,7 @@ print(datas)
 
 #使用sklearn数据
 X_train, X_test, y_train, y_test = train_test_split(datas, label.values, test_size=0.2, random_state=0)
-X2_train, X2_test, y2_train, y2_test = train_test_split(df2, label2.values, test_size=0.2, random_state=0)
+X2_train, X2_test, y2_train, y2_test = train_test_split(df2, label2.values, test_size=0.4, random_state=0)
 
 ### fit model for train data
 model = XGBClassifier(learning_rate=0.01,
@@ -85,7 +85,7 @@ model = XGBClassifier(learning_rate=0.01,
                       gamma=0.,                     # 惩罚项中叶子结点个数前的参数
                       subsample=0.8,                # 随机选择80%样本建立决策树
                       objective='reg:squarederror', # 指定损失函数
-                      scale_pos_weight=1,           # 解决样本个数不平衡的问题
+                      scale_pos_weight=2,           # 解决样本个数不平衡的问题
                       random_state=27,               # 随机数
                       colsample_bytree=0.7,
                       )

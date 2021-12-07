@@ -11,6 +11,7 @@ import numpy as np
 api = TdxHq_API(auto_retry=True)
 
 hostname="http://klang.org.cn"
+hostname="http://klang.zhanluejia.net.cn"
 #hostname="http://127.0.0.1:1337"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")

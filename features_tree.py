@@ -104,15 +104,11 @@ fields = [
 
 Klang_init()
 
-main_loop(start=None,endday='2021-07-01')
+main_loop(start=None,endday='2021-10-01')
 df = pd.DataFrame(all_list,columns=fields)
 df.to_csv('transverse_train'+today+'.csv',index=False)
 
 
-all_list = []
-main_loop(start='2021-07-15',endday=today)
-df = pd.DataFrame(all_list,columns=fields)
-df.to_csv('transverse_test'+today+'.csv',index=False)
 """
 all_list = []
 pred_data = 1
