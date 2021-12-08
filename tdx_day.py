@@ -9,7 +9,7 @@ import json
 api = TdxHq_API(auto_retry=True)
 
 hostname="http://klang.org.cn"
-#hostname="http://klang.zhanluejia.net.cn"
+hostname="http://klang.zhanluejia.net.cn"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
@@ -52,8 +52,6 @@ def get_bar(name,code):
         d['name'] = name
         d['code'] = code
         d['volume'] = float("%.4f" % (d['volume'] * 100)) #股 = 手*100
-        if d['volume'] == 0.0:
-            continue
         d['turn'] = float("%.4f" %(d['volume']*100 / liutonggu)) 
         del d['index']
     #print(jsondatas)
