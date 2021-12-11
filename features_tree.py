@@ -71,7 +71,7 @@ def main_loop(start,endday):
             #  计算涨幅空间
             max_target = talib.MAX(C.data,target_day)
             rise_target = (max_target[target_day:].values / C.data[:-target_day].values - 1 ) * 100
-            datas['target'] = rise_target > 10
+            datas['target'] = rise_target 
             for i in datas.values.tolist():
                 all_list.append(i)
         except KeyboardInterrupt:
@@ -99,8 +99,8 @@ fields = [
        'CDLTASUKIGAP', 'CDLTHRUSTING', 'CDLTRISTAR', 'CDLUNIQUE3RIVER',
        'CDLUPSIDEGAP2CROWS', 'CDLXSIDEGAP3METHODS', 'code', 'date', 'ma10',
        'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'name', 'rise', 'risevol',
+       'dea', 'diff', 'macd',
        'target']
-
 
 Klang_init()
 

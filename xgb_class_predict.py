@@ -29,7 +29,7 @@ def DisplayOriginalLabel(values):
 
 # 1. 获取数据
 
-df = pd.read_csv('transverse_train2021-12-8.csv')
+df = pd.read_csv('transverse_train2021-12-11.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
 
@@ -37,11 +37,12 @@ df1 = df[df['date']<'2021-07-15']
 df2 = df[df['date']>'2021-07-30']
 
 datas = df1
-label = datas['target']
-label2 = df2['target']
-print(label.values)
+prec = 10 #target 百分比
+label = datas['target'].values > prec
+label2 = df2['target'].values > prec
+print(label)
 
-DisplayOriginalLabel(label.values)
+DisplayOriginalLabel(label)
 
 
 fields = [
@@ -62,7 +63,7 @@ fields = [
        'CDLSPINNINGTOP', 'CDLSTALLEDPATTERN', 'CDLSTICKSANDWICH', 'CDLTAKURI',
        'CDLTASUKIGAP', 'CDLTHRUSTING', 'CDLTRISTAR', 'CDLUNIQUE3RIVER',
        'CDLUPSIDEGAP2CROWS', 'CDLXSIDEGAP3METHODS', 'ma10',
-       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol',
+       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol','dea', 'diff', 'macd'
        ]
 
 datas = datas.loc[:,fields]
@@ -72,8 +73,8 @@ print(datas)
 # 
 
 #使用sklearn数据
-X_train, X_test, y_train, y_test = train_test_split(datas, label.values, test_size=0.2, random_state=0)
-X2_train, X2_test, y2_train, y2_test = train_test_split(df2, label2.values, test_size=0.4, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(datas, label, test_size=0.2, random_state=0)
+X2_train, X2_test, y2_train, y2_test = train_test_split(df2, label2, test_size=0.4, random_state=0)
 
 ### fit model for train data
 model = XGBClassifier(learning_rate=0.01,
@@ -120,6 +121,9 @@ for i in range(len(y_pred)):
 DisplayOriginalLabel(y2_test)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 
+png = xgb.to_graphviz(model,num_trees=0)
+png.view("stock.png")
+
 """
 preds = pd.read_csv('transverse_pred'+end+'.csv')
 preds1 = preds.loc[:,fields]
@@ -136,8 +140,6 @@ df_pred = pd.DataFrame(pred_list,columns=['name','code','日期'])
 print('file://'+os.getcwd()+ '/' + './datas/tree_pred'+end+'.html' )
 save_df_tohtml('./datas/tree_pred'+end+'.html',df_pred)
 
-#png = xgb.to_graphviz(model,num_trees=0)
-#png.view("stock.png")
 
 
 #显示
