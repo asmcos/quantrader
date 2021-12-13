@@ -39,6 +39,9 @@ def get_features(code,end):
     df = df.drop(columns=['_id','codedate','id'])
     datas = df.sort_values(by="date",ascending=True) 
 
+    datas = datas.loc[:,[ 'code', 'date', 'ma10',
+       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'name', 'rise', 'risevol',
+       'dea', 'diff', 'macd']]
     return datas
 
 def main_loop(start,endday):
@@ -81,23 +84,7 @@ def main_loop(start,endday):
 
 
 fields = [
-       'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3INSIDE', 'CDL3LINESTRIKE',
-       'CDL3OUTSIDE', 'CDL3STARSINSOUTH', 'CDL3WHITESOLDIERS',
-       'CDLABANDONEDBABY', 'CDLADVANCEBLOCK', 'CDLBELTHOLD', 'CDLBREAKAWAY',
-       'CDLCLOSINGMARUBOZU', 'CDLCONCEALBABYSWALL', 'CDLCOUNTERATTACK',
-       'CDLDARKCLOUDCOVER', 'CDLDOJI', 'CDLDOJISTAR', 'CDLDRAGONFLYDOJI',
-       'CDLENGULFING', 'CDLEVENINGDOJISTAR', 'CDLEVENINGSTAR',
-       'CDLGAPSIDESIDEWHITE', 'CDLGRAVESTONEDOJI', 'CDLHAMMER',
-       'CDLHANGINGMAN', 'CDLHARAMI', 'CDLHARAMICROSS', 'CDLHIGHWAVE',
-       'CDLHIKKAKE', 'CDLHIKKAKEMOD', 'CDLHOMINGPIGEON', 'CDLIDENTICAL3CROWS',
-       'CDLINNECK', 'CDLINVERTEDHAMMER', 'CDLKICKING', 'CDLKICKINGBYLENGTH',
-       'CDLLADDERBOTTOM', 'CDLLONGLEGGEDDOJI', 'CDLLONGLINE', 'CDLMARUBOZU',
-       'CDLMATCHINGLOW', 'CDLMATHOLD', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR',
-       'CDLONNECK', 'CDLPIERCING', 'CDLRICKSHAWMAN', 'CDLRISEFALL3METHODS',
-       'CDLSEPARATINGLINES', 'CDLSHOOTINGSTAR', 'CDLSHORTLINE',
-       'CDLSPINNINGTOP', 'CDLSTALLEDPATTERN', 'CDLSTICKSANDWICH', 'CDLTAKURI',
-       'CDLTASUKIGAP', 'CDLTHRUSTING', 'CDLTRISTAR', 'CDLUNIQUE3RIVER',
-       'CDLUPSIDEGAP2CROWS', 'CDLXSIDEGAP3METHODS', 'code', 'date', 'ma10',
+       'code', 'date', 'ma10',
        'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'name', 'rise', 'risevol',
        'dea', 'diff', 'macd',
        'target']

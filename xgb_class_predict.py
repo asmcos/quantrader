@@ -29,14 +29,15 @@ def DisplayOriginalLabel(values):
 
 # 1. 获取数据
 
-df = pd.read_csv('transverse_train2021-12-11.csv')
+df = pd.read_csv('transverse_train2021-12-13.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
 
 df1 = df[df['date']<'2021-07-15']
 df2 = df[df['date']>'2021-07-30']
 
-datas = df1
+
+datas = df1 
 prec = 10 #target 百分比
 label = datas['target'].values > prec
 label2 = df2['target'].values > prec
@@ -46,25 +47,9 @@ DisplayOriginalLabel(label)
 
 
 fields = [
-       'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3INSIDE', 'CDL3LINESTRIKE',
-       'CDL3OUTSIDE', 'CDL3STARSINSOUTH', 'CDL3WHITESOLDIERS',
-       'CDLABANDONEDBABY', 'CDLADVANCEBLOCK', 'CDLBELTHOLD', 'CDLBREAKAWAY',
-       'CDLCLOSINGMARUBOZU', 'CDLCONCEALBABYSWALL', 'CDLCOUNTERATTACK',
-       'CDLDARKCLOUDCOVER', 'CDLDOJI', 'CDLDOJISTAR', 'CDLDRAGONFLYDOJI',
-       'CDLENGULFING', 'CDLEVENINGDOJISTAR', 'CDLEVENINGSTAR',
-       'CDLGAPSIDESIDEWHITE', 'CDLGRAVESTONEDOJI', 'CDLHAMMER',
-       'CDLHANGINGMAN', 'CDLHARAMI', 'CDLHARAMICROSS', 'CDLHIGHWAVE',
-       'CDLHIKKAKE', 'CDLHIKKAKEMOD', 'CDLHOMINGPIGEON', 'CDLIDENTICAL3CROWS',
-       'CDLINNECK', 'CDLINVERTEDHAMMER', 'CDLKICKING', 'CDLKICKINGBYLENGTH',
-       'CDLLADDERBOTTOM', 'CDLLONGLEGGEDDOJI', 'CDLLONGLINE', 'CDLMARUBOZU',
-       'CDLMATCHINGLOW', 'CDLMATHOLD', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR',
-       'CDLONNECK', 'CDLPIERCING', 'CDLRICKSHAWMAN', 'CDLRISEFALL3METHODS',
-       'CDLSEPARATINGLINES', 'CDLSHOOTINGSTAR', 'CDLSHORTLINE',
-       'CDLSPINNINGTOP', 'CDLSTALLEDPATTERN', 'CDLSTICKSANDWICH', 'CDLTAKURI',
-       'CDLTASUKIGAP', 'CDLTHRUSTING', 'CDLTRISTAR', 'CDLUNIQUE3RIVER',
-       'CDLUPSIDEGAP2CROWS', 'CDLXSIDEGAP3METHODS', 'ma10',
-       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol','dea', 'diff', 'macd'
-       ]
+     'ma10',
+       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol',
+       'dea', 'diff', 'macd'  ]
 
 datas = datas.loc[:,fields]
 print(datas)
@@ -121,10 +106,15 @@ for i in range(len(y_pred)):
 DisplayOriginalLabel(y2_test)
 print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
 
+plot_importance(model)
+plt.show()
+
+
+"""
 png = xgb.to_graphviz(model,num_trees=0)
 png.view("stock.png")
 
-"""
+
 preds = pd.read_csv('transverse_pred'+end+'.csv')
 preds1 = preds.loc[:,fields]
 y_pred = model.predict(preds1)
