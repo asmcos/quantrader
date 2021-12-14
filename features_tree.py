@@ -70,7 +70,7 @@ def main_loop(start,endday):
             #  计算涨幅空间
             max_target = talib.MAX(C.data,target_day)
             rise_target = (max_target[target_day:].values / C.data[:-target_day].values - 1 ) * 100
-            datas['oc'] = O.data[:-target_day].values / C.data[:-target_day].values
+            datas['oc'] = (O.data[:-target_day].values / C.data[:-target_day].values - 1)*100
             datas['target'] = rise_target 
             for i in datas.values.tolist():
                 all_list.append(i)
