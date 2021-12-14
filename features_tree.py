@@ -65,13 +65,12 @@ def main_loop(start,endday):
             datas = get_features(df['code'],featureday)   
             print(df['code'],df['name'])
             datas = datas[(datas['date'] >= allDate[0]) & (datas['date'] < featureday)]
-
             #print(datas.date,len(datas),C.data[:-target_day])
             #print(pd.DataFrame({"max":talib.MAX(C.data,target_day)[target_day:].values,"close":C.data[:-target_day].values}))
             #  计算涨幅空间
             max_target = talib.MAX(C.data,target_day)
             rise_target = (max_target[target_day:].values / C.data[:-target_day].values - 1 ) * 100
-            datas['oc'] = O / C
+            datas['oc'] = O.data[:-target_day].values / C.data[:-target_day].values
             datas['target'] = rise_target 
             for i in datas.values.tolist():
                 all_list.append(i)
