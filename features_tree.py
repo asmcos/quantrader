@@ -39,9 +39,6 @@ def get_features(code,end):
     df = df.drop(columns=['_id','codedate','id'])
     datas = df.sort_values(by="date",ascending=True) 
 
-    datas = datas.loc[:,[ 'code', 'date', 'ma10',
-       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'name', 'rise', 'risevol',
-       'dea', 'diff', 'macd']]
     return datas
 
 def main_loop(start,endday):
@@ -74,6 +71,7 @@ def main_loop(start,endday):
             #  计算涨幅空间
             max_target = talib.MAX(C.data,target_day)
             rise_target = (max_target[target_day:].values / C.data[:-target_day].values - 1 ) * 100
+            datas['oc'] = O / C
             datas['target'] = rise_target 
             for i in datas.values.tolist():
                 all_list.append(i)
@@ -84,9 +82,8 @@ def main_loop(start,endday):
 
 
 fields = [
-       'code', 'date', 'ma10',
-       'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'name', 'rise', 'risevol',
-       'dea', 'diff', 'macd',
+       'code', 'date', 'dea', 'diff', 'ma10', 'ma120', 'ma20', 'ma30', 'ma5',
+       'ma60', 'macd', 'name', 'rise', 'risevol','oc',
        'target']
 
 Klang_init()

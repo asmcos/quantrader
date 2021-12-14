@@ -29,7 +29,7 @@ def DisplayOriginalLabel(values):
 
 # 1. 获取数据
 
-df = pd.read_csv('transverse_train2021-12-13.csv')
+df = pd.read_csv('transverse_train2021-12-14.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
 
@@ -49,7 +49,7 @@ DisplayOriginalLabel(label)
 fields = [
      'ma10',
        'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol',
-       'dea', 'diff', 'macd'  ]
+       'dea', 'diff', 'macd' ,'oc' ]
 
 datas = datas.loc[:,fields]
 print(datas)
