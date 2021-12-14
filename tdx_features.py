@@ -59,8 +59,11 @@ def get_bar(name,code):
     mavol5 = talib.MA(datas.vol,5)
     risevol = datas.vol / mavol5
  
+    diff,dea,macd = talib.MACD(datas.close,fastperiod=12, slowperiod=26, signalperiod=9) 
+    macd = macd * 2
+
     func = lambda name :getattr(talib,name)(datas.open, datas.high, datas.low, datas.close)
-    
+    """ 
     talibdict = {i:func(i) for i in ['CDL2CROWS','CDL3BLACKCROWS','CDL3INSIDE','CDL3LINESTRIKE','CDL3OUTSIDE','CDL3STARSINSOUTH','CDL3WHITESOLDIERS',
                                     'CDLABANDONEDBABY','CDLADVANCEBLOCK','CDLBELTHOLD','CDLBREAKAWAY','CDLCLOSINGMARUBOZU','CDLCONCEALBABYSWALL',
                                     'CDLCOUNTERATTACK','CDLDARKCLOUDCOVER','CDLDOJI','CDLDOJISTAR','CDLDRAGONFLYDOJI','CDLENGULFING','CDLEVENINGDOJISTAR',
@@ -72,9 +75,10 @@ def get_bar(name,code):
                                     'CDLSHORTLINE','CDLSPINNINGTOP','CDLSTALLEDPATTERN','CDLSTICKSANDWICH','CDLTAKURI','CDLTASUKIGAP',
                                     'CDLTHRUSTING','CDLTRISTAR','CDLUNIQUE3RIVER','CDLUPSIDEGAP2CROWS','CDLXSIDEGAP3METHODS',
                                     ]}
-
+    
+    """
     #个性化的
-    talibdict.update({
+    talibdict = {
                             'ma5':ma5,
                             'ma10':ma10,
                             'ma20':ma20,
@@ -83,7 +87,10 @@ def get_bar(name,code):
                             'ma120':ma120,
                             'rise':rise,
                             'risevol':risevol,
-                            'date':datas.date})
+                            'diff':diff,
+                            'dea':dea,
+                            'macd':macd,
+                            'date':datas.date}
 
     print(len(datas),datas.iloc[-1].date)
 
