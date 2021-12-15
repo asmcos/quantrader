@@ -46,7 +46,6 @@ def get_bar(name,code):
     datas = datas.assign(date=datas['datetime'].apply(lambda x: str(x)[0:10])).drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)
 
     C = datas.close
-
     ma5 = talib.MA(datas.close,5) / C
     ma10 = talib.MA(datas.close,10) / C
     ma20 = talib.MA(datas.close,20) / C
@@ -56,8 +55,8 @@ def get_bar(name,code):
     rise = (datas['close'].values[1:]/datas['close'].values[:-1] - 1) * 100
     rise = np.insert(rise,0,np.NaN)
 
-    mavol5 = talib.MA(datas.vol,5)
-    risevol = datas.vol / mavol5
+    mavol10 = talib.MA(datas.vol,10)
+    risevol = datas.vol / mavol10
  
     diff,dea,macd = talib.MACD(datas.close,fastperiod=12, slowperiod=26, signalperiod=9) 
     macd = macd * 2
