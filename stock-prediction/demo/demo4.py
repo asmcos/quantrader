@@ -25,14 +25,22 @@ def get_stock_data(normalized=0):
         close_price = df['close']
         return  np.log(close_price) - np.log(close_price.shift(1))
     
-    import tushare as ts
+    import baostock as bs
+    bs.login()
 
     #青岛啤酒
-    code = '600600'
+    code = 'sh.600600'
     start  = '2019-04-14'
 
-    df = ts.get_k_data(code,start=start,index=False,ktype='D')
+    rs = bs.query_history_k_data_plus(code, 'date,open,high,low,close,volume,code,turn', start_date=start,
+                                      frequency='d' )
+    df = rs.get_data()
+    if len(df) < 2:
+        return
 
+    df['close'] = df['close'].astype(np.float32)
+    df['volume'] = df['volume'].astype(np.float32)
+    print(df.columns)
     df = df.set_index('date').sort_index(ascending=True)
 
 	#df = df['close']
@@ -92,11 +100,17 @@ def load_data(stock, seq_len, ratio=0.9):
 
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], amount_of_features))
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], amount_of_features))  
-    
+   
+    x_train = x_train.astype('float64') 
+    y_train = y_train.astype('float64') 
+    x_test = x_test.astype('float64') 
+    y_test = y_test.astype('float64') 
     return [x_train, y_train, x_test, y_test]
 
 sequence_len = 25
 X_train, y_train, X_test, y_test = load_data(df, sequence_len)
+
+print(X_train.shape)
 
 def build_model(layers):
     d = 0.2
