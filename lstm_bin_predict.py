@@ -54,6 +54,7 @@ fields = [
        'dea', 'diff', 'macd' ,'oc' ]
 
 datas = datas.loc[:,fields]
+datas2 = df2.loc[:,fields]
 print(datas)
 
 # 准备预测的数据
@@ -91,6 +92,7 @@ def load_data(stock, target,seq_len, ratio=0.9):
 
 sequence_len = 25
 X_train, y_train, X_test, y_test = load_data(datas,label, sequence_len)
+X2_train, y2_train, X2_test, y2_test = load_data(datas2,label2, sequence_len,ratio=1)
 
 
 def build_model():
@@ -109,20 +111,43 @@ def build_model():
 
     # fully connected layer
     model.add(Dense(16,kernel_initializer='uniform',activation='relu'))
-    model.add(Dense(1,kernel_initializer='uniform',activation='linear'))
-    model.compile(loss='mse',optimizer='adam',metrics=['accuracy'])
+    model.add(Dense(1,activation='sigmoid'))
+
+    # 二分类
+    model.compile(optimizer='rmsprop',
+              loss='binary_crossentropy',metrics=['accuracy'])
     return model
 
 
 model = build_model()
 print(X_train.shape)
+print(X2_train.shape)
 history = model.fit(
     X_train,
     y_train,
-    batch_size=512,
-    epochs=100)
+    batch_size=200,
+    epochs=1)
 
+y_pred = model.predict(X2_train)
+print(y_pred)
 # 对测试集进行预测
+
+pcnt1 = 0
+pcnt2 = 0
+for i in range(len(y_pred)):
+
+    if y_pred[i] == 0 :
+        continue
+
+    if y_pred[i] == y2_train[i]:
+        pcnt1 += 1
+    else:
+        pcnt2 += 1
+DisplayOriginalLabel(y2_train)
+print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
+
+
+
 
 """
 ans = model.predict_proba(X2_test.loc[:,fields])
