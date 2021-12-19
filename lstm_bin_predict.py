@@ -14,6 +14,7 @@ from common.framework import save_df_tohtml
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM
+from tensorflow import keras
 
 def DisplayOriginalLabel(values):
   cnt1 = 0
@@ -73,7 +74,7 @@ def load_data(stock, target,seq_len, ratio=0.9):
     y_result = []
     for index in range(len(data) - sequence_length):
         result.append(data[index: index + sequence_length])
-        y_result.append(target[index+sequence_length])
+        y_result.append(target[index+sequence_length-1])
     result = np.array(result)    # (len(), seq, cols) contains newest date
 
     row = round(ratio * result.shape[0])
@@ -110,12 +111,19 @@ def build_model():
     model.add(Dropout(d))
 
     # fully connected layer
-    model.add(Dense(16,kernel_initializer='uniform',activation='relu'))
+    model.add(Dense(16,activation='relu'))
     model.add(Dense(1,activation='sigmoid'))
 
+    lossfn = keras.losses.BinaryCrossentropy(
+        from_logits=False,
+        label_smoothing=0.0,
+        axis=-1,
+        reduction="auto",
+        name="binary_crossentropy",
+    )
     # 二分类
     model.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',metrics=['accuracy'])
+              loss=lossfn, metrics=['accuracy'])
     return model
 
 
@@ -136,10 +144,10 @@ pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] == 0 :
+    if y_pred[i] < 0.5 :
         continue
 
-    if y_pred[i] == y2_train[i]:
+    if y2_train[i] == True :
         pcnt1 += 1
     else:
         pcnt2 += 1
