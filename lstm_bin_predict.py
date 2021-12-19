@@ -15,6 +15,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM
 from tensorflow import keras
+import tensorflow as tf
 
 def DisplayOriginalLabel(values):
   cnt1 = 0
@@ -36,6 +37,10 @@ df = pd.read_csv('transverse_train2021-12-14.csv')
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 print(df.columns)
 
+codelist = df.groupby('code').nunique().index
+
+print(codelist)
+
 df1 = df[df['date']<'2021-07-15']
 df2 = df[df['date']>'2021-07-30']
 
@@ -52,7 +57,7 @@ DisplayOriginalLabel(label)
 fields = [
      'ma10',
        'ma120', 'ma20', 'ma30', 'ma5', 'ma60', 'rise', 'risevol',
-       'dea', 'diff', 'macd' ,'oc' ]
+       'dea', 'diff', 'macd' ,'oc']
 
 datas = datas.loc[:,fields]
 datas2 = df2.loc[:,fields]
@@ -72,15 +77,18 @@ def load_data(stock, target,seq_len, ratio=0.9):
     sequence_length = seq_len + 1
     result = []
     y_result = []
+
+
     for index in range(len(data) - sequence_length):
-        result.append(data[index: index + sequence_length])
-        y_result.append(target[index+sequence_length-1])
+         result.append(data[index: index + sequence_length]) 
+         y_result.append(target[index+sequence_length-1])
+
     result = np.array(result)    # (len(), seq, cols) contains newest date
 
     row = round(ratio * result.shape[0])
-    train = result[:int(row), :]
+    train = result[:int(row), :-1]
 
-    x_train = train[:, :-1]      # (len(), 10, 4) drop last row(), because last row contain the label
+    x_train = train   # (len(), 10, 4) drop last row(), because last row contain the label
     y_train = np.array(y_result[:int(row)])
 
     x_test = result[int(row):, :-1]
@@ -110,8 +118,9 @@ def build_model():
     model.add(LSTM(64, return_sequences=False))
     model.add(Dropout(d))
 
-    # fully connected layer
+    # fully connected layer 
     model.add(Dense(16,activation='relu'))
+    # 输入 1 维度 0，1
     model.add(Dense(1,activation='sigmoid'))
 
     lossfn = keras.losses.BinaryCrossentropy(
@@ -137,14 +146,16 @@ history = model.fit(
     epochs=1)
 
 y_pred = model.predict(X2_train)
-print(y_pred)
+print(y_pred,len(y_pred))
 # 对测试集进行预测
+
+print(tf.greater(y_pred, .5))
 
 pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
 
-    if y_pred[i] < 0.5 :
+    if y_pred[i][0] < 0.5 :
         continue
 
     if y2_train[i] == True :
