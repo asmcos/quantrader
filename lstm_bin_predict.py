@@ -102,7 +102,7 @@ def load_data(df, seq_len, ratio=0.9):
 
 
 
-for df in df_all[:100]:
+for df in df_all:
     load_data(df,sequence_len)
 
 X_train = np.array(X_train)
@@ -111,7 +111,7 @@ y_train = np.array(y_train)
 
 X_test = np.array(X_test)
 X_test = np.reshape(X_test,(X_test.shape[0],X_test.shape[1],len(fields)))
-#y_test = np.array(y_test)
+
 
 def build_model():
     d = 0.2
