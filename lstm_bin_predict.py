@@ -64,7 +64,7 @@ print(df_all[0].columns)
 #X_train, X_test, y_train, y_test = train_test_split(datas, label, test_size=0.2, random_state=0)
 
 
-sequence_len = 25
+sequence_len = 40
 prec = 10 #target 百分比
 fields = [
          'ma10',
@@ -79,7 +79,7 @@ y_test = []
 def load_data(df, seq_len, ratio=0.9):
 
     df1 = df[df['date']<'2021-07-15']
-    df2 = df[df['date']>'2021-07-30']
+    df2 = df[df['date']>'2021-07-16']
 
     label1 = df1['target'].values > prec
     label2 = df2['target'].values > prec
