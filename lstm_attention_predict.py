@@ -3,8 +3,6 @@
 # 使用lstm做股票二分类验证
 #
 
-
-
 import os
 import numpy as np
 from matplotlib import pyplot as plt
@@ -16,12 +14,12 @@ import datetime
 from common.framework import save_df_tohtml
 
 
-
-from tensorflow.keras.models import Sequential
+from tensorflow.keras import Input
+from tensorflow.keras.models import Sequential,Model,load_model
 from tensorflow.keras.layers import Dense, Dropout, Activation,LSTM
 import tensorflow as tf
 import json
-import shap
+from attention import Attention
 
 def DisplayOriginalLabel(values):
   cnt1 = 0
@@ -138,8 +136,40 @@ def build_model():
               loss=lossfn, metrics=['accuracy'])
     return model
 
+time_steps = X_train.shape[1]
+input_dim  = X_train.shape[2]
 
-model = build_model()
+print(time_steps,input_dim)
+
+def build_model2():
+    d = 0.2
+
+    model_input = Input(shape=(time_steps, input_dim))
+    x = LSTM(128, return_sequences=True)(model_input)
+    x = Dropout(d)(x)
+    x = LSTM(64, return_sequences=False)(x)
+    x = Dropout(d)(x)
+    #a = Attention(True)
+    #a.units = 32
+    #x = a(x)
+    x = Dense(16,activation='relu')(x)
+    x = Dense(1,activation='sigmoid')(x)
+
+    model = Model(model_input, x)
+
+    lossfn = tf.keras.losses.BinaryCrossentropy(
+        from_logits=False,
+        label_smoothing=0.0,
+        axis=-1,
+        reduction="auto",
+        name="binary_crossentropy",
+    )
+    # 二分类
+    model.compile(optimizer='rmsprop',
+              loss=lossfn, metrics=['accuracy'])
+    return model
+
+model = build_model2()
 
 log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
@@ -149,13 +179,6 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram
 model.fit(X_train,y_train,batch_size=200,
         epochs=2,callbacks=[tensorboard_callback])
 
-
-"""
-history = model.fit(
-        X_train,y_train,
-        batch_size=200,
-        epochs=2,callbacks=[tensorboard_callback])
-"""
 y_pred = model.predict(X_test)
 
 # 对测试集进行预测
@@ -178,16 +201,4 @@ if pcnt1+pcnt2 > 0:
     print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)),pcnt1 + pcnt2)
 
 
-background = X_train[np.random.choice(X_train.shape[0], 100, replace=False)]
-
-"""
-explainer = shap.DeepExplainer(
-    (model.layers[0].input, model.layers[-1].output), background
-)
-"""
-
-explainer = shap.DeepExplainer(model, background)
-
-shap_values = explainer.shap_values(X_test[:3]) 
-shap.image_plot(shap_values, -X_test[:3])
 
