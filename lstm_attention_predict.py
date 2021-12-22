@@ -16,10 +16,10 @@ from common.framework import save_df_tohtml
 
 from tensorflow.keras import Input
 from tensorflow.keras.models import Sequential,Model,load_model
-from tensorflow.keras.layers import Dense, Dropout, Activation,LSTM
+from tensorflow.keras.layers import Dense, Dropout, Activation,LSTM,Bidirectional
 import tensorflow as tf
 import json
-from attention import Attention
+from tensorflow.keras.layers import Attention,GlobalMaxPooling1D,Concatenate
 
 def DisplayOriginalLabel(values):
   cnt1 = 0
@@ -47,7 +47,7 @@ def load_data_fromfile(filename):
         df_all.append(df)
 
 
-load_data_fromfile('lstm_train2021-12-20.csv')
+load_data_fromfile('lstm_train2021-12-21.csv')
 
 print(df_all[0].columns)
 
@@ -145,14 +145,15 @@ def build_model2():
     d = 0.2
 
     model_input = Input(shape=(time_steps, input_dim))
-    x = LSTM(128, return_sequences=True)(model_input)
+    x = Bidirectional(LSTM(128, return_sequences=True))(model_input)
     x = Dropout(d)(x)
-    x = LSTM(64, return_sequences=False)(x)
-    x = Dropout(d)(x)
-    #a = Attention(True)
-    #a.units = 32
-    #x = a(x)
-    x = Dense(16,activation='relu')(x)
+    #x = Bidirectional(LSTM(64, return_sequences=False))(x)
+    #x = Dropout(d)(x)
+    a = Attention()([x,x])
+    out1 = GlobalMaxPooling1D()(x)
+    out2 = GlobalMaxPooling1D()(a)
+    merge = Concatenate()([out1,out2])
+    x = Dense(16,activation='relu')(merge)
     x = Dense(1,activation='sigmoid')(x)
 
     model = Model(model_input, x)
