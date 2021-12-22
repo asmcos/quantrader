@@ -96,8 +96,7 @@ fields = [
 
 Klang_init()
 
-main_loop(start=None,endday='2021-10-01')
-
+main_loop(start=None,endday='2021-12-01')
 
 save_dict_tofile(all_dict,'lstm_train'+today+'.csv')
 

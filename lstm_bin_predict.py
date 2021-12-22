@@ -10,20 +10,18 @@ import numpy as np
 from matplotlib import pyplot as plt
 import requests
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 import talib
+import datetime
 
 from common.framework import save_df_tohtml
 
 
 
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation
-from keras.layers.recurrent import LSTM
-from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation,LSTM
 import tensorflow as tf
 import json
+import shap
 
 def DisplayOriginalLabel(values):
   cnt1 = 0
@@ -59,10 +57,6 @@ print(df_all[0].columns)
 
 # 准备预测的数据
 # 
-
-#使用sklearn数据
-#X_train, X_test, y_train, y_test = train_test_split(datas, label, test_size=0.2, random_state=0)
-
 
 sequence_len = 40
 prec = 10 #target 百分比
@@ -102,7 +96,7 @@ def load_data(df, seq_len, ratio=0.9):
 
 
 
-for df in df_all:
+for df in df_all[:100]:
     load_data(df,sequence_len)
 
 X_train = np.array(X_train)
@@ -132,7 +126,7 @@ def build_model():
     # 输入 1 维度 0，1
     model.add(Dense(1,activation='sigmoid'))
 
-    lossfn = keras.losses.BinaryCrossentropy(
+    lossfn = tf.keras.losses.BinaryCrossentropy(
         from_logits=False,
         label_smoothing=0.0,
         axis=-1,
@@ -147,14 +141,23 @@ def build_model():
 
 model = build_model()
 
+log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
+#X = pd.DataFrame(data = X_train, columns = fields)
+
+model.fit(X_train,y_train,batch_size=200,
+        epochs=2,callbacks=[tensorboard_callback])
+
+
+"""
 history = model.fit(
-        X_train,
-        y_train,
+        X_train,y_train,
         batch_size=200,
-        epochs=2)
-
+        epochs=2,callbacks=[tensorboard_callback])
+"""
 y_pred = model.predict(X_test)
+
 # 对测试集进行预测
 # print(tf.greater(y_pred, .5))
 print(y_pred)
@@ -162,7 +165,7 @@ print(y_pred)
 pcnt1 = 0
 pcnt2 = 0
 for i in range(len(y_pred)):
-     if y_pred[i][0] < 0.5 :
+     if y_pred[i][0] < 0.6 :
         continue
 
      if y_test[i] == True :
@@ -172,5 +175,19 @@ for i in range(len(y_pred)):
 
 DisplayOriginalLabel(y_test)
 if pcnt1+pcnt2 > 0:
-    print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)))
+    print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)),pcnt1 + pcnt2)
+
+
+background = X_train[np.random.choice(X_train.shape[0], 100, replace=False)]
+
+"""
+explainer = shap.DeepExplainer(
+    (model.layers[0].input, model.layers[-1].output), background
+)
+"""
+
+explainer = shap.DeepExplainer(model, background)
+
+shap_values = explainer.shap_values(X_test[:3]) 
+shap.image_plot(shap_values, -X_test[:3])
 
