@@ -21,7 +21,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation,LSTM
 import tensorflow as tf
 import json
-import shap
 
 def DisplayOriginalLabel(values):
   cnt1 = 0
@@ -178,16 +177,4 @@ if pcnt1+pcnt2 > 0:
     print("Accuracy: %.2f %% " % (100 * pcnt1 / (pcnt1 + pcnt2)),pcnt1 + pcnt2)
 
 
-background = X_train[np.random.choice(X_train.shape[0], 100, replace=False)]
-
-"""
-explainer = shap.DeepExplainer(
-    (model.layers[0].input, model.layers[-1].output), background
-)
-"""
-
-explainer = shap.DeepExplainer(model, background)
-
-shap_values = explainer.shap_values(X_test[:3]) 
-shap.image_plot(shap_values, -X_test[:3])
 
