@@ -35,8 +35,10 @@ def create_color_hqltgz(hqltsz):
     return url_template
 
 def create_color_rise(rise):
-    
-    rise = float(rise)
+    try: 
+        rise = float(rise)
+    except:
+        rise = 0
     if rise >= 0.0:
         url_template= '''<font color="#ef4136">+{rise}</font></a>'''.format(rise=rise)
     else:
