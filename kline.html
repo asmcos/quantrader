@@ -208,8 +208,17 @@
                 <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
                 <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
                 </tr>
- 
 
+ 
+                <tr v-for="(item,index) in stockwatcherlist">
+                <td v-if="result[item]"><a @click="reloadwatcher(item)" target=_blank>{{result[item][0]}}</a></td>
+                <td v-if="result[item]">
+
+                <i class="fa fa-eye-slash" style="margin-right:5px;color:red;" @click="downwatcher(item)"></i>
+                <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
+                </tr>
+ 
 
                 <tr v-for="(item,index) in stocklist">
                 <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a>
@@ -217,7 +226,9 @@
                 <td v-if="result[item]">
 
                 <i class="fa fa-hand-o-up" style="margin-right:5px;" @click="uptop(item)"></i>
-                <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a>
+                <i class="fa fa-eye" style="margin-left:10px;" @click="upwatcher(item)"></i>
+                </td>
                 <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
                 </td>
                 </tr>
@@ -237,7 +248,7 @@
   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
   <!-- Template Main JS File -->
-    <script type="text/javascript" src="https://unpkg.com/klinecharts/dist/klinecharts.min.js"></script>
+    <script type="text/javascript" src="http://klang.org.cn/js/klinecharts.min.js""></script>
       <script>
        function getUrlParam(name){
 
@@ -261,7 +272,7 @@
        }
 
 
-
+       /****************************store list*****************/
 
        function getbrowserlist(){
             return getlist('klangbrowserlist')
@@ -286,6 +297,21 @@
        function deletetoplist(code){
             return deletelist('klangtoplist',code)
        }
+
+
+       function getwatcherlist(){
+            return getlist('klangwatcherlist')
+       }
+
+       function savewatcherlist(code1){
+            return savelist('klangwatcherlist',code1)
+       }
+
+       function deletewatcherlist(code){
+            return deletelist('klangwatcherlist',code)
+       }
+
+
 
  
        function getlist(name){
@@ -337,10 +363,11 @@
  
     }
 
+    /*****************end store list**************/
 
 
 
-
+        /******* 获取股票数据 ***/
 
           function formatData(code,datas){
             var name = datas[0]
@@ -367,6 +394,8 @@
 
       async function getDatas(that){
         stocklist = that.stocklist.concat(that.stocktoplist)
+        stocklist = stocklist.concat(that.stockwatcherlist)
+
         for (i=0 ; i < stocklist.length;i+=100){
             params = stocklist.slice(i,i+100).join()
             response = await axios.get(apihost+"/?list="+params)
@@ -391,7 +420,6 @@
                 })
 
       }
-
 
 
 
@@ -502,6 +530,7 @@
         } 
     }
 
+    /*************股票数据操作结束***********/
  
     window.onload = async function () {
 
@@ -517,6 +546,7 @@
                 result:[],
                 stocklist:[],
                 stocktoplist:[],
+                stockwatcherlist:[],
                 keyword:"",
                 searchlist:[],
                 stockname:"",
@@ -543,6 +573,7 @@
          async mounted () {
             var that = this
             that.stocktoplist = gettoplist()
+            that.stockwatcherlist = getwatcherlist()
             await getDatas(that)
 
             this.timer = setInterval(this.update, 3000);
@@ -644,13 +675,34 @@
                     await this.refresh()
                     this.reloadlock = 0
                 },
+                async reloadwatcher(newcode){
+                    if (this.reloadlock == 1){
+                        return
+                    }
+                    this.reloadlock = 1
+                    code = newcode
+                    this.stocklist = getbrowserlist( )
+                    this.stockwatcherlist = savewatcherlist(code)
+
+                    await this.refresh()
+                    this.reloadlock = 0
+                },
+ 
  
                 async uptop(code){
                      deletebrowserlist(code)
                      this.reloadtop(code)
                 },
+                async upwatcher(code){
+                     deletebrowserlist(code)
+                     this.reloadwatcher(code)
+                },
                 async downtop(code){
                      deletetoplist(code)
+                     this.reload(code)
+                },
+                async downwatcher(code){
+                     deletewatcherlist(code)
                      this.reload(code)
                 },
                 async reload(newcode){
@@ -661,6 +713,7 @@
                     code = newcode
                     this.stocklist = savebrowserlist(code)
                     this.stocktoplist = gettoplist()
+                    this.stockwatcherlist = getwatcherlist()
 
                     await this.refresh()
                     this.reloadlock = 0
@@ -695,6 +748,7 @@
 
         window.vue = Vue.createApp(VueApp).mount('#app')
 
+        /*************股票K线显示******/
 
         var chartline = klinecharts.init('klinelinemain')
 
