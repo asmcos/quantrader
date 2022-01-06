@@ -214,7 +214,7 @@
                 <td v-if="result[item]"><a @click="reloadwatcher(item)" target=_blank>{{result[item][0]}}</a></td>
                 <td v-if="result[item]">
 
-                <i class="fa fa-eye-slash" style="margin-right:5px;color:red;" @click="downwatcher(item)"></i>
+                <i class="fa fa-eye-slash" style="margin-right:5px;color:#f47920;" @click="downwatcher(item)"></i>
                 <a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
                 <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
                 </tr>
