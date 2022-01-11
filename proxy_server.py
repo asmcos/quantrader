@@ -12,6 +12,9 @@ import pandas as pd
 import json
 from urllib.parse import urlparse
 
+
+session=requests.Session()
+
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
@@ -138,7 +141,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print(req_header)
             print(self.path)
             req_header = call_before(self,req_header)
-            resp = requests.get(url, headers= req_header)
+            resp = session.get(url, headers= req_header)
             sent = True
 
             content = call_after(self,resp)
@@ -158,7 +161,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print ('traceback.format_exc():\n%s' % traceback.format_exc())
 
             # 发现有些网站第一次不成功需要第二次才能成功。所以再试一次
-            resp = requests.get(url, headers= req_header)
+            resp = session.get(url, headers= req_header)
             sent = True
 
             content = call_after(self,resp)
@@ -185,7 +188,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             req_header = self.parse_headers()
 
             req_header = call_before(self,req_header)
-            resp = requests.post(url, data=post_body, headers= req_header)
+            resp = session.post(url, data=post_body, headers= req_header)
             sent = True
 
             content = call_after(self,resp)
