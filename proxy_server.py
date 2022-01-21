@@ -137,10 +137,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             host = get_pathmap(self.path)
             url = '{}{}'.format(host, self.path)
             req_header = self.parse_headers()
+            req_header = call_before(self,req_header)
 
             print(req_header)
             print(self.path)
-            req_header = call_before(self,req_header)
+
             resp = session.get(url, headers= req_header)
             sent = True
 
@@ -319,11 +320,24 @@ def config():
             newHeader[k] = headers[k]
         return newHeader
         
+    def modify_before_gn(self,reqHeader):
+        newHeader = reqHeader
+        headers = {
+            'Host': 'stat.10jqka.com.cn',
+            'Pragma': 'no-cache',
+            'Referer': 'http://q.10jqka.com.cn/'
+        }       
+ 
+        for k in headers:
+            newHeader[k] = headers[k]
+        return newHeader
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
     set_after('/funds/gnzjl/$',modify_gnzjl)
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
+    #set_before('/gn/detail/code',modify_before_gn)
+
     set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
     set_after('/gn/detail/field/',modify_bkcode)
 
