@@ -305,6 +305,20 @@ def config():
         return json.dumps(datas).encode('gbk') 
 
 
+    def modify_sina(self,reqHeader):
+        newHeader = reqHeader
+        headers = {
+            'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="96", "Google Chrome";v="96"',
+            'sec-ch-ua-mobile': '?0',
+            'Sec-Fetch-Site': 'cross-site',
+            'Sec-Fetch-Mode': 'no-cors',
+            'Sec-Fetch-Dest': 'script',
+            'Referer': 'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
+        }       
+        for k in headers:
+            newHeader[k] = headers[k]
+        return newHeader
+        
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
@@ -317,6 +331,7 @@ def config():
     set_after('/data/Net/info/ETF_F009_desc_0_0_1_9999_0_0_0_jsonp_g.html',modify_etf)
 
     set_pathmap('list=','https://hq.sinajs.cn')
+    set_before('list=',modify_sina)
     set_pathmap('data/index.php','https://stock.gtimg.cn')
     set_pathmap('cn/api/json_v2.php','https://quotes.sina.cn')
     set_pathmap('s3/','https://smartbox.gtimg.cn')
