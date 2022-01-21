@@ -124,6 +124,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         try: #split("?") 删除参数
             if self.path.split("?")[0] in ['/gn.html','/zx.html',
                                            '/klinebk.html','/bk.json','/etf.html','/kline.html']:
+                # bk.json 使用tdxbk.py生成
                 gncontent = open(self.path.split("?")[0][1:]).read()
 
                 self.send_response(200)

@@ -305,6 +305,7 @@
 
     async function getDayData(code){
         //日K数据结构不包含正在交易的日K数据
+        datadaylist = []
         datas = vue.$data.allbkdatas[code]
         datas.forEach(function(item){
 
