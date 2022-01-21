@@ -189,7 +189,7 @@
             <th scope="col">name</th>
             <th scope="col">排序</th>
             <th scope="col">价格</th>
-            <th scope="col">涨幅</th>
+            <th scope="col">涨幅 <i class="fa fa-sort-amount-down" @click="sortbydesc()"></i></th>
             </tr>
             </thead>
              <tbody>
@@ -422,6 +422,26 @@
                 },
                 async search(){
                 },
+                sortbydesc(){
+                    that = this
+                    d = []
+                    that.stocklist.forEach(function(code){ 
+                        d1 = that.result[code]
+                        d1['code'] = code
+                        d.push(d1)
+                    })
+
+                    d = d.sort(function(a,b){
+                        console.log(a,b)
+                        return a[2]-b[2]}).reverse()
+
+
+                    that.stocklist = []
+
+                    d.forEach(function(item){
+                         that.stocklist.push(item.code)
+                    })
+                },
                 async clickresult(code){
                     this.keyword=""
                     this.reload(code)
@@ -468,7 +488,7 @@
 
     }
       
- 
+   // d.sort(function(a,b){return a['2']-b['2']}) 可以排序通过 涨幅 
    </script>
 
     </body>
