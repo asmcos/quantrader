@@ -113,6 +113,7 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
 
     def read_industry(folder:str) -> pd.DataFrame:
         incon = folder + '/incon.dat' # tdx industry file
+        incon = './incon.dat' # tdx industry file
         hy = folder + '/tdxhy.cfg' # tdx stock file
 
         tbk = {}
