@@ -5,7 +5,7 @@
 
  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
      <!-- font awesome CSS -->
-    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+<link crossorigin="anonymous" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" href="https://lib.baomitu.com/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
       <!-- Vendor CSS Files -->
    <style>
     .stock-chart {
@@ -217,7 +217,7 @@
    </div> <!-- app -->
     
     <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
+<script crossorigin="anonymous" integrity="sha512-KvaXQuRkPKYVQnd5RtRnFPR51W3+Vz+uq0IX8/TYaA2F6hDS2VQQv11BjdHES9boHiHXmqT9oC4H3AJLbq2Szg==" src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
   <!-- Template Main JS File -->
@@ -274,15 +274,35 @@
             console.log(name,close,rise)
        }
        
+      function getbklist(){
+         var blist = []
+         blist1 = localStorage.getItem("bklist")
+         if (blist1 != null){
+            blist = JSON.parse(blist1)
+         }
+         return blist
+      }
+      function savebklist(blist){
+        //添加到开头
+        localStorage.setItem("bklist",JSON.stringify(blist))
+      }
 
       async function getDatas(that){
         response = await axios.get(apihost+"/bk.json")
         var datadict = {}
+        bklist = getbklist()
         response.data.forEach(function(item){
              code = Object.keys(item)[0]
              datadict[code] = item[code]
-            that.stocklist.push(code)
+             if (bklist.length < 10){ //数据第一次来自bk.json
+                that.stocklist.push(code)
+             }
         })
+        if (bklist.length < 10){ //第一次存到本地
+           savebklist(that.stocklist)
+        } else {
+            that.stocklist = bklist
+        }
         that.allbkdatas = datadict
         that.stocklist.forEach(function(item){
             formatData(item,that.allbkdatas[item])
@@ -365,6 +385,7 @@
                         result += "['" +this.allbkdatas[code][0].name +"','" + code+ "'],"
                     }
                     console.log(result)
+                    savebklist(this.stocklist)
                 },
                 sortdown(code){
                     blist = this.stocklist
