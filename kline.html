@@ -141,7 +141,7 @@
 
 
 
-      <div class="boardmain" style="height:100%;width:70%;float:left;" v-show="display_state">
+      <div class="boardmain" style="height:100%;width:70%;float:left;" v-show="display_state=='1'">
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
@@ -566,7 +566,7 @@
           created() {
                  this.display_state = localStorage.getItem("display")
                  if (this.display_state == null){
-                     this.display_state = 1
+                     this.display_state = "1"
                  }
                  var lineorder = localStorage.getItem("lineorder")
                  if (lineorder == 'one' || lineorder == 'three'){
@@ -599,10 +599,10 @@
                 display(){
 
                     this.display_state = localStorage.getItem("display")
-                    if (this.display_state == 0){
-                        this.display_state = 1
+                    if (this.display_state == "0"){
+                        this.display_state = "1"
                     } else {
-                        this.display_state = 0
+                        this.display_state = "0"
                     }
                     localStorage.setItem("display",this.display_state)
                 },
