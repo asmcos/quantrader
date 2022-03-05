@@ -5,7 +5,7 @@
 
  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
      <!-- font awesome CSS -->
-    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+<link crossorigin="anonymous" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" href="https://lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
       <!-- Vendor CSS Files -->
    <style>
     .stock-chart {
@@ -141,7 +141,7 @@
 
 
 
-      <div class="boardmain" style="height:100%;width:70%;float:left;">
+      <div class="boardmain" style="height:100%;width:70%;float:left;" v-show="display_state">
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
@@ -239,14 +239,13 @@
 
 <div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
 <button class="btn btn-primary" @click="refresh">刷</button>
+<button class="btn btn-primary" @click="display" style="margin-left:5px;">显</button>
 </div>
 
    </div> <!-- app -->
-    
+<script crossorigin="anonymous" integrity="sha512-KvaXQuRkPKYVQnd5RtRnFPR51W3+Vz+uq0IX8/TYaA2F6hDS2VQQv11BjdHES9boHiHXmqT9oC4H3AJLbq2Szg==" src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
     <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
-
   <!-- Template Main JS File -->
     <script type="text/javascript" src="http://klang.org.cn/js/klinecharts.min.js""></script>
       <script>
@@ -540,6 +539,7 @@
                 return {
                 opened:0,
                 lineorder:'one',
+                display_state:1,
                 chartline:'',
                 chartday:'',
                 reloadlock:0,
@@ -564,6 +564,10 @@
 
           }, 
           created() {
+                 this.display_state = localStorage.getItem("display")
+                 if (this.display_state == null){
+                     this.display_state = 1
+                 }
                  var lineorder = localStorage.getItem("lineorder")
                  if (lineorder == 'one' || lineorder == 'three'){
                     this.lineorder = lineorder
@@ -591,6 +595,16 @@
                 lineup(){
                     this.lineorder="one"
                     localStorage.setItem("lineorder",this.lineorder)
+                },
+                display(){
+
+                    this.display_state = localStorage.getItem("display")
+                    if (this.display_state == 0){
+                        this.display_state = 1
+                    } else {
+                        this.display_state = 0
+                    }
+                    localStorage.setItem("display",this.display_state)
                 },
 
                 async update(){
