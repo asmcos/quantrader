@@ -147,8 +147,8 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
         hy = hy[~hy[1].str.startswith('2')]
 
         hy1 = hy[[1, 2]].set_index(2).join(incon.set_index('code')).set_index(1)[['name', 'type']]
-        hy2 = hy[[1, 3]].set_index(3).join(incon.set_index('code')).set_index(1)[['name', 'type']]
-
+        hy2 = hy[[1, 5]].set_index(5).join(incon.set_index('code')).set_index(1)[['name', 'type']]
+        print(hy1)
         # add 56 tdx block
         count = 0
         hy['tbk1'] = ""
@@ -172,7 +172,8 @@ def QA_fetch_get_tdx_industry() -> pd.DataFrame:
     if reset != 0:
         shutil.rmtree(folder, ignore_errors=True)
     dirpath = folder
-    if not os.path.exists(folder + '/incon.dat') or not os.path.exists(folder + '/tdxhy.cfg'): 
+    #if not os.path.exists(folder + '/incon.dat') or not os.path.exists(folder + '/tdxhy.cfg'): 
+    if not os.path.exists(folder + '/tdxhy.cfg'): 
         print("Save file to ",folder)
         download_tdx_file(folder)
 
