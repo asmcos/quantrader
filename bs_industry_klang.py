@@ -66,7 +66,7 @@ datas = pd.DataFrame(industry_list, columns=fields)
 datas = datas.to_json(orient='table')
 jsondatas = json.loads(datas)['data']
 
-hostname = "http://klang.org.cn"
+hostname = "https://klang.org.cn"
 #hostname = "http://klang.zhanluejia.net.cn"
 resp = requests.post(hostname+"/industries/drop")   
 print(resp.content)
