@@ -24,7 +24,8 @@ class LongOnly(bt.Sizer):
         return self.p.stake
 
 
-class PandasData(bt.feeds.PandasData):
+def PandasData(columns):
+    lines = ()
     params = (
         ('datetime', None),
         ('open','open'),
@@ -34,6 +35,12 @@ class PandasData(bt.feeds.PandasData):
         ('volume','vol'),
         ('openinterest',None),
     )
+
+    for c in columns:
+        lines = lines + (c,)
+        params = params + ( (c, -1), )
+
+    return type('PandasDataFeed', (bt.feeds.PandasData, ), {'lines':lines, 'params':params} )
 
 # Create a Stratey
 class KStrategy(bt.Strategy):
@@ -48,7 +55,7 @@ class KStrategy(bt.Strategy):
         self.dataclose = self.datas[0].close
         self.order = None
         self.macdhist = bt.ind.MACDHisto(self.data)
-
+        print(self.data)
     def notify_order(self, order):
         if order.status == order.Completed:
             pass
@@ -79,6 +86,10 @@ class KStrategy(bt.Strategy):
         self.order = None
     def next(self):
         # Simply log the closing price of the series from the reference
+        
+        d = eval("self.datas[0]."+"digit"+"[0]")
+        print(d[0])
+
         if not self.position:
             if self.macdhist > 0:
                 self.order=self.buy()
@@ -100,7 +111,10 @@ def init_btr():
     df['openinterest'] = 0
     df= df[['open','high','low','close','vol','openinterest']]
 
-    data = PandasData(dataname=df)
+    df.insert(6,"digit",[x+5.0 for x in range(200)])
+   
+    PandasField = PandasData(["digit"]) 
+    data = PandasField(dataname=df)
 
     cerebro.adddata(data)
 
