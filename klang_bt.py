@@ -86,9 +86,9 @@ class KStrategy(bt.Strategy):
         self.order = None
     def next(self):
         # Simply log the closing price of the series from the reference
-        
+ 
         d = eval("self.datas[0]."+"digit"+"[0]")
-        print(d[0])
+        print(d)
 
         if not self.position:
             if self.macdhist > 0:
