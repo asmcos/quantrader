@@ -130,11 +130,11 @@ def get_day_data(name,code,start,end):
     
     
     try:
-        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
+        json = requests.get("https://klang.org.cn/dayks",
             params={"code":code,"start":start,"limit":0},timeout=1000).json()
     except:
         time.sleep(2)
-        json = requests.get("http://klang.zhanluejia.net.cn/dayks",
+        json = requests.get("https://klang.org.cn/dayks",
             params={"code":code,"start":start,"limit":0},timeout=1000).json()
 
     df = pd.io.json.json_normalize(json)
@@ -195,8 +195,8 @@ def loop_60all(callback,stlist=stocklist):
 
 
 
-hostname="http://klang.org.cn"
-hostname="http://klang.zhanluejia.net.cn"
+hostname="https://klang.org.cn"
+#hostname="http://klang.zhanluejia.net.cn"
 
 #
 #stock list
