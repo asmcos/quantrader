@@ -25,7 +25,7 @@ code_list = {}
 
 def create_clickable_code(code):
     code = code_list.get(code,code).replace('.','')
-    url_template= '''<a href="http://klang.org.cn/kline.html?code={code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
+    url_template= '''<a href="https://klang.org.cn/kline.html?code={code}" target="_blank"><font color="blue">{code}</font></a>'''.format(code=code)
     return url_template
 
 def create_color_hqltgz(hqltsz):
@@ -227,7 +227,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         try:
             scheme = urlparse(self.headers['Referer']).scheme
             netloc = urlparse(self.headers['Referer']).netloc
-            self.send_header('Access-Control-Allow-Origin', scheme+"://"+netloc);
+            #self.send_header('Access-Control-Allow-Origin', scheme+"://"+netloc);
+            self.send_header('Access-Control-Allow-Origin', "*");
             self.send_header('Access-Control-Allow-Credentials','true');
         except:
             self.send_header('Access-Control-Allow-Origin', "*");
@@ -320,6 +321,7 @@ def config():
         for k in headers:
             newHeader[k] = headers[k]
         return newHeader
+        
         
     def modify_before_gn(self,reqHeader):
         newHeader = reqHeader
