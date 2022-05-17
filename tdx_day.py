@@ -8,11 +8,13 @@ import json
 
 api = TdxHq_API(auto_retry=True)
 
-hostname="https://klang.org.cn"
+hostname="https://klang.org.cn/api"
 #hostname="http://klang.zhanluejia.net.cn"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
 filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
+
+session = ""
 
 def updatestocklist(stname=filename_sl):
 
@@ -34,7 +36,7 @@ def get_bar(name,code):
         zone = 1
     
     print(name,code1)
-    datas = api.get_security_bars(9,zone,code1, 0, 50)
+    datas = api.get_security_bars(9,zone,code1, 0, 400)
     info = api.get_finance_info(zone, code1)  
     datas = api.to_df(datas)
     if len(datas) < 2:
@@ -57,19 +59,21 @@ def get_bar(name,code):
     #print(jsondatas)
     #print(datas.iloc[-1],liutonggu,d)
     try:
-        requests.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
+        resp = session.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
+        print(resp.content)
     except:
         time.sleep(2)
-        requests.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
+        session.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
 
 if api.connect('119.147.212.81', 7709):
 
-    updatestocklist()
+    #updatestocklist()
 
     init_stock_list()
 
     from common.framework import stocklist
 
-    for stock in stocklist:
+    session = requests.Session()
+    for stock in stocklist[:]:
         code ,name ,tdxbk,tdxgn = getstockinfo(stock)        
         get_bar(name,code)
