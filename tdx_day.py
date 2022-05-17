@@ -21,7 +21,7 @@ def updatestocklist(stname=filename_sl):
     for i in json:
         cm_dict[i['code']] = i.get('chouma','50')
     df = pd.json_normalize(json)
-    df = df.drop(columns=['_id','updatedAt','id','createdAt'])
+    df = df.drop(columns=['updatedAt','id','createdAt'])
     # 结果集输出到csv文件
     df.to_csv(stname, index=False,columns=['updateDate','code','code_name','industry','industryClassification','tdxbk','tdxgn'])
 
@@ -59,7 +59,6 @@ def get_bar(name,code):
     #print(datas.iloc[-1],liutonggu,d)
     try:
         resp = session.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
-        print(resp.content)
     except:
         time.sleep(2)
         session.post(hostname+"/dayks/updates",json=jsondatas,timeout=2000)
