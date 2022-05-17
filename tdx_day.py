@@ -12,7 +12,6 @@ hostname="https://klang.org.cn/api"
 #hostname="http://klang.zhanluejia.net.cn"
 
 filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
-filename_st = os.path.expanduser("~/.klang_stock_trader.csv")
 
 session = ""
 
@@ -36,7 +35,7 @@ def get_bar(name,code):
         zone = 1
     
     print(name,code1)
-    datas = api.get_security_bars(9,zone,code1, 0, 400)
+    datas = api.get_security_bars(9,zone,code1, 0, 5)
     info = api.get_finance_info(zone, code1)  
     datas = api.to_df(datas)
     if len(datas) < 2:
@@ -67,7 +66,7 @@ def get_bar(name,code):
 
 if api.connect('119.147.212.81', 7709):
 
-    #updatestocklist()
+    updatestocklist()
 
     init_stock_list()
 
