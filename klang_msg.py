@@ -4,11 +4,11 @@ import asyncio
 import websockets
 import json
 
-uri = "ws://klang.org.cn:9099"
+uri = "wss://klang.org.cn:8099/user"
 
 async def msg():
 
-    reset_stock = json.dumps({"action": 'cmd',"content":"reset_stock","pw":"Klang"})
+    reset_stock = json.dumps({type: 'U_CMD',content:"UPDATEALL",pw:"Klang"})
     async with websockets.connect(uri) as websocket:
         
         await websocket.send(reset_stock)
