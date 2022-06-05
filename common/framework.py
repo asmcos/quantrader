@@ -19,6 +19,40 @@ stocklist=[]
 
 bs.login()
 
+filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
+
+hostname="https://data.klang.org.cn/api"
+
+session = requests.Session()
+
+class DataAPI():
+    def __init__(self,host=hostname):
+        self.host = host
+
+    def get_stocklist(self):
+        url = self.host + "/stocklists"
+        return session.get(url)
+
+    def get_factor(self,factorname,date=end):
+        url = self.host + "/getfactors"
+        return session.get(url,params={'factorname':factorname,'date':date})
+
+#
+#stock list
+#['code','name','SCR','tdxbk','tdxgn']
+stocklist=[]
+stockindex={}
+kapi = DataAPI()
+
+def get_scr(code):
+    index = stockindex[code]
+    stock = stocklist[index]
+    return stock.get('SCR',"50")
+
+def get_chouma(code):
+    return get_scr(code)
+
+
 
 def SMA(data,period,period2):
     y1 = 0
@@ -168,12 +202,10 @@ def get_60_data(name,code,start,end):
         return [] 
     print(len(datas),datas.date[datas.index[-1]])
     return datas
+
 # 从文件中一行数据 格式化分析出信息
 def getstockinfo(stock):
-    #2019-12-09,sz.002094,青岛金王,化工,申万一级行业
-    # 时间，股票代码，名称，类别
-    d,code,name,skip1,skip2,tdxbk,tdxgn= stock.split(',')
-    return code,name,tdxbk,tdxgn
+    return stock["code"],stock["name"],stock['tdxbk'],stock['tdxgn']
 
 #循环调用A股所有的股票
 def loop_all(callback,stlist=stocklist):
@@ -195,39 +227,27 @@ def loop_60all(callback,stlist=stocklist):
 
 
 
-hostname="https://klang.org.cn/api"
-#hostname="http://klang.zhanluejia.net.cn"
+   
 
-#
-#stock list
-#
-cm_dict  = {}
-def init_chouma( ):
-
-    json = requests.get(hostname+"/industries").json()
-    #df = pd.json_normalize(json)
-    #df = df.drop(columns=['_id','updatedAt','id','createdAt'])
-    # 结果集输出到csv文件
-    #df.to_csv(stname, index=False,columns=['updateDate','code','code_name','industry','industryClassification','tdxbk','tdxgn','chouma'])
-    for i in json:
-        cm_dict[i['code']] = i.get('chouma','50')
-
-def get_chouma(code):
-    return cm_dict.get(code,"50")
-    
-
-filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
-#从csv文件列表中获取A股所有的股票信息
 def init_stock_list():
     global stocklist
 
     if not os.path.exists(filename_sl):
-        print('正在下载股票库列表....')
-        os.system('python3 bs_get_industry_check.py')
+        print("请使用KlangAlpha/Klang update_all 更新数据")
+        return
 
-    stocklist = open(filename_sl).readlines()
-    stocklist = stocklist[1+int(offset):] #删除第一行
-    init_chouma()
+    stocklist  = []
+    print("正在从文件",filename_sl,"加载股票列表")
+    stocklines = open(filename_sl,encoding='utf-8').readlines()
+    stocklines = stocklines[1:] #删除第一行
+
+    index = 0
+    for i in stocklines:
+        i = i.strip()
+        code,name,scr,tdxbk,tdxgn = i.split(',')
+        stocklist.append({"code":code,"name":name,'SCR':scr,"tdxbk":tdxbk,"tdxgn":tdxgn})
+        stockindex[code] = index
+        index += 1
 
     return stocklist
 

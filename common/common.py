@@ -26,6 +26,8 @@ today = datetime.now()
 if endday== '0':
     endday = str(today.year) + str(today.month) + str(today.day)
 
+end = endday
+
 def save_file(filename,content):
     f = open(filename,"w+")
     f.write(content)
