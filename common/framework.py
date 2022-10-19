@@ -19,7 +19,7 @@ stocklist=[]
 
 bs.login()
 
-filename_sl = os.path.expanduser("~/.klang_stock_list.csv")
+filename_sl = os.path.expanduser("~/.klang/klang_stock_list.csv")
 
 hostname="https://data.klang.org.cn/api"
 
@@ -235,7 +235,7 @@ def init_stock_list():
     if not os.path.exists(filename_sl):
         print("请使用KlangAlpha/Klang update_all 更新数据")
         return
-
+        
     stocklist  = []
     print("正在从文件",filename_sl,"加载股票列表")
     stocklines = open(filename_sl,encoding='utf-8').readlines()
