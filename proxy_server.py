@@ -115,6 +115,7 @@ def call_after(self,resp):
 
     return resp.content
 
+hexin_v = ""
 
 class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
@@ -211,13 +212,16 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print ('traceback.format_exc():\n%s' % traceback.format_exc())
 
     def parse_headers(self):
+        global hexin_v
         del self.headers['Host']
         host = get_pathmap(self.path)
         self.headers['Host'] = host.split("://")[1]
         del self.headers["User-Agent"]
         self.headers["User-Agent"]= "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
-        self.headers["Cookie"] = "v=A8Kd5Gm0Fc0arwmRj-bc8pD5GsMhk8ateJe60Qzb7jXgX2x99CMWvUgnCuDf"
-        self.headers["hexin-v"]= "A-dOIuBYSK7UmMwie3dCOVGsdhC0bLp6FUc_zLlUARyfrg3OwTxLniUQzwLK"
+
+        print("get hexin",self.headers.get("hexin-v",None))
+        if self.headers.get("hexin-v",None):
+            hexin_v = self.headers.get("hexin-v")
 
         return self.headers #req_header
 
@@ -227,7 +231,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         print ('Response Header')
         for key in respheaders:
             if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
-                print (key, respheaders[key])
+                #print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
         try:
@@ -288,6 +292,8 @@ def config():
         #if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
         #    return resp.content
 
+        if len(re.findall("<table.*?table>",resp.text,re.I|re.S)) < 1:
+            return resp.content
 
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
         df = pd.read_html(content,converters={'代码': str},index_col=0)[0]
@@ -332,23 +338,18 @@ def config():
         
     def modify_before_gn(self,reqHeader):
         newHeader = reqHeader
-        headers = {
-            'Host': 'stat.10jqka.com.cn',
-            'Pragma': 'no-cache',
-            'Referer': 'http://q.10jqka.com.cn/'
-        }       
+        if len(hexin_v) > 0: 
+            newHeader["hexin-v"] = hexin_v
  
-        for k in headers:
-            newHeader[k] = headers[k]
         return newHeader
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
     set_after('/funds/gnzjl/$',modify_gnzjl)
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
-    #set_before('/gn/detail/code',modify_before_gn)
 
     set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
+    set_before('/gn/detail/field',modify_before_gn)
     set_after('/gn/detail/field/',modify_bkcode)
 
     set_pathmap('/data/Net/info/ETF_F009_desc_0_0_1_9999_0_0_0_jsonp_g.html','http://fund.ijijin.cn')
