@@ -214,7 +214,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         del self.headers['Host']
         host = get_pathmap(self.path)
         self.headers['Host'] = host.split("://")[1]
+        del self.headers["User-Agent"]
         self.headers["User-Agent"]= "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+        self.headers["Cookie"] = "v=A8Kd5Gm0Fc0arwmRj-bc8pD5GsMhk8ateJe60Qzb7jXgX2x99CMWvUgnCuDf"
+        self.headers["hexin-v"]= "A-dOIuBYSK7UmMwie3dCOVGsdhC0bLp6FUc_zLlUARyfrg3OwTxLniUQzwLK"
 
         return self.headers #req_header
 
