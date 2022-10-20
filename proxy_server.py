@@ -284,8 +284,9 @@ def config():
     def modify_bkcode(self,resp):
         path = self.path
         print(path,self.headers)
-        if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
-            return resp.content
+        
+        #if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
+        #    return resp.content
 
 
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
