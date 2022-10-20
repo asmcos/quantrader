@@ -68,7 +68,7 @@ for i in alllist:
 hostname = 'http://data.10jqka.com.cn'
 proxyhost = "https://api.klang.org.cn"
 proxyhost = "http://192.168.123.169:9999"
-
+root_path = sys.path[0]
 path_map ={}
 
 def set_pathmap(path,target):
@@ -128,7 +128,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             if self.path.split("?")[0] in ['/gn.html','/zx.html',
                                            '/klinebk.html','/bk.json','/etf.html','/kline.html']:
                 # bk.json 使用tdxbk.py生成
-                gncontent = open(self.path.split("?")[0][1:]).read()
+                gncontent = open(root_path + self.path.split("?")[0]).read()
 
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
