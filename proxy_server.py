@@ -67,7 +67,7 @@ for i in alllist:
 
 hostname = 'http://data.10jqka.com.cn'
 proxyhost = "https://api.klang.org.cn"
-proxyhost = "http://127.0.0.1:9999"
+proxyhost = "http://192.168.123.169:9999"
 
 path_map ={}
 
@@ -214,6 +214,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         del self.headers['Host']
         host = get_pathmap(self.path)
         self.headers['Host'] = host.split("://")[1]
+        self.headers["User-Agent"]= "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
 
         return self.headers #req_header
 
