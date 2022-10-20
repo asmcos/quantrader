@@ -125,7 +125,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, body=True):
         sent = False
         try: #split("?") 删除参数
-            if self.path.split("?")[0] in ['/gn.html','/zx.html',
+            if self.path.split("?")[0] in ['/gn.html','/gncookie.html','/zx.html',
                                            '/klinebk.html','/bk.json','/etf.html','/kline.html']:
                 # bk.json 使用tdxbk.py生成
                 gncontent = open(root_path + self.path.split("?")[0]).read()
@@ -219,7 +219,6 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         del self.headers["User-Agent"]
         self.headers["User-Agent"]= "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
 
-        print("get hexin",self.headers.get("hexin-v",None))
         if self.headers.get("hexin-v",None):
             hexin_v = self.headers.get("hexin-v")
 
@@ -287,8 +286,14 @@ def config():
 
     def modify_bkcode(self,resp):
         path = self.path
-        print(path,self.headers)
         
+        print(path,resp.status_code,self.headers)
+        if resp.status_code == 401:
+            content = re.sub("//q.10jqka.com.cn",proxyhost,resp.text,flags = re.I|re.S)
+            f = open(root_path+"/gncookie.html","+w")
+            f.write(content)
+            f.close()
+            return resp.content
         #if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
         #    return resp.content
 
