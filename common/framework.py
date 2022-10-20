@@ -50,8 +50,10 @@ def get_scr(code):
     return stock.get('SCR',"50")
 
 def get_chouma(code):
-    return get_scr(code)
-
+    try :
+        return get_scr(code)
+    except:
+        return 50
 
 
 def SMA(data,period,period2):
