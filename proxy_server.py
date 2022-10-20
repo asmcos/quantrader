@@ -66,6 +66,8 @@ for i in alllist:
 
 
 hostname = 'http://data.10jqka.com.cn'
+proxyhost = "https://api.klang.org.cn"
+proxyhost = "http://127.0.0.1:9999"
 
 path_map ={}
 
@@ -249,7 +251,7 @@ def parse_args(argv=sys.argv[1:]):
 def main(argv=sys.argv[1:]):
     args = parse_args(argv)
     print('http server is starting on port {}...'.format(args.port))
-    server_address = ('127.0.0.1', args.port)
+    server_address = ('0.0.0.0', args.port)
     httpd = ThreadingSimpleServer(server_address, ProxyHTTPRequestHandler)
     print('http server is running as reverse proxy')
     httpd.serve_forever()
@@ -265,13 +267,13 @@ def config():
     def modify_gn(self,resp):
         path = self.path
         print(path,"modify gn code")
-        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/",proxyhost+"/gn/detail/code/",resp.text,flags = re.I|re.S)
         return content.encode('gbk') 
 
     def modify_gnzjl(self,resp):
         path = self.path
         print(path,"get gn 50 table ")
-        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/",proxyhost+"/gn/detail/code/",resp.text,flags = re.I|re.S)
         content1 = re.findall("<table.*?table>",content,re.I|re.S)[0]
         return content1.encode('gbk') 
 
