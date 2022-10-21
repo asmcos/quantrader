@@ -219,6 +219,13 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         del self.headers["User-Agent"]
         self.headers["User-Agent"]= "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
 
+        del self.headers["Referer"]
+        self.headers["Referer"]= "http://127.0.0.1:999/"
+
+        if self.headers.get('cook',None):
+            self.headers["Cookie"] = self.headers.get('cook');
+
+
         if self.headers.get("hexin-v",None):
             hexin_v = self.headers.get("hexin-v")
 
@@ -288,12 +295,6 @@ def config():
         path = self.path
         
         print(path,resp.status_code,self.headers)
-        if resp.status_code == 401:
-            content = re.sub("//q.10jqka.com.cn",proxyhost,resp.text,flags = re.I|re.S)
-            f = open(root_path+"/gncookie.html","+w")
-            f.write(content)
-            f.close()
-            return resp.content
         #if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
         #    return resp.content
 
