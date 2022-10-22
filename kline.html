@@ -894,7 +894,16 @@
 
             chartline._chartPane._measurePaneWidth()
             chartline._chartPane._invalidatePane()
-        
+ 
+            //重新计算 chartline 的每个bar宽度
+            // linebar 每天的分时线个数 每分钟一个，245个
+            barsize = chartline._chartPane._chartStore._timeScaleStore._totalDataSpace / (linebar+10)
+            // 每个的空间
+            chartline._chartPane._chartStore._timeScaleStore._dataSpace = barsize
+
+       
+            chartline._chartPane._measurePaneWidth()
+            chartline._chartPane._invalidatePane()
 
         })
     }
