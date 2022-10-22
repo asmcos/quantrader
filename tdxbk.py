@@ -30,13 +30,23 @@ def get_bar():
     for line in block_list:
         name = line[0]
         code = line[1]
+        print(code,name)
+        jsondatas = get_block_bar(code,name)
+        if jsondatas is None:
+            continue
+
+        dayK_list.append({code:jsondatas})
+
+    save_file("bk.json",json.dumps(dayK_list))
+
+def _get_block_bar (code,name):
+        
         datas = api.get_index_bars(9,1, code, 0, 200)
 
         datas = api.to_df(datas)
 
-        print(code,name,datas)
         if len(datas)<20:
-            continue
+            return None
         datas = datas.assign(date=datas['datetime'].apply(lambda x: str(x)[0:10])).drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)
         datas.rename(columns={'vol':'volume'},inplace = True)
 
@@ -49,15 +59,17 @@ def get_bar():
             d['volume'] = float("%.4f" % (d['volume'] * 100)) #股 = 手*100
             del d['index']
 
-        dayK_list.append({code:jsondatas})
+        return jsondatas
 
-    save_file("bk.json",json.dumps(dayK_list))
+def get_block_bar(code,name):
+    try :
+        return _get_block_bar(code,name)
+    except:
+        api.connect('119.147.212.81', 7709)
+        return _get_block_bar(code,name)
 
-
-
-if api.connect('119.147.212.81', 7709):
-    # 获取板块
-
+api.connect('119.147.212.81', 7709)
+if __name__ == "__main__":
     #get_block()
-    
     get_bar()
+
