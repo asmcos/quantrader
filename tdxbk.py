@@ -4,6 +4,7 @@ from pytdx.hq import TdxHq_API
 import pandas as pd
 from common.common import * 
 import json
+import sys
 
 api = TdxHq_API()
 
@@ -37,7 +38,7 @@ def get_bar():
 
         dayK_list.append({code:jsondatas})
 
-    save_file("bk.json",json.dumps(dayK_list))
+    save_file(sys.path[0]+"/bk.json",json.dumps(dayK_list))
 
 def _get_block_bar (code,name):
         
@@ -61,13 +62,15 @@ def _get_block_bar (code,name):
 
         return jsondatas
 
+def connect():
+    api.connect('119.147.212.81', 7709)
+    get_bar()
+
 def get_block_bar(code,name):
     try :
         return _get_block_bar(code,name)
     except:
-        api.connect('119.147.212.81', 7709)
-        return _get_block_bar(code,name)
-
+        return None;
 api.connect('119.147.212.81', 7709)
 if __name__ == "__main__":
     #get_block()

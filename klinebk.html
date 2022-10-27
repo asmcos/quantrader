@@ -244,10 +244,7 @@
        }
 
 
-
-
-
-
+            apihost = "http://192.168.123.169:9999"
 
           function formatData(code,datas){
         
@@ -286,7 +283,10 @@
         localStorage.setItem("bklist",JSON.stringify(blist))
       }
 
-      async function getDatas(that){
+      async function getDatasJson(that){
+	//刷新数据保存到 bk.json		    
+	await axios.get(apihost+"/blocklist")
+	
         response = await axios.get(apihost+"/bk.json")
         var datadict = {}
         bklist = getbklist()
@@ -308,9 +308,23 @@
         })
       }
 
-
-
-
+      async function getDatas(that){
+		var bklist = getbklist()
+		if (bklist.length < 10){ //
+		      response = await axios.get(apihost+"/blocklist")
+		      response.data.forEach(async function(item){
+				code = item[1]
+             			name1 = item[0]
+                		that.stocklist.push(code)
+		      		respdata = await axios.get(apihost+"/block?"+code+"&"+name1)
+				formatData(code,respdata.data)
+		      })
+		      savebklist(that.stocklist)
+	        } else {
+        	    that.stocklist = bklist
+        	}
+        	that.allbkdatas = datadict
+      }
 
     var datalinelist = []
     var datadaylist = []
@@ -371,7 +385,7 @@
 
          async mounted () {
             var that = this
-            await getDatas(that)
+            await getDatasJson(that)
             await getDayData(vue.$data.stocklist[0])
             chartday.applyNewData(datadaylist)
             this.code = this.stocklist[0]

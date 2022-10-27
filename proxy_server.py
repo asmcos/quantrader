@@ -11,7 +11,10 @@ import traceback
 import pandas as pd
 import json
 from urllib.parse import urlparse
-
+import tdxbk as tdxblock
+import time
+import threading
+block_list = tdxblock.block_list
 
 session=requests.Session()
 
@@ -136,6 +139,31 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
                 self.wfile.write(gncontent.encode())
+                return
+            if self.path.split("?")[0] in ["/blocklist"]:
+                threading.Thread(target=tdxblock.connect).start()
+
+                content = json.dumps(block_list).encode('utf-8')
+
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Content-Length', len(content))
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            if self.path.split("?")[0] in ["/block"]:
+                time.sleep(100) # 100ms
+                params = self.path.split("?")[1]
+                code = params.split("&")[0]
+                name = params.split("&")[1]
+                jsondata = tdxblock.get_block_bar(code,name)
+                content  =  json.dumps(jsondata).encode('utf-8')
+
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Content-Length', len(content))
+                self.end_headers()
+                self.wfile.write(content)
                 return
 
             host = get_pathmap(self.path)
