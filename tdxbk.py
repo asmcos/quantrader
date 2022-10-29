@@ -26,8 +26,10 @@ block_list= [
 
 ]
 def get_bar():
+    global dayK_list 
+
     content = ""
-    
+    dayK_list = []    
     for line in block_list:
         name = line[0]
         code = line[1]
