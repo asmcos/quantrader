@@ -194,7 +194,7 @@
             </thead>
              <tbody>
                 <tr v-for="(item,index) in stocklist">
-                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a>
+                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{index}} - {{result[item][0]}}</a>
                 </td>
                 <td>
                  <i class="fa fa-sort-amount-up"   @click="sortup(item)" style="margin-left:10px; margin-right:10px;"></i>
@@ -519,6 +519,12 @@
       })
 
         
+        window.addEventListener("resize",function(){
+            chartday._chartPane._measurePaneWidth()
+            chartday._chartPane._invalidatePane()
+
+        })
+    }
 
 
     }
