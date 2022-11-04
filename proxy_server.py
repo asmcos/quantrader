@@ -11,7 +11,10 @@ import traceback
 import pandas as pd
 import json
 from urllib.parse import urlparse
-
+import tdxbk as tdxblock
+import time
+import threading
+block_list = tdxblock.block_list
 
 session=requests.Session()
 
@@ -66,7 +69,9 @@ for i in alllist:
 
 
 hostname = 'http://data.10jqka.com.cn'
-
+proxyhost = "https://api.klang.org.cn"
+proxyhost = "http://192.168.123.169:9999"
+root_path = sys.path[0]
 path_map ={}
 
 def set_pathmap(path,target):
@@ -113,6 +118,7 @@ def call_after(self,resp):
 
     return resp.content
 
+hexin_v = ""
 
 class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
@@ -122,10 +128,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, body=True):
         sent = False
         try: #split("?") 删除参数
-            if self.path.split("?")[0] in ['/gn.html','/zx.html',
+            if self.path.split("?")[0] in ['/gn.html','/gncookie.html','/zx.html',
                                            '/klinebk.html','/bk.json','/etf.html','/kline.html']:
                 # bk.json 使用tdxbk.py生成
-                gncontent = open(self.path.split("?")[0][1:]).read()
+                gncontent = open(root_path + self.path.split("?")[0]).read()
 
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
@@ -133,6 +139,31 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
                 self.wfile.write(gncontent.encode())
+                return
+            if self.path.split("?")[0] in ["/blocklist"]:
+                threading.Thread(target=tdxblock.connect).start()
+
+                content = json.dumps(block_list).encode('utf-8')
+
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Content-Length', len(content))
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            if self.path.split("?")[0] in ["/block"]:
+                time.sleep(100) # 100ms
+                params = self.path.split("?")[1]
+                code = params.split("&")[0]
+                name = params.split("&")[1]
+                jsondata = tdxblock.get_block_bar(code,name)
+                content  =  json.dumps(jsondata).encode('utf-8')
+
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Content-Length', len(content))
+                self.end_headers()
+                self.wfile.write(content)
                 return
 
             host = get_pathmap(self.path)
@@ -209,9 +240,22 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print ('traceback.format_exc():\n%s' % traceback.format_exc())
 
     def parse_headers(self):
+        global hexin_v
         del self.headers['Host']
         host = get_pathmap(self.path)
         self.headers['Host'] = host.split("://")[1]
+        del self.headers["User-Agent"]
+        self.headers["User-Agent"]= "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+
+        del self.headers["Referer"]
+        self.headers["Referer"]= "http://127.0.0.1:999/"
+
+        if self.headers.get('cook',None):
+            self.headers["Cookie"] = self.headers.get('cook');
+
+
+        if self.headers.get("hexin-v",None):
+            hexin_v = self.headers.get("hexin-v")
 
         return self.headers #req_header
 
@@ -221,7 +265,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         print ('Response Header')
         for key in respheaders:
             if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
-                print (key, respheaders[key])
+                #print (key, respheaders[key])
                 self.send_header(key, respheaders[key])
         self.send_header('Content-Length', len(content))
         try:
@@ -249,7 +293,7 @@ def parse_args(argv=sys.argv[1:]):
 def main(argv=sys.argv[1:]):
     args = parse_args(argv)
     print('http server is starting on port {}...'.format(args.port))
-    server_address = ('127.0.0.1', args.port)
+    server_address = ('0.0.0.0', args.port)
     httpd = ThreadingSimpleServer(server_address, ProxyHTTPRequestHandler)
     print('http server is running as reverse proxy')
     httpd.serve_forever()
@@ -265,22 +309,25 @@ def config():
     def modify_gn(self,resp):
         path = self.path
         print(path,"modify gn code")
-        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/",proxyhost+"/gn/detail/code/",resp.text,flags = re.I|re.S)
         return content.encode('gbk') 
 
     def modify_gnzjl(self,resp):
         path = self.path
         print(path,"get gn 50 table ")
-        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/","http://127.0.0.1:9999/gn/detail/code/",resp.text,flags = re.I|re.S)
+        content = re.sub("http://q.10jqka.com.cn/gn/detail/code/",proxyhost+"/gn/detail/code/",resp.text,flags = re.I|re.S)
         content1 = re.findall("<table.*?table>",content,re.I|re.S)[0]
         return content1.encode('gbk') 
 
     def modify_bkcode(self,resp):
         path = self.path
-        print(path,self.headers)
-        if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
-            return resp.content
+        
+        print(path,resp.status_code,self.headers)
+        #if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
+        #    return resp.content
 
+        if len(re.findall("<table.*?table>",resp.text,re.I|re.S)) < 1:
+            return resp.content
 
         content = re.findall("<table.*?table>",resp.text,re.I|re.S)[0]
         df = pd.read_html(content,converters={'代码': str},index_col=0)[0]
@@ -325,23 +372,18 @@ def config():
         
     def modify_before_gn(self,reqHeader):
         newHeader = reqHeader
-        headers = {
-            'Host': 'stat.10jqka.com.cn',
-            'Pragma': 'no-cache',
-            'Referer': 'http://q.10jqka.com.cn/'
-        }       
+        if len(hexin_v) > 0: 
+            newHeader["hexin-v"] = hexin_v
  
-        for k in headers:
-            newHeader[k] = headers[k]
         return newHeader
 
     set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/',modify_gn)
     set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/',modify_gn)
     set_after('/funds/gnzjl/$',modify_gnzjl)
     set_pathmap('/gn/detail/code','http://q.10jqka.com.cn')
-    #set_before('/gn/detail/code',modify_before_gn)
 
     set_pathmap('/gn/detail/field/','http://q.10jqka.com.cn')
+    set_before('/gn/detail/field',modify_before_gn)
     set_after('/gn/detail/field/',modify_bkcode)
 
     set_pathmap('/data/Net/info/ETF_F009_desc_0_0_1_9999_0_0_0_jsonp_g.html','http://fund.ijijin.cn')

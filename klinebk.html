@@ -194,7 +194,7 @@
             </thead>
              <tbody>
                 <tr v-for="(item,index) in stocklist">
-                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{result[item][0]}}</a>
+                <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{index+1}} - {{result[item][0]}}</a>
                 </td>
                 <td>
                  <i class="fa fa-sort-amount-up"   @click="sortup(item)" style="margin-left:10px; margin-right:10px;"></i>
@@ -244,11 +244,7 @@
        }
 
 
-
-
-
-
-
+          apihost="http://examples.org.cn"
           function formatData(code,datas){
         
             d1 = datas[datas.length-1]
@@ -286,7 +282,10 @@
         localStorage.setItem("bklist",JSON.stringify(blist))
       }
 
-      async function getDatas(that){
+      async function getDatasJson(that){
+	//刷新数据保存到 bk.json		    
+	await axios.get(apihost+"/blocklist")
+	
         response = await axios.get(apihost+"/bk.json")
         var datadict = {}
         bklist = getbklist()
@@ -308,9 +307,23 @@
         })
       }
 
-
-
-
+      async function getDatas(that){
+		var bklist = getbklist()
+		if (bklist.length < 10){ //
+		      response = await axios.get(apihost+"/blocklist")
+		      response.data.forEach(async function(item){
+				code = item[1]
+             			name1 = item[0]
+                		that.stocklist.push(code)
+		      		respdata = await axios.get(apihost+"/block?"+code+"&"+name1)
+				formatData(code,respdata.data)
+		      })
+		      savebklist(that.stocklist)
+	        } else {
+        	    that.stocklist = bklist
+        	}
+        	that.allbkdatas = datadict
+      }
 
     var datalinelist = []
     var datadaylist = []
@@ -371,7 +384,7 @@
 
          async mounted () {
             var that = this
-            await getDatas(that)
+            await getDatasJson(that)
             await getDayData(vue.$data.stocklist[0])
             chartday.applyNewData(datadaylist)
             this.code = this.stocklist[0]
@@ -505,6 +518,12 @@
       })
 
         
+        window.addEventListener("resize",function(){
+            chartday._chartPane._measurePaneWidth()
+            chartday._chartPane._invalidatePane()
+
+        })
+    
 
 
     }

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+<!--use klinecharts 8.6.2 -->
 <html style="height:100%;" >
     <head>
     <meta content="text/html; charset=utf-8" http-equiv="content-type" />
 
- <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+ <link href="https://klang.org.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
      <!-- font awesome CSS -->
 <link crossorigin="anonymous" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" href="https://lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
       <!-- Vendor CSS Files -->
@@ -248,7 +249,8 @@
   <script crossorigin="anonymous" integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A==" src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script type="text/javascript" src="/js/klinecharts.min.js""></script>
+    <script type="text/javascript" src="https://klang.org.cn/js/klinecharts-8.6.2.js"></script>
+    <script type="text/javascript" src="https://klang.org.cn/js/vendors.min.js"></script>
       <script>
        function getUrlParam(name){
 
@@ -664,7 +666,7 @@
                     }])
 
 
-                    barsize = this.chartline._chartPane._chartData._timeScaleStore._dataSpace 
+                    barsize = this.chartline._chartPane._chartStore._timeScaleStore._dataSpace 
                     // 靠左显示
                     this.chartline.setOffsetRightSpace((linebar-datalinelist.length) * barsize)
 
@@ -836,11 +838,11 @@
 
 
         // linebar 每天的分时线个数 每分钟一个，245个
-        barsize = chartline._chartPane._chartData._timeScaleStore._totalDataSpace / (linebar+10)
+        barsize = chartline._chartPane._chartStore._timeScaleStore._totalDataSpace / (linebar+10)
         // 每个的空间
-        chartline._chartPane._chartData._timeScaleStore._dataSpace = barsize
+        chartline._chartPane._chartStore._timeScaleStore._dataSpace = barsize
         // 靠左显示
-        chartline._chartPane._chartData._timeScaleStore._barSpace = 2
+        chartline._chartPane._chartStore._timeScaleStore._barSpace = 2
         chartline.setOffsetRightSpace((linebar-datalinelist.length) * barsize) 
 
         chartline.applyNewData(datalinelist)
@@ -886,7 +888,24 @@
         chartday.applyNewData(datadaylist)
 
         loaddata = 0
+        window.addEventListener("resize",function(){
+            chartday._chartPane._measurePaneWidth()
+            chartday._chartPane._invalidatePane()
 
+            chartline._chartPane._measurePaneWidth()
+            chartline._chartPane._invalidatePane()
+ 
+            //重新计算 chartline 的每个bar宽度
+            // linebar 每天的分时线个数 每分钟一个，245个
+            barsize = chartline._chartPane._chartStore._timeScaleStore._totalDataSpace / (linebar+10)
+            // 每个的空间
+            chartline._chartPane._chartStore._timeScaleStore._dataSpace = barsize
+
+       
+            chartline._chartPane._measurePaneWidth()
+            chartline._chartPane._invalidatePane()
+
+        })
     }
       
  

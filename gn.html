@@ -3,27 +3,14 @@
     <meta content="text/html; charset=utf-8" http-equiv="content-type" />
 
       <!-- Vendor CSS Files -->
-  <link href="http://klang.zhanluejia.net.cn/assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="http://klang.zhanluejia.net.cn/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="http://klang.zhanluejia.net.cn/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="http://klang.zhanluejia.net.cn/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-
 
   <!-- Template Main CSS File -->
-  <link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet">
-
-  <link href="http://www.zhanluejia.net.cn/corlate/css/bootstrap.min.css" rel="stylesheet">
-  <link href="http://www.zhanluejia.net.cn/corlate/css/font-awesome.min.css" rel="stylesheet">
-  <link href="http://www.zhanluejia.net.cn/corlate/css/animate.min.css" rel="stylesheet">
-    <link href="http://www.zhanluejia.net.cn/corlate/css/animation.css" rel="stylesheet">
-  <link href="http://www.zhanluejia.net.cn/corlate/css/prettyPhoto.css" rel="stylesheet">
-  <link href="http://www.zhanluejia.net.cn/corlate/css/main.css" rel="stylesheet">
-  <link href="http://www.zhanluejia.net.cn/corlate/css/responsive.css" rel="stylesheet">
-    <link href="http://www.zhanluejia.net.cn/zlj/css/style.css" rel="stylesheet">
-<link href="http://www.zhanluejia.net.cn/static/css/site.css">
-<link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
-
+     <!-- Vendor CSS Files -->
+  <link href="https://klang.org.cn/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="https://klang.org.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://klang.org.cn/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://klang.org.cn/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://klang.org.cn/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
         <title>Klang(金浪)板块实时数据</title>
 
     </head>
@@ -56,16 +43,14 @@
 </div>
 
 </div> <!--app -->
-
-    
-    <script src="http://www.zhanluejia.net.cn/corlate/js/jquery.js"></script>
-<script src="http://www.zhanluejia.net.cn/corlate/js/bootstrap.min.js"></script>
- <script type="text/javascript" src="http://www.zhanluejia.net.cn/static/js/jquery.fitvids.js?v=0e648b2512"></script>
-
-
-
-   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.1.0/vue.global.js"></script>
-   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script crossorigin="anonymous" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
+<script type="text/javascript" src="https://klang.org.cn/js/vendors.min.js"></script>
+     <!-- Template Main JS File -->
+  <script src="https://klang.org.cn/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://klang.org.cn/assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script crossorigin="anonymous" integrity="sha512-KvaXQuRkPKYVQnd5RtRnFPR51W3+Vz+uq0IX8/TYaA2F6hDS2VQQv11BjdHES9boHiHXmqT9oC4H3AJLbq2Szg==" src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
+<script crossorigin="anonymous" integrity="sha512-bPh3uwgU5qEMipS/VOmRqynnMXGGSRv+72H/N260MQeXZIK4PG48401Bsby9Nq5P5fz7hy5UGNmC/W1Z51h2GQ==" src="https://lib.baomitu.com/axios/0.26.1/axios.min.js"></script>
+<script crossorigin="anonymous" integrity="sha512-GtM/5c/Ie0lStj6QwEG0HkpMQuGr9vrOAgFD4nNmImviyZvsJxN7TYU7b+R7Kthob0zFBUpuxfl3R3Mn1qekTw==" src="https://lib.baomitu.com/socket.io/4.5.3/socket.io.min.js"></script> 
 
 
 
@@ -135,13 +120,18 @@
             $("#win2_iframe").attr('src',href)
      }     
      async function getbkdata(code,index){            
-           response = await axios.get("/gn/detail/field/199112/order/desc/page/1/ajax/1/code/"+code)
-           console.log(response.data)
-           $('#bk'+index).html(response.data)
+           axios.get(apihost+"/gn/detail/field/199112/order/desc/page/1/ajax/1/code/"+code).then((response) => {
 
-           tableClass()
- 
-           setTimeout("tableClass()",1000 );  
+           	$('#bk'+index).html(response.data)
+           	tableClass()
+           	setTimeout("tableClass()",1000 );  
+	})
+  	.catch((error) => {
+  		console.log(error.response.status);
+		if (error.response.status == 401){
+			winiframe(apihost+"/gncookie.html")
+		}
+	});
      } 
 
       async function getDatas(that){
@@ -171,7 +161,8 @@
      } else {
         apihost = "http://"+host
      }
-   
+
+      //apihost="https://api.klang.org.cn"
       const VueApp = {
         data() {
             return {
@@ -197,7 +188,7 @@
             getbkcode(href,index){
               var reg = /\d+\/$/
               var code =  reg.exec(href)[0].replace('/','')
-              winiframe(href)
+              //winiframe(href)
               getbkdata(code,index)
            }
         }
