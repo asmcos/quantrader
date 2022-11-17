@@ -880,8 +880,9 @@
 
         function handle_day( kLineData, candleOptions){
             color = kLineData.rise > 0 ? '#EF5350' : '#26A69A'
+            d = new Date(kLineData.timestamp).toLocaleString().split(" ")[0].replaceAll("/","-")
             return [
-                { value: kLineData.timestamp },
+                { value: d },
                 { value: kLineData.open },
                 { value: kLineData.close },
                 { value: kLineData.high },
