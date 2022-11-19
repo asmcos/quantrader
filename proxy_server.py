@@ -335,7 +335,7 @@ def config():
             ,'成交额'    ,'流通股'     ,'市盈率'  ,'加自选'],axis=True)
 
         df['流通市值'] = df['流通市值'].apply(create_color_hqltgz) 
-        df['筹码'] = df['代码'].apply(create_chouma) 
+        #df['筹码'] = df['代码'].apply(create_chouma) 
         df['代码'] = df['代码'].apply(create_clickable_code) 
         df['涨跌幅(%)'] = df['涨跌幅(%)'].apply(create_color_rise)
 
