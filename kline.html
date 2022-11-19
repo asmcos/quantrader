@@ -485,11 +485,17 @@
 
 
     async function getDaySinaData(code){
-        var lastday1
+        var lastday1=""
         //日K数据结构不包含正在交易的日K数据
-        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=240&ma=no&datalen=280')
+        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=240&ma=no&datalen=500')
         response.data.forEach(function(item){
-
+                if (lastday1 == "") { rise = 0; 
+                } else {
+                    close1 = parseFloat(item.close).toFixed(2)
+                    close2 = lastday1.close
+                    rise = (close1 - close2 ) / close2 * 100
+                    rise = parseFloat(rise).toFixed(2)
+                }
                 datadaylist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
@@ -497,8 +503,9 @@
                     low: parseFloat(item.low),
                     volume: parseFloat(item.volume),
                     timestamp:new Date(item.day).getTime(),
+                    rise:rise,
                 })
-            lastday1 = item
+                lastday1 = item
         })
         
         //用实时数据补齐当日的日K
@@ -519,6 +526,9 @@
             }
             if(ldate !=lastday1.day){
                 //如果不包含就补齐
+                close2 = parseFloat(lastday1.close).toFixed(2)
+                rise = (close - close2 ) / close2 * 100
+                rise = parseFloat(rise).toFixed(2)
                 datadaylist.push({
                     open:parseFloat(open),
                     close:parseFloat(close),//当前日期的实施数据为当今收盘价
@@ -526,6 +536,7 @@
                     low:parseFloat(low),
                     volume:parseFloat(lastday[8]),
                     timestamp:new Date(ldate).getTime(),
+                    rise:rise,
                 })
                 
             }
@@ -867,8 +878,26 @@
         window.vue.$data.chartday = chartday
         window.vue.$data.chartline = chartline
 
+        function handle_day( kLineData, candleOptions){
+            color = kLineData.rise > 0 ? '#EF5350' : '#26A69A'
+            d = new Date(kLineData.timestamp).toLocaleString().split(" ")[0].replaceAll("/","-")
+            return [
+                { value: d },
+                { value: kLineData.open },
+                { value: kLineData.close },
+                { value: kLineData.high },
+                { value: kLineData.low },
+                { value: kLineData.volume },
+                { value: kLineData.rise,
+                  color:  color},
+            ]
+        }
        chartday.setStyleOptions({
         candle: {
+          tooltip: {
+            labels: ['时间: ', '开: ', '收: ', '高: ', '低: ', '成交量: ','涨幅: '],
+            values: handle_day 
+          },
           bar: {
            downColor: '#26A69A',
            upColor: '#EF5350',

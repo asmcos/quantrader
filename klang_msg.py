@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-import asyncio
-import websockets
+import socketio 
 import json
+import os
 
-uri = "wss://klang.org.cn:8099/user"
+uri = "https://klang.org.cn:8099/user"
+sio = socketio.Client()
 
-async def msg():
+@sio.event
+def connect():
+    print("connected! ")
+    sio.emit("u_cmd_event",{"content":"UPDATEALL"})
+    os._exit(0)
 
-    reset_stock = json.dumps({"type": 'U_CMD',"content":"UPDATEALL","pw":"Klang"})
-    async with websockets.connect(uri) as websocket:
-        
-        await websocket.send(reset_stock)
-        await websocket.recv()
+sio.connect(uri)
 
-asyncio.get_event_loop().run_until_complete(msg())
