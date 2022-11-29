@@ -44,7 +44,7 @@ def get_bar():
 
 def _get_block_bar (code,name):
         
-        datas = api.get_index_bars(9,1, code, 0, 200)
+        datas = api.get_index_bars(9,1, code, 0, 400)
 
         datas = api.to_df(datas)
 
