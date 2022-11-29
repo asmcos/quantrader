@@ -5,6 +5,8 @@
 
 <link href="https://klang.org.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
      <!-- font awesome CSS -->
+     <link crossorigin="anonymous" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" href="https://lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+      
 <link crossorigin="anonymous" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" href="https://lib.baomitu.com/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
       <!-- Vendor CSS Files -->
    <style>
@@ -141,24 +143,8 @@
 
 
 
-      <div class="boardmain" style="height:100%;width:70%;float:left;">
-      <!--div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
-          <div class="top-bar"> 
-            <span v-if="stocklist.length" style="margin-right:10px;">{{result[stocklist[0]][0]}}:{{stocklist[0]}}</span>
-            <i class="fa fa-sort-amount-down" v-if="lineorder=='one'" @click="linedown"></i>
-            <i class="fa fa-sort-amount-up" v-if="lineorder=='three'" @click="lineup"></i>
+      <div class="boardmain" style="height:70%;width:70%;float:left;">
 
-          </div>
-
-          <div class="row stock-chart k-line-chart-container"> 
-              <div class="col tools"> </div>
-
-              <div class="chart-widget">
-                <div id="klinelinemain" style="width:100%;height:100%;"> </div>
-              </div>
-          </div>
-
-      </div--> <!-- k-line-chart-light -->
 
       <div class="k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded two">
           <div class="top-bar"> 
@@ -179,7 +165,7 @@
       <div class="col-3" style="float:right;margin:10px;">
 
 
-           <div  class="shadow-sm p-3 mb-5 bg-white rounded" style="overflow-y:scroll;max-height:600px;">
+           <div  class="shadow-sm p-3 mb-5 bg-white rounded" style="overflow-y:scroll;max-height:900px;">
     
 
             <h5 style="margin-top:5px;">最近访问</h5>
@@ -189,19 +175,34 @@
             <th scope="col">name</th>
             <th scope="col">排序</th>
             <th scope="col">价格</th>
-            <th scope="col">涨幅 <i class="fa fa-sort-amount-down" @click="sortbydesc()"></i></th>
+            <th scope="col">涨幅</th>
             </tr>
             </thead>
              <tbody>
+                <tr v-for="(item,index) in stocktoplist">
+                    <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{index+1}} - {{result[item][0]}}</a>
+                    </td>
+                    <td>
+                     <i class="fa fa-ban fa-fw" style="margin-right:5px;color:red;" @click="downtop(item)"></i>   
+                     <i class="fa fa-sort-amount-up"   @click="sorttopup(item)" style="margin-left:10px; margin-right:10px;"></i>
+                     <i class="fa fa-sort-amount-down" @click="sorttopdown(item)"></i>
+    
+                    </td>
+                    <td v-if="result[item]"><font color=blue>{{result[item][1]}}</font></td>
+                    <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
+                    </td>
+                </tr>
+
                 <tr v-for="(item,index) in stocklist">
                 <td v-if="result[item]"><a @click="reload(item)" target=_blank>{{index+1}} - {{result[item][0]}}</a>
                 </td>
                 <td>
+                 <i class="fa fa-hand-o-up" style="margin-right:5px;" @click="uptop(item)"></i>   
                  <i class="fa fa-sort-amount-up"   @click="sortup(item)" style="margin-left:10px; margin-right:10px;"></i>
                  <i class="fa fa-sort-amount-down" @click="sortdown(item)"></i>
 
                 </td>
-                <td v-if="result[item]"><a v-bind:href="'https://gu.qq.com/'+item" target=_blank ><font color=blue>{{result[item][1]}}</font></a></td>
+                <td v-if="result[item]">{{result[item][1]}}</font></td>
                 <td v-if="result[item]"><font v-if="result[item][2]>=0" color="#ef4136">+{{result[item][2]}}</font> <font v-if="result[item][2]<0" color="#00ef00">{{result[item][2]}}</font></td>
                 </td>
                 </tr>
@@ -268,61 +269,140 @@
             vue.$data.result[code]=[name,close,rise]
             console.log(name,close,rise)
        }
+      
        
-      function getbklist(){
-         var blist = []
-         blist1 = localStorage.getItem("bklist")
+ 
+
+      /****************************store list*****************/
+
+      function getbrowserlist(){
+            return getlist('bkbrowserlist')
+       }
+
+       function savebrowserlist(code1){
+            return savelist('bkbrowserlist',code1)
+       }
+
+       function deletebrowserlist(code){
+            return deletelist('bkbrowserlist',code)
+       }
+
+       function gettoplist(){
+            return getlist('bktoplist')
+       }
+
+       function savetoplist(code1){
+            return savelist('bktoplist',code1)
+       }
+
+       function deletetoplist(code){
+            return deletelist('bktoplist',code)
+       }
+
+       function getlist(name){
+         var blist=[]
+         blist1 = localStorage.getItem(name)
+
          if (blist1 != null){
             blist = JSON.parse(blist1)
          }
+            
          return blist
-      }
-      function savebklist(blist){
+
+       }
+
+     function savelist(name,code1){
+         var blist=[]
+         blist1 = localStorage.getItem(name)
+
+         if (blist1 != null){
+            blist = JSON.parse(blist1)
+         }
+        i = blist.indexOf(code1) 
+        
+        if(i >= 0){
+            //更换顺序
+            blist.splice(i,1)
+        }    
         //添加到开头
-        localStorage.setItem("bklist",JSON.stringify(blist))
-      }
+        blist.unshift(code1)
+        localStorage.setItem(name,JSON.stringify(blist.slice(0,100)))
+        return blist
+    }
+
+
+
+
+    function deletelist(name,code){
+         var blist=[]
+         blist1 = localStorage.getItem(name)
+
+         if (blist1 != null){
+            blist = JSON.parse(blist1)
+         }
+        
+        i = blist.indexOf(code) 
+        if (i>=0){
+            blist.splice(i,1)
+        }
+        localStorage.setItem(name,JSON.stringify(blist))
+        return blist
+ 
+    }
+
+    /*****************end store list**************/
+
 
       async function getDatasJson(that){
-	//刷新数据保存到 bk.json		    
-	await axios.get(apihost+"/blocklist")
-	
-        response = await axios.get(apihost+"/bk.json")
-        var datadict = {}
-        bklist = getbklist()
-        response.data.forEach(function(item){
-             code = Object.keys(item)[0]
-             datadict[code] = item[code]
-             if (bklist.length < 10){ //数据第一次来自bk.json
-                that.stocklist.push(code)
-             }
-        })
-        if (bklist.length < 10){ //第一次存到本地
-           savebklist(that.stocklist)
-        } else {
-            that.stocklist = bklist
-        }
-        that.allbkdatas = datadict
-        that.stocklist.forEach(function(item){
-            formatData(item,that.allbkdatas[item])
-        })
+            //刷新数据保存到 bk.json		    
+            await axios.get(apihost+"/blocklist")
+        
+            response = await axios.get(apihost+"/bk.json")
+            var datadict = {}
+            bklist = getbrowserlist() + gettoplist()
+            response.data.forEach(function(item){
+                code = Object.keys(item)[0]
+                datadict[code] = item[code]
+                if (bklist.length < 10){ //数据第一次来自bk.json
+                    
+                    savebrowserlist(code)
+                }
+                
+            })
+
+            that.stocklist = getbrowserlist()
+            that.stocktoplist = gettoplist()
+            
+            that.allbkdatas = datadict
+            that.stocklist.forEach(function(item){
+                formatData(item,that.allbkdatas[item])
+            })
+
+            that.stocktoplist.forEach(function(item){
+               
+                formatData(item,that.allbkdatas[item])
+            })
       }
 
       async function getDatas(that){
-		var bklist = getbklist()
+		var bklist = getbrowserlist() + gettoplist()
 		if (bklist.length < 10){ //
 		      response = await axios.get(apihost+"/blocklist")
 		      response.data.forEach(async function(item){
-				code = item[1]
-             			name1 = item[0]
-                		that.stocklist.push(code)
+				    code = item[1]
+             		name1 = item[0]
+                	//that.stocklist.push(code)
 		      		respdata = await axios.get(apihost+"/block?"+code+"&"+name1)
-				formatData(code,respdata.data)
+				    formatData(code,respdata.data)
+                    savebrowserlist(code)
 		      })
-		      savebklist(that.stocklist)
-	        } else {
-        	    that.stocklist = bklist
-        	}
-        	that.allbkdatas = datadict
+		      
+        }
+
+        that.stocklist = getbrowserlist()
+        that.stocktoplist = gettoplist()
+        
+        that.allbkdatas = datadict
       }
 
     var datalinelist = []
@@ -360,12 +440,12 @@
         const VueApp = {
              data() {
                 return {
-                lineorder:'one',
-                chartline:'',
+
                 chartday:'',
                 reloadlock:0,
                 result:[],
                 stocklist:[],
+                stocktoplist:[],
                 allbkdatas:"",
                 code:"",
                 name:"",
@@ -376,29 +456,20 @@
 
           }, 
           created() {
-                 var lineorder = localStorage.getItem("lineorder")
-                 if (lineorder == 'one' || lineorder == 'three'){
-                    this.lineorder = lineorder
-                }
+
          },
 
          async mounted () {
             var that = this
+
+            that.stocktoplist = gettoplist()
             await getDatasJson(that)
             await getDayData(vue.$data.stocklist[0])
             chartday.applyNewData(datadaylist)
             this.code = this.stocklist[0]
          },
          methods: {
-                display(){
-                    result = ''
-                    for (i=0;i<this.stocklist.length;i++){
-                        code = this.stocklist[i]
-                        result += "['" +this.allbkdatas[code][0].name +"','" + code+ "'],"
-                    }
-                    console.log(result)
-                    savebklist(this.stocklist)
-                },
+ 
                 sortdown(code){
                     blist = this.stocklist
                     i = blist.indexOf(code) 
@@ -412,7 +483,8 @@
                      }    
                      blist.splice(i+1,0,code)
                      this.stocklist = blist
-                     this.display()
+                     localStorage.setItem("bkbrowserlist",JSON.stringify(blist)) 
+                     this.reload(code)
                 },
                 sortup(code){
                     blist = this.stocklist
@@ -427,7 +499,40 @@
                      }    
                      blist.splice(i-1,0,code)
                      this.stocklist = blist
-                     this.display()
+                     localStorage.setItem("bkbrowserlist",JSON.stringify(blist)) 
+                     this.reload(code)
+                },
+                sorttopdown(code){
+                    blist = this.stocktoplist
+                    i = blist.indexOf(code) 
+                    if (i == this.stocklist.lenght-1){
+
+                        return
+                    }
+                    if(i >= 0){
+                     //更换顺序
+                        blist.splice(i,1)
+                     }    
+                     blist.splice(i+1,0,code)
+                     this.stocktoplist = blist
+                     localStorage.setItem("bktoplist",JSON.stringify(blist)) 
+                     this.reload(code)
+                },
+                sorttopup(code){
+                    blist = this.stocktoplist
+                    i = blist.indexOf(code) 
+                    if (i == 0){
+
+                        return
+                    }
+                    if(i >= 0){
+                       //更换顺序
+                        blist.splice(i,1)
+                     }    
+                     blist.splice(i-1,0,code)
+                     this.stocktoplist = blist
+                     localStorage.setItem("bktoplist",JSON.stringify(blist)) 
+                     this.reload(code)
                 },
                 async reload(newcode){
                     if (this.reloadlock == 1){
@@ -437,22 +542,33 @@
                     code = newcode
                     this.code = newcode
                     this.name = this.result[code][0]
-                    /*
-                    blist = this.stocklist
-                    i = blist.indexOf(code) 
-        
-                    if(i >= 0){
-                     //更换顺序
-                        blist.splice(i,1)
-                     }    
-                    //添加到开头
-                    blist.unshift(code)
-                    this.stocklist = blist
-                    */
+ 
                     await getDayData(code)
                     
                     chartday.applyNewData(datadaylist)
                     this.reloadlock = 0
+                },
+                async reloadtop(newcode){
+                    if (this.reloadlock == 1){
+                        return
+                    }
+                    this.reloadlock = 1
+                    code = newcode
+                    this.stocklist = getbrowserlist( )
+                    this.stocktoplist = savetoplist(code)
+
+                    await this.reload()
+                    this.reloadlock = 0
+                },
+                async uptop(code){
+                     deletebrowserlist(code)
+                     this.reloadtop(code)
+                },
+                async downtop(code){
+                     deletetoplist(code)
+                     this.stocklist = savebrowserlist(code)
+                     this.stocktoplist = gettoplist()
+                     this.reload(code)
                 },
                 async search(){
                 },
