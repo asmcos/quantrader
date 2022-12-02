@@ -70,7 +70,7 @@ for i in alllist:
 
 hostname = 'http://data.10jqka.com.cn'
 proxyhost = "https://api.klang.org.cn"
-proxyhost = "http://192.168.123.169:9999"
+
 root_path = sys.path[0]
 path_map ={}
 
@@ -216,15 +216,30 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             host = get_pathmap(self.path)
             url = '{}{}'.format(host, self.path)
             print(self.path)
-            content_len = int(self.headers.getheader('content-length', 0))
+            content_len = int(self.headers.get('content-length', 0))
             post_body = self.rfile.read(content_len)
+            post_body = json.loads(post_body)
             req_header = self.parse_headers()
-
             req_header = call_before(self,req_header)
-            resp = session.post(url, data=post_body, headers= req_header)
-            sent = True
+            if post_body.get("parserData") == None:
+                resp = session.post(url, data=post_body, headers= req_header)
+    
+                sent = True
+                content = call_after(self,resp)
+            else:
+                # 获取一个空的resp
+                resp = session.get("http://127.0.0.1/test")
+                sent = True
+                resp.headers['Content-Type'] = "text/html;charset=gbk"
+                resp.status_code = 200
+                class Resp():
+                    def __init__(self):
+                        pass
+                resp1 = Resp()
+                resp1.status_code = 200
+                resp1.text = post_body['data']
+                content = call_after(self,resp1)
 
-            content = call_after(self,resp)
             self.send_response(resp.status_code)
             self.send_resp_headers(resp,content)
             if body:
@@ -322,9 +337,7 @@ def config():
     def modify_bkcode(self,resp):
         path = self.path
         
-        print(path,resp.status_code,self.headers)
-        #if self.headers['Referer'] != 'http://127.0.0.1:9999/gn.html':
-        #    return resp.content
+        print(path,self.headers)
 
         if len(re.findall("<table.*?table>",resp.text,re.I|re.S)) < 1:
             return resp.content
