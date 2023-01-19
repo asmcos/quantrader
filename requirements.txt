@@ -13,3 +13,4 @@ yahoo_fin
 demjson
 click
 pytdx
+scipy
