@@ -57,16 +57,19 @@ valley_indexes = valley_indexes[0]
  
 # Merge peaks and valleys data points using pandas.
 df_peaks = pd.DataFrame({'datetime': data_x[peak_indexes], 'zigzag_y': data_y[peak_indexes]})
+
 df_valleys = pd.DataFrame({'datetime': data_x[valley_indexes], 'zigzag_y': data_y[valley_indexes]})
-df_peaks_valleys = pd.concat([df_peaks, df_valleys], axis=0, ignore_index=True, sort=True)
+#df_peaks_valleys = pd.concat([df_peaks, df_valleys], axis=0, ignore_index=True, sort=True)
  
 # Sort peak and valley datapoints by date.
-df_peaks_valleys = df_peaks_valleys.sort_values(by=['datetime'])
+#df_peaks_valleys = df_peaks_valleys.sort_values(by=['datetime'])
  
 # Plot zigzag trendline.
-ax.plot(df_peaks_valleys['datetime'].values, df_peaks_valleys['zigzag_y'].values, 
-                                                        color='red', label="zigzag")
+ax.plot(df_peaks['datetime'].values, df_peaks['zigzag_y'].values, 
+                                                        color='red', label="zigzag_peak")
  
+ax.plot(df_valleys['datetime'].values, df_valleys['zigzag_y'].values, 
+                                                        color='blue', label="zigzag_valley")
 # Plot close price line.
 ax.plot(data_x, data_y, linestyle='dashed', color='black', label="Close Price", linewidth=1)
  
