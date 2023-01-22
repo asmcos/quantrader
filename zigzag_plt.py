@@ -2,6 +2,8 @@
 import matplotlib
  
 # Avoid FutureWarning: Pandas will require you to explicitly register matplotlib converters.
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 
 from scipy import signal
@@ -35,9 +37,9 @@ codename = "sh.600010"
 
 if len(sys.argv)>=1:
     codename = sys.argv[1]
-display = 1
+show = 1
 if len(sys.argv)>=2:
-    display = int(sys.argv[2])
+    show = int(sys.argv[2])
 
 Kl.code(codename)
 print(codename,Kl.cur_name)
@@ -62,12 +64,22 @@ peak_indexes = peak_indexes[0]
 valley_indexes = signal.argrelextrema(data_y, np.less)
 valley_indexes = valley_indexes[0]
  
+# Instantiate axes.
+(fig, ax) = plt.subplots()
  
 # Merge peaks and valleys data points using pandas.
 df_peaks = pd.DataFrame({'datetime': data_x[peak_indexes], 'zigzag_y': data_y[peak_indexes]})
 
 df_valleys = pd.DataFrame({'datetime': data_x[valley_indexes], 'zigzag_y': data_y[valley_indexes]})
  
+# Plot zigzag trendline.
+ax.plot(df_peaks['datetime'].values, df_peaks['zigzag_y'].values, 
+                                                        color='red', label="zigzag_peak")
+ 
+ax.plot(df_valleys['datetime'].values, df_valleys['zigzag_y'].values, 
+                                                        color='blue', label="zigzag_valley")
+# Plot close price line.
+ax.plot(data_x, data_y, linestyle='dashed', color='black', label="Close Price", linewidth=1)
  
 from bokeh.plotting import figure, output_file, show
 
@@ -89,4 +101,24 @@ show(graph)
 
 
  
+# Customize graph.
+##########################
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
+ 
+# Format time.
+ax.xaxis_date()
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+ 
+plt.gcf().autofmt_xdate()   # Beautify the x-labels
+plt.autoscale(tight=True)
+ 
+plt.legend(loc='best')
+plt.grid(True, linestyle='dashed')
+
+plt.savefig("images/" + codename+"_zigzag.png",dpi=200,bbox_inches='tight')
+
+if show == 1:
+    plt.show()
  
