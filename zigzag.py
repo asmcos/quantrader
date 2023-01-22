@@ -1,30 +1,13 @@
 #!/usr/bin/python3
-import matplotlib
- 
-# Avoid FutureWarning: Pandas will require you to explicitly register matplotlib converters.
-
 
 from scipy import signal
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
- 
+import numpy as np 
 import pandas as pd
 
 ## Klang
 from Klang import Kl,Klang 
 Klang.Klang_init()
 ## 
-
-#设置字体 ，显示股票中文名称
-matplotlib.rcParams["font.sans-serif"] = ['AR PL UKai CN']
-
-# Load data from CSV file.
-##########################
-my_headers = ['datetime', 'open', 'high', 'low', 'close', 'volume']
-my_dtypes = {'datetime': 'str', 'open': 'float', 'high': 'float', 'low': 'float', 
-                                                'close': 'float', 'volume': 'int'}
-my_parse_dates = ['datetime']
 
 #
 # load stock data by code
@@ -42,13 +25,10 @@ if len(sys.argv)>=2:
 Kl.code(codename)
 print(codename,Kl.cur_name)
 loaded_data = Kl.day_df 
-#print(loaded_data)
 
-# Convert 'Timestamp' to 'float'.
-#   Need time be in float days format - see date2num.
-loaded_data['datetime'] = [mdates.date2num(np.datetime64(d)) for d in loaded_data['datetime']]
- 
- 
+#datetime types
+loaded_data['datetime'] = pd.to_datetime(loaded_data['datetime'])
+
  
 # Create zigzag trendline.
 ########################################
@@ -71,8 +51,15 @@ df_valleys = pd.DataFrame({'datetime': data_x[valley_indexes], 'zigzag_y': data_
  
 from bokeh.plotting import figure, output_file, show
 
-output_file("images/" + codename+"_zigzag.html")
-graph = figure(title = codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
+
+TOOLTIPS = [
+    ("index", "$index"),
+    ("(y)", "($y)"),
+]
+
+output_file("images/" + codename+"_zigzag.html",title="Klang zigzag")
+graph = figure(title = codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline',
+    x_axis_type="datetime",width=1200, height=400,toolbar_location="above",tooltips = TOOLTIPS)
 
 # name of the x-axis
 graph.xaxis.axis_label = "日期"
@@ -85,8 +72,12 @@ graph.line(data_x, data_y,line_dash = "dotdash",line_color="black")
 graph.line(df_valleys['datetime'].values, df_valleys['zigzag_y'].values,line_color="blue")
 
 graph.line(df_peaks['datetime'].values, df_peaks['zigzag_y'].values,line_color="red")
+
 show(graph)
 
+#from bokeh.io import export_png
+
+#export_png(graph, filename="images/" + codename+"_zigzag.png")
 
  
  

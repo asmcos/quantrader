@@ -81,24 +81,6 @@ ax.plot(df_valleys['datetime'].values, df_valleys['zigzag_y'].values,
 # Plot close price line.
 ax.plot(data_x, data_y, linestyle='dashed', color='black', label="Close Price", linewidth=1)
  
-from bokeh.plotting import figure, output_file, show
-
-output_file("images/" + codename+"_zigzag.html")
-graph = figure(title = codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
-
-# name of the x-axis
-graph.xaxis.axis_label = "日期"
-  
-# name of the y-axis
-graph.yaxis.axis_label = "价格"
-
-graph.line(data_x, data_y,line_dash = "dotdash",line_color="black")
-
-graph.line(df_valleys['datetime'].values, df_valleys['zigzag_y'].values,line_color="blue")
-
-graph.line(df_peaks['datetime'].values, df_peaks['zigzag_y'].values,line_color="red")
-show(graph)
-
 
  
 # Customize graph.
@@ -120,5 +102,24 @@ plt.grid(True, linestyle='dashed')
 plt.savefig("images/" + codename+"_zigzag.png",dpi=200,bbox_inches='tight')
 
 if show == 1:
-    plt.show()
+    from bokeh.plotting import figure, output_file, show 
+
+    output_file("images/" + codename+"_zigzag.html")
+    graph = figure(title = codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline',width=1200,height=400)
+
+    # name of the x-axis
+    graph.xaxis.axis_label = "日期"
+  
+    # name of the y-axis
+    graph.yaxis.axis_label = "价格"
+
+    graph.line(data_x, data_y,line_dash = "dotdash",line_color="black")
+
+    graph.line(df_valleys['datetime'].values, df_valleys['zigzag_y'].values,line_color="blue")
+
+    graph.line(df_peaks['datetime'].values, df_peaks['zigzag_y'].values,line_color="red")
+    show(graph)
+
+
+    #plt.show()
  
