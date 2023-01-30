@@ -147,8 +147,8 @@
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
             <span> 当前价格:{{curprice}}</span>
-            <span> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
-            <span> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
+            <span v-if="curracapital !=0"> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
+            <span v-if="totalcapital !=0"> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
             <i class="fa fa-arrow-down"  v-if="lineorder=='one'" @click="linedown"></i>
             <i class="fa fa-arrow-up" v-if="lineorder=='three'" @click="lineup"></i>
 
@@ -168,8 +168,8 @@
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
             <span> 当前价格:{{curprice}}</span>
-            <span> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
-            <span> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
+            <span v-if="curracapital !=0"> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
+            <span v-if="totalcapital !=0"> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
           </div>
 
           <div class="row stock-chart k-line-chart-container"> 
@@ -490,10 +490,22 @@
     }
 
     async function getInfoData(code){
-        response = await axios.get(apihost + '/realstock/company/'+ code +'/jsvar.js')
-        eval(response.data)
-        vue.$data.totalcapital = parseFloat(totalcapital) / 10000 
-        vue.$data.curracapital = parseFloat(curracapital) / 10000 
+
+        (async() => {
+            let response = null;
+            try {
+  
+                response = await axios.get(apihost + '/realstock/company/'+ code +'/jsvar.js')
+                eval(response.data)
+                vue.$data.totalcapital = parseFloat(totalcapital) / 10000 
+                vue.$data.curracapital = parseFloat(curracapital) / 10000 
+               } catch (err) {
+                    vue.$data.totalcapital = 0
+                    vue.$data.curracapital = 0 
+               } finally {
+                }
+            })();
+
     }
 
     async function getDaySinaData(code){
