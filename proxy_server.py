@@ -407,6 +407,7 @@ def config():
     set_pathmap('data/index.php','https://stock.gtimg.cn')
     set_pathmap('cn/api/json_v2.php','https://quotes.sina.cn')
     set_pathmap('s3/','https://smartbox.gtimg.cn')
+    set_pathmap('/realstock/company','https://finance.sina.com.cn')
 
 if __name__ == '__main__':
     config()

@@ -146,6 +146,9 @@
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
+            <span> 当前价格:{{curprice}}</span>
+            <span> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
+            <span> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
             <i class="fa fa-arrow-down"  v-if="lineorder=='one'" @click="linedown"></i>
             <i class="fa fa-arrow-up" v-if="lineorder=='three'" @click="lineup"></i>
 
@@ -164,6 +167,9 @@
       <div class="k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded two">
           <div class="top-bar"> 
             <span style="margin-right:10px;">{{stockname}}:<a v-bind:href="'/kline.html?code='+stockcode" >{{stockcode}}</a></span>
+            <span> 当前价格:{{curprice}}</span>
+            <span> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
+            <span> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
           </div>
 
           <div class="row stock-chart k-line-chart-container"> 
@@ -483,6 +489,12 @@
         return [close1,hclose,lclose]
     }
 
+    async function getInfoData(code){
+        response = await axios.get(apihost + '/realstock/company/'+ code +'/jsvar.js')
+        eval(response.data)
+        vue.$data.totalcapital = parseFloat(totalcapital) / 10000 
+        vue.$data.curracapital = parseFloat(curracapital) / 10000 
+    }
 
     async function getDaySinaData(code){
         var lastday1=""
@@ -540,7 +552,8 @@
                 })
                 
             }
-        } 
+        }
+        vue.$data.curprice = datadaylist[datadaylist.length-1].close 
     }
 
     /*************股票数据操作结束***********/
@@ -566,6 +579,10 @@
                 stockname:"",
                 stockcode:"",
                 timer:'',
+                curprice:"",
+                curracapital:"",
+                totalcapital:"",
+
             }
           },
           watch:{
@@ -639,6 +656,9 @@
                     datalinelist = []
 
                     await getDaySinaData(code)
+
+                    await getInfoData(code)
+
                     this.chartday.applyNewData(datadaylist)
  
                     //获取昨天的收盘价
@@ -913,7 +933,8 @@
         },
       })
         await getDaySinaData(code)
-        
+        await getInfoData(code)
+ 
         chartday.applyNewData(datadaylist)
 
         loaddata = 0
