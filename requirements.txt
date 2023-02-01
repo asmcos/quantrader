@@ -14,3 +14,4 @@ demjson
 click
 pytdx
 scipy
+bokeh

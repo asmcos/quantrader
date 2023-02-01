@@ -21,12 +21,6 @@ Klang.Klang_init()
 #设置字体 ，显示股票中文名称
 matplotlib.rcParams["font.sans-serif"] = ['AR PL UKai CN']
 
-# Load data from CSV file.
-##########################
-my_headers = ['datetime', 'open', 'high', 'low', 'close', 'volume']
-my_dtypes = {'datetime': 'str', 'open': 'float', 'high': 'float', 'low': 'float', 
-                                                'close': 'float', 'volume': 'int'}
-my_parse_dates = ['datetime']
 
 #
 # load stock data by code
@@ -35,10 +29,10 @@ import sys
 
 codename = "sh.600010" 
 
-if len(sys.argv)>=1:
+if len(sys.argv)>1:
     codename = sys.argv[1]
 show = 1
-if len(sys.argv)>=2:
+if len(sys.argv)>2:
     show = int(sys.argv[2])
 
 Kl.code(codename)
@@ -65,7 +59,7 @@ valley_indexes = signal.argrelextrema(data_y, np.less)
 valley_indexes = valley_indexes[0]
  
 # Instantiate axes.
-(fig, ax) = plt.subplots()
+(fig, ax) = plt.subplots( figsize=(21, 7) )
  
 # Merge peaks and valleys data points using pandas.
 df_peaks = pd.DataFrame({'datetime': data_x[peak_indexes], 'zigzag_y': data_y[peak_indexes]})
@@ -102,6 +96,10 @@ plt.grid(True, linestyle='dashed')
 plt.savefig("images/" + codename+"_zigzag.png",dpi=200,bbox_inches='tight')
 
 if show == 1:
+    plt.show()
+
+display = 0
+if display == 1:
     from bokeh.plotting import figure, output_file, show 
 
     output_file("images/" + codename+"_zigzag.html")
@@ -121,5 +119,4 @@ if show == 1:
     show(graph)
 
 
-    #plt.show()
  

@@ -16,10 +16,10 @@ import sys
 
 codename = "sh.600010" 
 
-if len(sys.argv)>=1:
+if len(sys.argv)>1:
     codename = sys.argv[1]
 display = 1
-if len(sys.argv)>=2:
+if len(sys.argv)>2:
     display = int(sys.argv[2])
 
 Kl.code(codename)
