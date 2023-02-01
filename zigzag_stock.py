@@ -2,7 +2,10 @@ import pandas as pd
 from zigzag_lib import peak_valley_pivots, max_drawdown, compute_segment_returns, pivots_to_modes
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
+#设置字体 ，显示股票中文名称
+matplotlib.rcParams["font.sans-serif"] = ['AR PL UKai CN']
 
 ## Klang
 from Klang import Kl,Klang 
@@ -18,7 +21,7 @@ codename = "sh.600010"
 
 if len(sys.argv)>1:
     codename = sys.argv[1]
-display = 1
+display = 1 
 if len(sys.argv)>2:
     display = int(sys.argv[2])
 
@@ -44,6 +47,9 @@ def plot_pivots(X, pivots):
 pivots = peak_valley_pivots(loaded_data['close'].values, 0.03, -0.03)
 plot_pivots(loaded_data['close'].values,pivots)
 
+plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
+plt.savefig("images/" + codename+"_zigzag.png",dpi=200,bbox_inches='tight')
 
-plt.show()
+if display :
+    plt.show()
 
