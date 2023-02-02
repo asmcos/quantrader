@@ -25,12 +25,14 @@ display = 1
 if len(sys.argv)>2:
     display = int(sys.argv[2])
 
+offset = 100
+if len(sys.argv)>3:
+    offset = int(sys.argv[3])
+
 Kl.code(codename)
 print(codename,Kl.cur_name)
-loaded_data = Kl.day_df 
+loaded_data = Kl.day_df.iloc[offset:] 
 
-#datetime types
-loaded_data['datetime'] = pd.to_datetime(loaded_data['datetime'])
 
 # Instantiate axes.
 (fig, ax) = plt.subplots( figsize=(21, 7) )
@@ -44,12 +46,15 @@ def plot_pivots(X, pivots):
     plt.scatter(np.arange(len(X))[pivots == -1], X[pivots == -1], color='r')
 
 
-
-pivots = peak_valley_pivots(loaded_data['close'].values, 0.03, -0.03)
-plot_pivots(loaded_data['close'].values,pivots)
-
 plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
-plt.savefig("images/" + codename+"_zigzag.png",dpi=200,bbox_inches='tight')
+plt.grid(True, linestyle='dashed')
+
+def calc_data(data_x):
+    pivots = peak_valley_pivots(data_x, 0.03, -0.03)
+    plot_pivots(data_x,pivots)
+    plt.savefig("images/" + codename+ str(len(data_x))+ "_zigzag.png",dpi=100,bbox_inches='tight')
+
+calc_data(loaded_data['close'].values)
 
 if display :
     plt.show()
