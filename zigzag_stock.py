@@ -52,7 +52,7 @@ plt.grid(True, linestyle='dashed')
 def calc_data(data_x):
     pivots = peak_valley_pivots(data_x, 0.03, -0.03)
     plot_pivots(data_x,pivots)
-    plt.savefig("images/" + codename+ str(len(data_x))+ "_zigzag.png",dpi=100,bbox_inches='tight')
+    plt.savefig("images/" + codename + "_" + str(len(data_x))+ "_zigzag.png",dpi=100,bbox_inches='tight')
 
 calc_data(loaded_data['close'].values)
 
