@@ -50,7 +50,7 @@ plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
 plt.grid(True, linestyle='dashed')
 
 def calc_data(data_x):
-    pivots = peak_valley_pivots(data_x, 0.03, -0.03)
+    pivots = peak_valley_pivots(data_x, 0.02, -0.02)
     plot_pivots(data_x,pivots)
     plt.savefig("images/" + codename + "_" + str(len(data_x))+ "_zigzag.png",dpi=100,bbox_inches='tight')
 
