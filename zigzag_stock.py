@@ -85,6 +85,10 @@ def pattern_cup_handle():
             cb / 3 > cd: 
             ax.text(a+1,close[a],"<-A")
             ax.text(c+1,close[c],"<-C")
+            ax.annotate('', xy=(c, close[c]),xytext=(b, close[b]),\
+                arrowprops=dict(facecolor='black', arrowstyle='-',connectionstyle="arc3,rad=0.4"))
+            ax.annotate('', xy=(b, close[b]),xytext=(a, close[a]),\
+                arrowprops=dict(facecolor='black', arrowstyle='-',connectionstyle="arc3,rad=0.4"))
             return 1
 
     return 0
