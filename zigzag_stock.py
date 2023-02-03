@@ -65,9 +65,9 @@ def pattern_tail_rise():
     return 0
 
 def pattern_cup_handle():
-
+    global startX
     if len(pv_index) < 6:
-        return 
+        return 0 
     close = loaded_data['close'].values
     for i in range(0,len(pv_index)-6):
         x1 = pv_index[i]
@@ -76,10 +76,15 @@ def pattern_cup_handle():
         c = pv_index[i+3]
         d = pv_index[i+4]
         e = pv_index[i+5]
-        # a,c 杯沿差不多高，杯底b，比杯柄低，回调不能超过15%
-        if math.isclose(close[a],close[c],abs_tol = 0.1) and \
+        # a,c 杯沿差不多高，杯底b，比杯柄低，回调不能超过杯底部1/3
+        ab = close[a] - close[b]
+        cb = close[c] - close[b]
+        cd = close[c] - close[d]
+        if pivots[x1] == -1 and abs(ab-cb)/cb < 0.15 and \
             close[b] < close[d] and \
-            (close[c] - close[d] ) / close[d] < 0.15: 
+            cb / 3 > cd: 
+            ax.text(a+1,close[a],"<-A")
+            ax.text(c+1,close[c],"<-C")
             return 1
 
     return 0
@@ -87,10 +92,10 @@ def pattern_cup_handle():
 
 pivots = calc_data(loaded_data['close'].values)
 pv_index = create_index(pivots)
-plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
-plt.grid(True, linestyle='dashed')
 
-if pattern_cup_handle():
+if pattern_cup_handle() == 1:
+    plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
+    plt.grid(True, linestyle='dashed')
     plt.savefig("images/" + codename + "_" + str(len(loaded_data['close'].values))+ "_zigzag.png",dpi=100,bbox_inches='tight')
     
 if display :
