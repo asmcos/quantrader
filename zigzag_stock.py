@@ -8,7 +8,7 @@ import math
 matplotlib.rcParams["font.sans-serif"] = ['AR PL UKai CN']
 
 ## Klang
-from Klang import Kl,Klang 
+from Klang import Kl,Klang,APPROX 
 Klang.Klang_init()
 ## 
 
@@ -64,11 +64,12 @@ def pattern_tail_rise():
         return 1
     return 0
 
+# 杯和柄模式
 def pattern_cup_handle():
-    global startX
     if len(pv_index) < 6:
         return 0 
     close = loaded_data['close'].values
+    ret = 0
     for i in range(0,len(pv_index)-6):
         x1 = pv_index[i]
         a = pv_index[i+1]
@@ -89,15 +90,63 @@ def pattern_cup_handle():
                 arrowprops=dict(color='blue', arrowstyle='-',connectionstyle="arc3,rad=0.4"))
             ax.annotate('', xy=(b, close[b]),xytext=(a, close[a]),\
                 arrowprops=dict(color='blue', arrowstyle='-',connectionstyle="arc3,rad=0.4"))
-            return 1
+            ret = 1
 
-    return 0
+    return ret
 
+# W 底部
+def pattern_w_bottom():
+    if len(pv_index) < 5:
+        return 0 
+    ret = 0
+    close = loaded_data['close'].values
+    for i in range(0,len(pv_index)-5):
+        a = pv_index[i]
+        b = pv_index[i+1]
+        c = pv_index[i+2]
+        d = pv_index[i+3]
+        e = pv_index[i+4]
+        ab = close[a] - close[b]
+        ad = close[a] - close[d]
 
+        # b,d 为双底，a，e为顶
+        if pivots[a] == 1 and APPROX(ab,ad,0.05) and \
+            ab / close[b] > 0.2 :
+            ax.text(b+1,close[b],"<-B")
+            ax.text(d+1,close[d],"<-D")
+            ret = 1
+    return ret
+
+# 三次底部
+def pattern_triple_bottom():
+    if len(pv_index) < 6:
+        return 0 
+    ret = 0
+    close = loaded_data['close'].values
+    for i in range(0,len(pv_index)-6):
+        a = pv_index[i]
+        b = pv_index[i+1]
+        c = pv_index[i+2]
+        d = pv_index[i+3]
+        e = pv_index[i+4]
+        f = pv_index[i+5]
+        ab = close[a] - close[b]
+        ad = close[a] - close[d]
+        af = close[a] - close[f]
+
+        # b,d,f 为三底，a，e为顶
+        if pivots[a] == 1 and APPROX(ab,ad,0.05) and \
+            APPROX(ab,af,0.05) and ab / close[b] > 0.2 :
+            ax.text(b+1,close[b],"<-B")
+            ax.text(d+1,close[d],"<-D")
+            ax.text(f+1,close[d],"<-F")
+            ret = 1
+    return ret
+ 
 pivots = calc_data(loaded_data['close'].values)
 pv_index = create_index(pivots)
 
-if pattern_cup_handle() == 1:
+if pattern_triple_bottom() == 1:
     plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
     plt.grid(True, linestyle='dashed')
     plt.savefig("images/" + codename + "_" + str(len(loaded_data['close'].values))+ "_zigzag.png",dpi=100,bbox_inches='tight')
