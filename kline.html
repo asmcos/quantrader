@@ -6,7 +6,7 @@
 
  <link href="https://klang.org.cn/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
      <!-- font awesome CSS -->
-<link crossorigin="anonymous" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" href="https://lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link  href="https://lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
       <!-- Vendor CSS Files -->
    <style>
     .stock-chart {
@@ -101,8 +101,7 @@
 
    </style>
 
-  <!-- Template Main CSS File -->
-  <!--link href="http://klang.zhanluejia.net.cn/assets/css/style.css" rel="stylesheet"-->
+ 
 
 
         <title>Klang(金浪)自选股票</title>
@@ -113,35 +112,22 @@
 
   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
    <div class="container-fluid">
-    <a class="navbar-brand" href="/online.html">公式选股</a>
+    <a class="navbar-brand" href="https://www.klang.org.cn/online.html">公式选股</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="http://www.klang.org.cn">主页</a>
+          <a class="nav-link active" aria-current="page" href="https://www.klang.org.cn">主页</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/gushen/index.html">股神</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="/kline.html?code=sh000001" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            看盘软件
-          </a>
-       </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">和谐交易</a>
-        </li>
+
       </ul>
      </div>
     </div>
    </nav>
 
   
-
-
-
       <div class="boardmain" style="height:100%;width:70%;float:left;" v-show="display_state=='1'">
       <div v-bind:class="'k-line-chart-light shadow-sm p-3 mb-5 bg-white rounded ' + lineorder">
           <div class="top-bar"> 
@@ -250,12 +236,13 @@
 </div>
 
    </div> <!-- app -->
-<script crossorigin="anonymous" integrity="sha512-KvaXQuRkPKYVQnd5RtRnFPR51W3+Vz+uq0IX8/TYaA2F6hDS2VQQv11BjdHES9boHiHXmqT9oC4H3AJLbq2Szg==" src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
-<script crossorigin="anonymous" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
-  <script crossorigin="anonymous" integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A==" src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
+<script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
+  <script  src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script type="text/javascript" src="https://klang.org.cn/js/klinecharts-8.6.2.js"></script>
+    <!--script type="text/javascript" src="https://klang.org.cn/js/klinecharts-8.6.2.js"></script-->
+    <script type="text/javascript" src="https://unpkg.com/klinecharts/dist/klinecharts.min.js"></script>
     <script type="text/javascript" src="https://klang.org.cn/js/vendors.min.js"></script>
       <script>
        function getUrlParam(name){
@@ -279,6 +266,7 @@
             apihost = "https://api.klang.org.cn"
        }
 
+       apihost = "https://api.klang.org.cn"
 
        /****************************store list*****************/
 
@@ -651,17 +639,12 @@
                 },
 
                 async update(){
-                    getDatas(this)
-                    if (loaddata == 1){
-                        return
-                    }
- 
-                    datalinelist = []
-                    await getLineSinaData(code)
-                    this.chartline.applyNewData(datalinelist)
+
+                    this.refresh()
                 },
                 async refresh(){
  
+                     
                     loaddata = 1
  
                     datadaylist = []
@@ -686,34 +669,39 @@
                         hclose = close1 * 2 - lclose
                     }     
 
-                    chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax = function (){
-                        mm = this.oldMinMax()
-                        mm.min = lclose
-                        mm.max = hclose
-                        return mm
-                    }
+                    lclose = lclose * 0.995
+                    hclose = hclose * 1.005
 
+                    chartline.createOverlay({
 
+                            name:"simpleTag",
+                            extendData:"close:" + close1,
+                            styles: { text: { color: '#98cc12' } ,color: 'rgba(230, 230, 100, .3)',style:'dashed' },
+                            points: [{ value: close1 }],
 
-                    chartline.createTag([
-                    {
-                        id: 'close1',
-                        mark: 'close',
-                        text: close1,
-                        point: { value: close1 },
-                        styles: {
-                            line: { color: '#98cc12' },
-                            mark: { backgroundColor: '#f0f' },
-                            text: { backgroundColor: '#00f' }
-                            }
-                    }])
+                        })
 
-
-                    barsize = this.chartline._chartPane._chartStore._timeScaleStore._dataSpace 
+                    // linebar 每天的分时线个数 每分钟一个，245个
+                    barsize = chartline._chartStore._timeScaleStore._totalBarSpace / (linebar+10)
+                
                     // 靠左显示
-                    this.chartline.setOffsetRightSpace((linebar-datalinelist.length) * barsize)
-
+                    chartline._chartStore._timeScaleStore._barSpace = barsize
+                    
+                    // 靠左显示
+                    this.chartline.setOffsetRightDistance((linebar-datalinelist.length) * barsize)
+                    
                     this.chartline.applyNewData(datalinelist)
+
+                    chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+                        max:hclose,
+                        range:hclose-lclose,
+                        realMax:hclose,
+                        realMin:lclose,
+                        realRange:hclose-lclose})
+
+                    chartline.adjustPaneViewport(true, true, true, true, true)
+
+                   
  
                     getDatas(this)
 
@@ -812,35 +800,52 @@
 
         var chartline = klinecharts.init('klinelinemain')
 
-        //chart.createTechnicalIndicator('MA', false, { id: 'candle_pane' })
+ 
         // 创建一个副图技术指标VOL
-        chartline.createTechnicalIndicator('VOL')
-        // 创建一个副图技术指标MACD
-        //chart.createTechnicalIndicator('MACD')
+        chartline.createIndicator("VOL")
+
 
 
         window.chartline = chartline
         
-       chartline.setStyleOptions({
-        candle: {
-          type:'area',
-          bar: {
-           downColor: '#26A69A',
-           upColor: '#EF5350',
-           noChangeColor: '#888888'
-          }
-         },
-        technicalIndicator: {
-           bar: {
-           downColor: '#26A69A',
-           upColor: '#EF5350',
-           noChangeColor: '#888888'
-          }
-        },
-      })
+        chartline.setStyles({
+            candle:{
+                type:"area",
+                area: {
+                    lineSize: 2,
+                    lineColor: '#2196F3',
+                    value: 'close',
+                    backgroundColor: [{
+                        offset: 0,
+                        color: 'rgba(33, 150, 243, 0.01)'
+                    }, {
+                        offset: 1,
+                        color: 'rgba(33, 150, 243, 0.2)'
+                    }]
+                }
+            },
+            
+         indicator: {
+            ohlc: {
+            downColor: 'rgba(38, 166, 154, .65)',
+            upColor: 'rgba(239, 83, 80, .65)',
+            noChangeColor: '#888888'
+            },
+            bars: [{
+            // 'fill' | 'stroke' | 'stroke_fill'
+            style: 'fill',
+            // 'solid' | 'dashed'
+            borderStyle: 'solid',
+            borderSize: 1,
+            borderDashedValue: [2, 2],
+            downColor: 'rgba(38, 166, 154, .65)',
+            upColor: 'rgba(239, 83, 80, .65)',
+            noChangeColor: '#888888'
+            }]
 
-       //save origin compute
-       chartline._chartPane._panes.get('candle_pane')._yAxis.oldMinMax = chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax
+            }
+        })
+
 
         loaddata = 1
         //获取昨天的收盘价
@@ -856,39 +861,42 @@
             hclose = close1 * 2 - lclose
         }      
 
-       chartline._chartPane._panes.get('candle_pane')._yAxis._computeMinMax = function (){
-            mm = this.oldMinMax()
-            mm.min = lclose
-            mm.max = hclose
-            return mm
-        }
+        lclose = lclose * 0.995
+        hclose = hclose * 1.005
 
-         chartline.createTag([
+
+         chartline.createOverlay(
           {
-            id: 'close1',
-            mark: 'close',
-            text: close1,
-            point: { value: close1 },
-            styles: {
-              line: { color: '#98cc12' },
-              mark: { backgroundColor: '#f0f' },
-              text: { backgroundColor: '#00f' }
-            }
+
+            name:"simpleTag",
+            extendData:"close:" + close1,
+            styles: { text: { color: '#98cc12' } ,color: 'rgba(230, 230, 100, .3)',style:'dashed' },
+            points: [{ value: close1 }],
+
           }
-         ])
+         )
 
 
 
 
         // linebar 每天的分时线个数 每分钟一个，245个
-        barsize = chartline._chartPane._chartStore._timeScaleStore._totalDataSpace / (linebar+10)
-        // 每个的空间
-        chartline._chartPane._chartStore._timeScaleStore._dataSpace = barsize
+        barsize = chartline._chartStore._timeScaleStore._totalBarSpace / (linebar+10)
+      
         // 靠左显示
-        chartline._chartPane._chartStore._timeScaleStore._barSpace = 2
-        chartline.setOffsetRightSpace((linebar-datalinelist.length) * barsize) 
+        chartline._chartStore._timeScaleStore._barSpace = barsize
+        chartline.setOffsetRightDistance((linebar-datalinelist.length) * barsize) 
+         
 
         chartline.applyNewData(datalinelist)
+
+        chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+                        max:hclose,
+                        range:hclose-lclose,
+                        realMax:hclose,
+                        realMin:lclose,
+                        realRange:hclose-lclose})
+
+        chartline.adjustPaneViewport(true, true, true, true, true)
 
 
         if (datalinelist.length>0){
@@ -899,11 +907,34 @@
         var chartday = klinecharts.init('klinedaymain')
 
 
-        chartday.createTechnicalIndicator('MA', false, { id: 'candle_pane' })
+        chartday.createIndicator('MA', false, { id: 'candle_pane' })
         // 创建一个副图技术指标VOL
-        chartday.createTechnicalIndicator('VOL')
+        chartday.createIndicator("VOL")
+    
         // 创建一个副图技术指标MACD
-        chartday.createTechnicalIndicator('MACD')
+        chartday.createIndicator('MACD')
+        chartday.setStyles({
+
+            indicator: {
+                ohlc: {
+                downColor: 'rgba(38, 166, 154, .65)',
+                upColor: 'rgba(239, 83, 80, .65)',
+                noChangeColor: '#888888'
+                },
+                bars: [{
+                // 'fill' | 'stroke' | 'stroke_fill'
+                style: 'fill',
+                // 'solid' | 'dashed'
+                borderStyle: 'solid',
+                borderSize: 1,
+                borderDashedValue: [2, 2],
+                downColor: 'rgba(38, 166, 154, .65)',
+                upColor: 'rgba(239, 83, 80, .65)',
+                noChangeColor: '#888888'
+                }]
+            
+            },
+      })
 
         window.chartday = chartday
 
@@ -924,7 +955,7 @@
                   color:  color},
             ]
         }
-       chartday.setStyleOptions({
+       chartday.setStyles({
         candle: {
           tooltip: {
             labels: ['时间: ', '开: ', '收: ', '高: ', '低: ', '成交量: ','涨幅: '],
@@ -951,21 +982,21 @@
 
         loaddata = 0
         window.addEventListener("resize",function(){
-            chartday._chartPane._measurePaneWidth()
-            chartday._chartPane._invalidatePane()
+            chartday.adjustPaneViewport(true, true, true, true, true)
 
-            chartline._chartPane._measurePaneWidth()
-            chartline._chartPane._invalidatePane()
- 
             //重新计算 chartline 的每个bar宽度
             // linebar 每天的分时线个数 每分钟一个，245个
-            barsize = chartline._chartPane._chartStore._timeScaleStore._totalDataSpace / (linebar+10)
-            // 每个的空间
-            chartline._chartPane._chartStore._timeScaleStore._dataSpace = barsize
+            barsize = chartline._chartStore._timeScaleStore._totalBarSpace / (linebar+10)
+        
+            // 靠左显示
+            chartline._chartStore._timeScaleStore._barSpace = barsize
+            chartline.setOffsetRightDistance((linebar-datalinelist.length) * barsize) 
+            extremum = chartline._panes.get("candle_pane").getAxisComponent().getExtremum()
+            extremum.min = lclose;
+            extremum.max = hclose;
+            chartline._panes.get("candle_pane").getAxisComponent().setExtremum(extremum)
 
-       
-            chartline._chartPane._measurePaneWidth()
-            chartline._chartPane._invalidatePane()
+            chartline.adjustPaneViewport(true, true, true, true, true)
 
         })
     }
