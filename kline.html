@@ -1032,24 +1032,26 @@
         window.vue.$data.chartline = chartline
 
         function handle_day( kLineData, candleOptions){
-            color = kLineData.rise > 0 ? '#EF5350' : '#26A69A'
-            d = new Date(kLineData.timestamp).toLocaleString().split(" ")[0].replaceAll("/","-")
-            return [
-                { value: d },
-                { value: kLineData.open },
-                { value: kLineData.close },
-                { value: kLineData.high },
-                { value: kLineData.low },
-                { value: kLineData.volume },
-                { value: kLineData.rise,
-                  color:  color},
+            data = kLineData.current
+
+             
+            color = data.rise > 0 ? '#EF5350' : '#26A69A'
+            d = new Date(data.timestamp).toLocaleString().split(" ")[0].replaceAll("/","-")
+            return [{title:"时间: ",value:d},
+                    {title:"开: ",value:data.open },
+                    {title:"收: ",value:data.close},
+                    {title:"高: ",value:data.high},
+                    {title:"低: ",value:data.low},
+                    {title:"成交量: ",value:data.volume},
+                    {title:"涨幅: ",value:{"text":data.rise,"color":color}},
+
             ]
+
         }
        chartday.setStyles({
         candle: {
           tooltip: {
-            labels: ['时间: ', '开: ', '收: ', '高: ', '低: ', '成交量: ','涨幅: '],
-            values: handle_day 
+            custom:handle_day  
           },
           bar: {
            downColor: '#26A69A',
