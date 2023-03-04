@@ -146,28 +146,28 @@
  
 
 
-        <title>Klang(金浪)自选股票</title>
+    <title>Klang(金浪)自选股票</title>
 
     </head>
     <body class="bg" style="height: 100%;min-height:600px;">
      <div id="app" style="height:100%;">
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
-   <div class="container-fluid">
-    <a class="navbar-brand" href="https://www.klang.org.cn/online.html">公式选股</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="https://www.klang.org.cn">主页</a>
-        </li>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="https://www.klang.org.cn/online.html">公式选股</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="https://www.klang.org.cn">主页</a>
+                </li>
 
-      </ul>
-     </div>
-    </div>
-   </nav>
+            </ul>
+            </div>
+            </div>
+        </nav>
 
   
       <div class="boardmain" style="height:100%;width:70%;float:left;" v-show="display_state=='1'">
@@ -314,15 +314,15 @@
        </div>
       </div>
 
-<div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
-<button class="btn btn-primary" @click="refresh">刷</button>
-<button class="btn btn-primary" @click="display" style="margin-left:5px;">显</button>
-</div>
+    <div style="z-index: 9999; position:fixed; right: 50px; bottom: 50px;">
+    <button class="btn btn-primary" @click="refresh">刷</button>
+    <button class="btn btn-primary" @click="display" style="margin-left:5px;">显</button>
+    </div>
 
    </div> <!-- app -->
-<script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
-<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
-  <script  src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
+    <script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
+    <script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
+    <script  src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
 
     <!-- Template Main JS File -->
     <!--script type="text/javascript" src="https://klang.org.cn/js/klinecharts-8.6.2.js"></script-->
@@ -338,7 +338,7 @@
                 return unescape(r[2]);
             }
             return null;
-     }
+        }
  
 
        var hostname = window.location.hostname
@@ -730,7 +730,40 @@
 
                 async update(){
 
-                    this.refresh()
+                    getDatas(this)
+                    if (loaddata == 1){
+                        return
+                    }
+ 
+                    datalinelist = []
+                     
+                    arrayclose1 = await getLineSinaData(code)
+                    close1 = arrayclose1[0]
+                    hclose = arrayclose1[1]
+                    lclose = arrayclose1[2]
+
+
+                    if(hclose-close1>close1-lclose){
+                        lclose = close1 * 2 - hclose
+                    } else {
+                        hclose = close1 * 2 - lclose
+                    }     
+
+                    lclose = lclose * 0.995
+                    hclose = hclose * 1.005
+                    
+                    this.chartline.applyNewData(datalinelist)
+
+                    chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+                        max:hclose,
+                        range:hclose-lclose,
+                        realMax:hclose,
+                        realMin:lclose,
+                        realRange:hclose-lclose})
+
+                    chartline.adjustPaneViewport(true, true, true, true, true)
+ 
+
                 },
                 async refresh(){
  
