@@ -752,6 +752,15 @@
                     lclose = lclose * 0.995
                     hclose = hclose * 1.005
                     
+                    // linebar 每天的分时线个数 每分钟一个，245个
+                    barsize = chartline._chartStore._timeScaleStore._totalBarSpace / (linebar+10)
+                
+                    // 靠左显示
+                    chartline._chartStore._timeScaleStore._barSpace = barsize
+                    
+                    // 靠左显示
+                    this.chartline.setOffsetRightDistance((linebar-datalinelist.length) * barsize)
+                    
                     this.chartline.applyNewData(datalinelist)
 
                     chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
