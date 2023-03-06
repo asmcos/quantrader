@@ -804,6 +804,8 @@
                     lclose = lclose * 0.995
                     hclose = hclose * 1.005
 
+                    chartline.removeOverlay({"name":"simpleTag"})
+
                     chartline.createOverlay({
 
                             name:"simpleTag",
