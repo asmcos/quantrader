@@ -150,8 +150,7 @@
 
     </head>
     <body class="bg" style="height: 100%;min-height:600px;">
-     <div id="app" style="height:100%;">
-         <spinner size="small" message="Loading..."></spinner>
+     <div id="app" style="height:100%;opacity:0;">
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
         <div class="container-fluid">
             <a class="navbar-brand" href="https://www.klang.org.cn/online.html">公式选股</a>
@@ -321,12 +320,10 @@
 
    </div> <!-- app -->
     <script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
-    <script src="https://unpkg.com/browse/vue-simple-spinner@1.1.5/dist/vue-simple-spinner.min.js"></script>
     <script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
     <script  src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
 
     <!-- Template Main JS File -->
-    <!--script type="text/javascript" src="https://klang.org.cn/js/klinecharts-8.6.2.js"></script-->
     <script type="text/javascript" src="https://unpkg.com/klinecharts/dist/klinecharts.min.js"></script>
     <script type="text/javascript" src="https://klang.org.cn/js/vendors.min.js"></script>
       <script>
@@ -341,6 +338,7 @@
             return null;
         }
  
+
 
        var hostname = window.location.hostname
        var host = window.location.host
@@ -679,7 +677,7 @@
             },
 
           }, 
-          created() {
+          async created() {
                  this.display_state = localStorage.getItem("display")
                  if (this.display_state == null){
                      this.display_state = "1"
@@ -688,10 +686,15 @@
                  if (lineorder == 'one' || lineorder == 'three'){
                     this.lineorder = lineorder
                 }
+
          },
 
          async mounted () {
+
+
             var that = this
+            $("#app").css({"opacity":1});
+
             that.stocktoplist = gettoplist()
             that.stockwatcherlist = getwatcherlist()
             await getDatas(that)
@@ -730,6 +733,7 @@
                 },
 
                 async update(){
+
 
                     getDatas(this)
                     if (loaddata == 1){
@@ -933,11 +937,18 @@
 
         /*************股票K线显示******/
 
-        var chartline = klinecharts.init('klinelinemain')
-
+        
  
+         var chartline = klinecharts.init('klinelinemain')
+         var chartday = klinecharts.init('klinedaymain')
+
+
+          window.chartday = chartday
+          window.vue.$data.chartday = chartday
+          window.vue.$data.chartline = chartline
+
         // 创建一个副图技术指标VOL
-        chartline.createIndicator("VOL")
+         chartline.createIndicator("VOL")
 
 
 
@@ -1039,7 +1050,6 @@
             vue.$data.stocklist = savebrowserlist(code)
         }
 
-        var chartday = klinecharts.init('klinedaymain')
 
 
         chartday.createIndicator('MA', false, { id: 'candle_pane' })
@@ -1071,10 +1081,6 @@
             },
       })
 
-        window.chartday = chartday
-
-        window.vue.$data.chartday = chartday
-        window.vue.$data.chartline = chartline
 
         function handle_day( kLineData, candleOptions){
             data = kLineData.current
@@ -1112,6 +1118,8 @@
         chartday.applyNewData(datadaylist)
 
         loaddata = 0
+
+
         window.addEventListener("resize",function(){
             chartday.adjustPaneViewport(true, true, true, true, true)
 
