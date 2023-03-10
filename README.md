@@ -65,10 +65,6 @@ Final Portfolio Value: 73601.29
 * bs_industry_klang.py  #获取板块信息，并且提交到 klang.org.cn
 * tdxhy.py #获取 通达信板块信息
 
-# AI图谱
-
-![](http://www.zhanluejia.net.cn/static/uploads/5b1dea78fd13d5f1869043d867906e0c.png)
-
 #使用LSTM 预测股票
 
 ```bash
