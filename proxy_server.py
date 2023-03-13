@@ -14,6 +14,9 @@ from urllib.parse import urlparse
 import tdxbk as tdxblock
 import time
 import threading
+from pytdx.hq import TdxHq_API
+tdxapi = TdxHq_API()
+
 block_list = tdxblock.block_list
 
 session=requests.Session()
@@ -22,9 +25,21 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
 
-from common.framework import init_stock_list, getstockinfo,get_chouma
+from common.framework import init_stock_list, getstockinfo
 
 code_list = {}
+
+
+def get_finance(code):
+    tdxapi.connect('119.147.212.81', 7709)
+    zone,code = code[:2],code[2:]
+    if zone == "sh":
+        zone = 1
+    else:
+        zone = 0
+    ret = tdxapi.get_finance_info(zone, code)
+    return json.dumps(dict(ret))
+
 
 def create_clickable_code(code):
     code = code_list.get(code,code).replace('.','')
@@ -53,10 +68,6 @@ def create_color_rise(rise):
 
 
 
-def create_chouma(code):
-    chouma = str(get_chouma(code_list.get(code,code)))
-    code = code_list.get(code,code).replace('.','')
-    return """<a href="https://gu.qq.com/"""+code+'''" target="_blank">''' +chouma+"""</a>"""
 
 #tdx 板块信息只有 个股code对应板块名
 #因此要获取code和股票名的 对应表
@@ -162,6 +173,18 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.send_header('Content-Length', len(content))
+                self.end_headers()
+                self.wfile.write(content)
+                return
+
+            if self.path.split("?")[0] in ["/finance"]:
+                params = self.path.split("?")[1]
+                code = params.split("&")[0]
+                content = get_finance(code).encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Content-Length', len(content))
+                self.send_header('Access-Control-Allow-Origin', "*");
                 self.end_headers()
                 self.wfile.write(content)
                 return
@@ -348,7 +371,6 @@ def config():
             ,'成交额'    ,'流通股'     ,'市盈率'  ,'加自选'],axis=True)
 
         df['流通市值'] = df['流通市值'].apply(create_color_hqltgz) 
-        #df['筹码'] = df['代码'].apply(create_chouma) 
         df['代码'] = df['代码'].apply(create_clickable_code) 
         df['涨跌幅(%)'] = df['涨跌幅(%)'].apply(create_color_rise)
 

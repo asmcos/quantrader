@@ -176,6 +176,7 @@
             <span> 当前价格:{{curprice}}</span>
             <span v-if="curracapital !=0"> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
             <span v-if="totalcapital !=0"> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
+            <span v-if="jinglirun !=0"> 净利润:{{Number(jinglirun).toFixed(2)}} 亿</span>
             <i class="fa fa-arrow-down"  v-if="lineorder=='one'" @click="linedown"></i>
             <i class="fa fa-arrow-up" v-if="lineorder=='three'" @click="lineup"></i>
 
@@ -197,6 +198,7 @@
             <span> 当前价格:{{curprice}}</span>
             <span v-if="curracapital !=0"> 流通市值:{{Number(curprice * curracapital).toFixed(2)}} 亿</span>
             <span v-if="totalcapital !=0"> 总市值:{{Number(curprice * totalcapital).toFixed(2)}} 亿</span>
+            <span v-if="jinglirun !=0"> 净利润:{{Number(jinglirun).toFixed(2)}} 亿</span>
           </div>
 
           <div class="row stock-chart k-line-chart-container"> 
@@ -349,7 +351,7 @@
             apihost = "https://api.klang.org.cn"
        }
 
-       apihost = "https://api.klang.org.cn"
+       //apihost = "https://api.klang.org.cn"
 
        /****************************store list*****************/
 
@@ -566,10 +568,11 @@
             let response = null;
             try {
   
-                response = await axios.get(apihost + '/realstock/company/'+ code +'/jsvar.js')
-                eval(response.data)
-                vue.$data.totalcapital = parseFloat(totalcapital) / 10000 
-                vue.$data.curracapital = parseFloat(curracapital) / 10000 
+                //response = await axios.get(apihost + '/realstock/company/'+ code +'/jsvar.js')
+                response = await axios.get(apihost + '/finance?'+ code)
+                vue.$data.totalcapital = parseFloat(response.data.zongguben) / 10000 / 10000
+                vue.$data.curracapital = parseFloat(response.data.liutongguben) / 10000 / 10000 
+                vue.$data.jinglirun = parseFloat(response.data.jinglirun) / 10000 / 10000 / 10 
                } catch (err) {
                     vue.$data.totalcapital = 0
                     vue.$data.curracapital = 0 
@@ -665,6 +668,7 @@
                 curprice:"",
                 curracapital:"",
                 totalcapital:"",
+                jinglirun:0,
 
             }
           },
