@@ -16,6 +16,7 @@ import time
 import threading
 from pytdx.hq import TdxHq_API
 from sendrequest_task import handle_task
+from requests.models import Response
 tdxapi = TdxHq_API()
 
 
@@ -215,9 +216,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
                     },res)
                 #获取一个空的 resp
-                resp = session.get("http://127.0.0.1/test")
+                resp = Response()
                 resp.status_code = res['status']
-                resp.content = res['data']
+                resp._content = res['data'].encode()
                 resp.headers = res['headers']
             else:
                 resp = session.get(url, headers= req_header)
@@ -275,7 +276,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 content = call_after(self,resp)
             else:
                 # 获取一个空的resp
-                resp = session.get("http://127.0.0.1/test")
+                resp = Response()
                 sent = True
                 resp.headers['Content-Type'] = "text/html;charset=gbk"
                 resp.status_code = 200
