@@ -15,7 +15,14 @@ import tdxbk as tdxblock
 import time
 import threading
 from pytdx.hq import TdxHq_API
+from sendrequest_task import handle_task
 tdxapi = TdxHq_API()
+
+
+"""
+    reponse = {}
+    handle_task(req_task_content,reponse)
+"""
 
 block_list = tdxblock.block_list
 
@@ -197,7 +204,24 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print(req_header)
             print(self.path)
 
-            resp = session.get(url, headers= req_header)
+            if 'https://hq.sinajs.cn' in url and True:
+                res = {}
+                headers_dict = {k: v for k, v in req_header.items()}
+                handle_task({"url":url,
+                             "headers":json.dumps(headers_dict),
+                             'type':'requests',
+                             'Bridge':'wss://bridge.duozhutuan.com',
+                             'clientId':''
+
+                    },res)
+                #获取一个空的 resp
+                resp = session.get("http://127.0.0.1/test")
+                resp.status_code = res['status']
+                resp.content = res['data']
+                resp.headers = res['headers']
+            else:
+                resp = session.get(url, headers= req_header)
+            
             sent = True
 
             content = call_after(self,resp)
@@ -399,6 +423,7 @@ def config():
             'Sec-Fetch-Mode': 'no-cors',
             'Sec-Fetch-Dest': 'script',
             'Referer': 'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
+            'Host': 'hq.sinajs.cn',
         }       
         for k in headers:
             newHeader[k] = headers[k]
