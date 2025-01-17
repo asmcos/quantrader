@@ -1,6 +1,6 @@
 from .common import *
 import baostock as bs
-import talib
+#import talib
 import numpy as np
 
 # print 打印color 表

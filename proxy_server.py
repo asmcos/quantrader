@@ -15,10 +15,13 @@ import tdxbk as tdxblock
 import time
 import threading
 from pytdx.hq import TdxHq_API
-from sendrequest_task import handle_task
+#from sendrequest_task import handle_task
+from sendrequest import handle_task
 from requests.models import Response
 tdxapi = TdxHq_API()
 
+bridge = ["wss://bridge.duozhutuan.com/cacherelay","wss://43.136.70.238/cacherelay"]
+#bridge = "wss://bridge.duozhutuan.com/client"
 
 """
     reponse = {}
@@ -206,19 +209,29 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             print(self.path)
 
             if 'https://hq.sinajs.cn' in url and True:
-                res = {}
                 headers_dict = {k: v for k, v in req_header.items()}
+                headers_dict['Origin'] = 'https://hq.sinajs.cn'
+                res = {}
                 handle_task({"url":url,
                              "headers":json.dumps(headers_dict),
                              'type':'requests',
-                             'Bridge':'wss://bridge.duozhutuan.com',
+                             'Bridge':bridge,
                              'clientId':''
 
                     },res)
                 #获取一个空的 resp
                 resp = Response()
                 resp.status_code = res['status']
-                resp._content = res['data'].encode()
+                content_type = res['headers'].get('content-type')
+                if content_type is None:
+                    content_type = res['headers'].get('Content-Type') 
+
+                # 检查编码信息
+                charset = 'utf-8' # 默认编码 
+                if 'charset=' in content_type: 
+                    charset = content_type.split('charset=')[-1]
+                resp._content = res['data'].encode(charset)
+                
                 resp.headers = res['headers']
             else:
                 resp = session.get(url, headers= req_header)
