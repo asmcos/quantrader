@@ -321,12 +321,14 @@
     </div>
 
    </div> <!-- app -->
-    <script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script>
+    <!--script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script-->
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/3.2.31/vue.global.min.js" type="application/javascript"></script>
     <script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
     <script  src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script type="text/javascript" src="https://unpkg.com/klinecharts/dist/klinecharts.min.js"></script>
+    <!--script type="text/javascript" src="https://unpkg.com/klinecharts/dist/klinecharts.min.js"></script-->
+    <script type="text/javascript" src="/js/klinecharts.min.js"></script> 
     <script type="text/javascript" src="https://klang.org.cn/js/vendors.min.js"></script>
       <script>
        function getUrlParam(name){
@@ -601,7 +603,7 @@
                     low: parseFloat(item.low),
                     volume: parseFloat(item.volume),
                     timestamp:new Date(item.day).getTime(),
-                    rise:rise,
+                    change:rise,
                 })
                 lastday1 = item
         })
@@ -634,7 +636,7 @@
                     low:parseFloat(low),
                     volume:parseFloat(lastday[8]),
                     timestamp:new Date(ldate).getTime(),
-                    rise:rise,
+                    change:rise,
                 })
                 
             }
@@ -701,9 +703,9 @@
 
             that.stocktoplist = gettoplist()
             that.stockwatcherlist = getwatcherlist()
+            this.timer = setInterval(this.update, 3000);
             await getDatas(that)
 
-            this.timer = setInterval(this.update, 3000);
 
             this.stockcode = code
             if (this.result[code]){
@@ -772,7 +774,7 @@
                     
                     this.chartline.applyNewData(datalinelist)
 
-                    chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+                    chartline._candlePane.getAxisComponent().setExtremum({min:lclose,
                         max:hclose,
                         range:hclose-lclose,
                         realMax:hclose,
@@ -835,7 +837,7 @@
                     
                     this.chartline.applyNewData(datalinelist)
 
-                    chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+                    chartline._candlePane.getAxisComponent().setExtremum({min:lclose,
                         max:hclose,
                         range:hclose-lclose,
                         realMax:hclose,
@@ -1039,7 +1041,8 @@
 
         chartline.applyNewData(datalinelist)
 
-        chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+        //chartline._panes.get("candle_pane").getAxisComponent().setExtremum({min:lclose,
+        chartline._candlePane.getAxisComponent().setExtremum({min:lclose,
                         max:hclose,
                         range:hclose-lclose,
                         realMax:hclose,
@@ -1092,13 +1095,13 @@
              
             color = data.rise > 0 ? '#EF5350' : '#26A69A'
             d = new Date(data.timestamp).toLocaleString().split(" ")[0].replaceAll("/","-")
-            return [{title:"时间: ",value:d},
+            return [//{title:"时间: ",value:d},
                     {title:"开: ",value:data.open },
                     {title:"收: ",value:data.close},
                     {title:"高: ",value:data.high},
                     {title:"低: ",value:data.low},
                     {title:"成交量: ",value:data.volume},
-                    {title:"涨幅: ",value:{"text":data.rise,"color":color}},
+                    //{title:"涨幅: ",value:{"text":data.rise,"color":color}},
 
             ]
 
@@ -1106,8 +1109,16 @@
        chartday.setStyles({
         candle: {
           tooltip: {
-            custom:handle_day  
+            custom:[
+  		{ title: 'time', value: '{time}' },
+  		{ title: 'open', value: '{open}' },
+  		{ title: 'close', value: '{close}' },
+  		{ title: 'high', value: '{high}' },
+		{ title: 'low',  value: '{low}' },
+		{ title: 'change', value: '{change}' }
+	    ]
           },
+
           bar: {
            downColor: '#26A69A',
            upColor: '#EF5350',
@@ -1116,7 +1127,14 @@
            upBorderColor: '#EF5350',
            downWickColor: '#26A69A',
            upWickColor: '#EF5350'                   
-          }
+          },
+          priceMark: {
+     		 last: {
+           downColor: '#26A69A',
+           upColor: '#EF5350',
+        	noChangeColor: '#0000FF'
+      	}
+    	}
          },
 
       })
@@ -1138,10 +1156,10 @@
             // 靠左显示
             chartline._chartStore._timeScaleStore._barSpace = barsize
             chartline.setOffsetRightDistance((linebar-datalinelist.length) * barsize) 
-            extremum = chartline._panes.get("candle_pane").getAxisComponent().getExtremum()
+            extremum = chartline._candlePane.getAxisComponent().getExtremum()
             extremum.min = lclose;
             extremum.max = hclose;
-            chartline._panes.get("candle_pane").getAxisComponent().setExtremum(extremum)
+            chartline._candlePane.getAxisComponent().setExtremum(extremum)
 
             chartline.adjustPaneViewport(true, true, true, true, true)
 
