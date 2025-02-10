@@ -742,6 +742,11 @@
 
 
                     getDatas(this)
+			
+ 		    this.stockcode = code
+            	    if (this.result[code]){
+                	this.stockname = this.result[code][0]
+            	    }
                     if (loaddata == 1){
                         return
                     }
@@ -782,7 +787,7 @@
                         realRange:hclose-lclose})
 
                     chartline.adjustPaneViewport(true, true, true, true, true)
- 
+
 
                 },
                 async refresh(){
