@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request, Response
+from flask import Flask, request ,Response
 import argparse
 import os
 import random
@@ -16,7 +16,7 @@ import threading
 from pytdx.hq import TdxHq_API
 # from sendrequest_task import handle_task
 from sendrequest import handle_task
-from requests.models import Response
+#from requests.models import Response
 
 tdxapi = TdxHq_API()
 
@@ -143,16 +143,22 @@ def proxy(path):
 
 def handle_get_request(path):
     headers = dict(request.headers)
-    headers = call_before(headers, path)
 
-    target_url = get_pathmap(path)
+    query_params = request.args
+    # 构建完整的请求路径，包含查询参数
+    full_path = path
+    if query_params:
+        full_path += '?' + request.query_string.decode('utf-8')
+
+    headers = call_before(headers, full_path)
+    target_url = get_pathmap(full_path)
     if target_url is None:
         return "Path not found", 404
 
-    resp = session.get(target_url, headers=headers)
-    resp_content = call_after(resp, path)
+    resp = session.get(target_url, headers=headers,params=query_params)
+    resp_content = call_after(resp, full_path)
 
-    response = Response(resp_content)
+    response = Response(resp_content,resp.status_code)
     for key, value in resp.headers.items():
         if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length',
                        'Content-Length']:
@@ -260,7 +266,7 @@ def config():
         df['代码'] = df['代码'].apply(create_clickable_code)
         df['涨跌幅(%)'] = df['涨跌幅(%)'].apply(create_color_rise)
 
-        pages = re.findall('page="(\d+)"', resp.text, re.I | re.S)
+        pages = re.findall(r'page="(\d+)"', resp.text, re.I | re.S)
         print(pages)
 
         return df.to_html(escape=False, float_format='%.2f').encode('gbk')  # resp.content
@@ -268,7 +274,7 @@ def config():
     def modify_etf(resp):
         path = request.path
         print(path, "etf")
-        content = re.findall("g\(({.*})\)", resp.text, re.I | re.S)[0]
+        content = re.findall(r"g\(({.*})\)", resp.text, re.I | re.S)[0]
         datas = []
         content = json.loads(content).get('data').get('data')
         for d in content.keys():
@@ -297,8 +303,8 @@ def config():
 
         return newHeader
 
-    set_after('/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/', modify_gn)
-    set_after('/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/', modify_gn)
+    set_after(r'/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/', modify_gn)
+    set_after(r'/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/', modify_gn)
     set_after('/funds/gnzjl/$', modify_gnzjl)
     set_pathmap('/gn/detail/code', 'http://q.10jqka.com.cn')
 
