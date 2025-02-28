@@ -170,12 +170,13 @@ def handle_get_request(path):
         return "Path not found", 404
 
     headers = call_before(headers, full_path)
-    host = get_pathmap(full_path)
+    host = get_pathmap("/" + full_path)
     if host is None:
         return "Path not found", 404
     url = '{}/{}'.format(host, path)
 
     headers['Host'] = host.split("//")[1]
+    headers['Referer'] = url
     print(url,headers,query_params)
     resp = session.get(url, headers=headers,params=query_params)
     resp_content = call_after(resp, full_path)
@@ -328,9 +329,9 @@ def config():
     set_after(r'/funds/gnzjl/field/tradezdf/order/desc/page/(\d+)/ajax/1/free/1/', modify_gn)
     set_after(r'/funds/gnzjl/field/tradezdf/order/desc/ajax/(\d+)/free/1/', modify_gn)
     set_after('/funds/gnzjl/$', modify_gnzjl)
-    set_pathmap('/gn/detail/code', 'http://q.10jqka.com.cn')
+    set_pathmap('/gn/detail/code', 'https://q.10jqka.com.cn')
 
-    set_pathmap('/gn/detail/field/', 'http://q.10jqka.com.cn')
+    set_pathmap('/gn/detail/field/', 'https://q.10jqka.com.cn')
     set_before('/gn/detail/field', modify_before_gn)
     set_after('/gn/detail/field/', modify_bkcode)
 
