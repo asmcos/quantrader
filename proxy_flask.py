@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request ,Response
+from flask import Flask, request, Response, send_from_directory
 import argparse
 import os
 import random
@@ -93,7 +93,7 @@ def get_pathmap(path):
     for k in path_map.keys():
         if re.search(k, path) is not None:
             return path_map[k]
-    return None
+    return hostname
 
 
 before_call = {}
@@ -130,7 +130,19 @@ hexin_v = ""
 
 
 app = Flask(__name__)
+file_paths = ['/gn.html', '/gncookie.html', '/zx.html', '/klinebk.html', '/bk.json', '/etf.html', '/kline.html']
 
+# 定义根目录
+root_path = os.path.dirname(os.path.abspath(__file__))
+
+def browser_file(filename):
+    
+    file_path = os.path.join(root_path, filename)
+    # 检查文件是否存在
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+       return send_from_directory(root_path, filename)
+    else:
+       return "File not found", 404
 
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
@@ -143,6 +155,10 @@ def proxy(path):
 
 def handle_get_request(path):
     headers = dict(request.headers)
+    
+    if "/" + path in file_paths:
+        return browser_file(path)
+
 
     query_params = request.args
     # 构建完整的请求路径，包含查询参数
@@ -150,12 +166,18 @@ def handle_get_request(path):
     if query_params:
         full_path += '?' + request.query_string.decode('utf-8')
 
-    headers = call_before(headers, full_path)
-    target_url = get_pathmap(full_path)
-    if target_url is None:
+    if full_path == "":
         return "Path not found", 404
 
-    resp = session.get(target_url, headers=headers,params=query_params)
+    headers = call_before(headers, full_path)
+    host = get_pathmap(full_path)
+    if host is None:
+        return "Path not found", 404
+    url = '{}/{}'.format(host, path)
+
+    headers['Host'] = host.split("//")[1]
+    print(url,headers,query_params)
+    resp = session.get(url, headers=headers,params=query_params)
     resp_content = call_after(resp, full_path)
 
     response = Response(resp_content,resp.status_code)
