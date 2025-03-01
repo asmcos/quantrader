@@ -12,6 +12,7 @@ def divisor(mc):
     return {"1":100,"0":100,"116":1000,"128":1000}.get(str(mc))
 
 def replace_market_code(code):
+    code = code.lower()
     code = code.replace("sh", "1.").replace("sz", "0.").replace("hk", "116.").replace("..",".")
     return code
 
@@ -42,17 +43,19 @@ def remake_result(codes):
 def get_timeline(code):
     #code = "116.01822"
     #code = "0.300059"
+    code = replace_market_code(code)
     url = "https://push2his.eastmoney.com/api/qt/stock/trends2/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58&ut=fa5fd1943c7b386f172d6893dbfba10b&iscr=0&ndays=1&secid=%s&_=%s26" % (code,t)
 
     resp = requests.get(url)
-    print(resp.text)
+    return resp.text
 
 
 def get_dayk(code):
+    code = replace_market_code(code)
     url = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=20200101&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid=%s&klt=101&fqt=1" %(code)
 
     resp = requests.get(url)
-    print(resp.text)
+    return resp.text
 
 def get_stock_price_bylist(codelist):
     #http://qt.gtimg.cn/r=0.8409869808238q=s_sz000559,s_sz000913,s_sz002048,s_sz002085,s_sz002126,s_sz002284,s_sz002434,s_sz002472,s_sz002488

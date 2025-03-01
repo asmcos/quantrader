@@ -14,9 +14,9 @@ import tdxbk as tdxblock
 import time
 import threading
 from pytdx.hq import TdxHq_API
-# from sendrequest_task import handle_task
-from sendrequest import handle_task
-#from requests.models import Response
+#from sendrequest import handle_task
+
+from hk_eastmoney import get_timeline,get_dayk,get_stock_price_bylist 
 
 tdxapi = TdxHq_API()
 
@@ -152,6 +152,22 @@ def proxy(path):
     elif request.method == 'POST':
         return handle_post_request(path)
 
+@app.route('/tick/<code>', methods=['GET', 'POST'])
+def tickdata(code):
+    return get_timeline(code)
+
+@app.route('/day/<code>', methods=['GET', 'POST'])
+def daydata(code):
+    return get_dayk(code)
+
+@app.route('/list/<codelist>', methods=['GET', 'POST'])
+def listdata(codelist):
+    codelist = codelist.split(',')
+    data = get_stock_price_bylist(codelist)
+    formatted_json = json.dumps(data, ensure_ascii=False, indent=4)
+
+    # 使用 Response 对象返回 JSON 数据
+    return Response(formatted_json, content_type='application/json')
 
 def handle_get_request(path):
     headers = dict(request.headers)
@@ -177,7 +193,7 @@ def handle_get_request(path):
 
     headers['Host'] = host.split("//")[1]
     headers['Referer'] = url
-    print(url,headers,query_params)
+    #print(url,headers,query_params)
     resp = session.get(url, headers=headers,params=query_params)
     resp_content = call_after(resp, full_path)
 
