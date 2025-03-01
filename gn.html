@@ -119,6 +119,18 @@
      function winiframe(href){
             $("#win2_iframe").attr('src',href)
      }     
+     function winiframecontent(content){
+
+	 var iframe = $("#win2_iframe")[0]; // 或者使用 $("#win2_iframe").get(0)
+
+                // 获取 iframe 的文档对象
+                var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+                // 写入内容
+                iframeDoc.open();
+                iframeDoc.write(content);
+                iframeDoc.close();
+     }
      async function getbkdata(code,index){            
            axios.get(apihost+"/gn/detail/field/199112/order/desc/page/1/ajax/1/code/"+code).then((response) => {
 
@@ -128,9 +140,15 @@
 	})
   	.catch((error) => {
   		console.log(error.response.status);
-		if (error.response.status == 401){
-			winiframe(apihost+"/gncookie.html")
+		function recall()
+		{
+			getbkdata(code,index)
 		}
+		if (error.response.status == 401){
+			winiframecontent(error.response.data)
+			setTimeout(recall,500)
+		}
+
 	});
      } 
 

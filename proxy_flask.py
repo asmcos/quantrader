@@ -162,7 +162,7 @@ def handle_get_request(path):
 
     query_params = request.args
     # 构建完整的请求路径，包含查询参数
-    full_path = path
+    full_path = "/" + path
     if query_params:
         full_path += '?' + request.query_string.decode('utf-8')
 
@@ -170,7 +170,7 @@ def handle_get_request(path):
         return "Path not found", 404
 
     headers = call_before(headers, full_path)
-    host = get_pathmap("/" + full_path)
+    host = get_pathmap(full_path)
     if host is None:
         return "Path not found", 404
     url = '{}/{}'.format(host, path)
@@ -182,6 +182,7 @@ def handle_get_request(path):
     resp_content = call_after(resp, full_path)
 
     response = Response(resp_content,resp.status_code)
+    
     for key, value in resp.headers.items():
         if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length',
                        'Content-Length']:
@@ -275,6 +276,8 @@ def config():
 
     def modify_bkcode(resp):
         path = request.path
+        if resp.status_code == 401:
+            return resp.text.replace("q.10jqka.com.cn",request.host)
 
         print(path, request.headers)
 
@@ -283,7 +286,7 @@ def config():
 
         content = re.findall("<table.*?table>", resp.text, re.I | re.S)[0]
         df = pd.read_html(content, converters={'代码': str}, index_col=0)[0]
-        df = df.drop(['涨跌', '涨速(%)', '换手(%)', '量比', '振幅(%)', '成交额', '流通股', '市盈率', '加自选'], axis=True)
+        df = df.drop(['涨跌', '涨速(%)', '换手(%)', '量比', '振幅(%)', '成交额', '流通股', '市盈率', ], axis=True)
 
         df['流通市值'] = df['流通市值'].apply(create_color_hqltgz)
         df['代码'] = df['代码'].apply(create_clickable_code)
