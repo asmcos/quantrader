@@ -256,7 +256,7 @@ def handle_post_request(path):
 
 def parse_args(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(description='Proxy HTTP requests')
-    parser.add_argument('--port', dest='port', type=int, default=9999,
+    parser.add_argument('--port', dest='port', type=int, default=9998,
                         help='serve HTTP requests on specified port (default: random)')
     args = parser.parse_args(argv)
     return args
