@@ -31,6 +31,7 @@ from common.framework import init_stock_list, getstockinfo
 
 code_list = {}
 
+apihost="api.klang.org.cn/v2"
 
 def get_finance(code):
     tdxapi.connect('119.147.212.81', 7709)
@@ -293,7 +294,7 @@ def config():
     def modify_bkcode(resp):
         path = request.path
         if resp.status_code == 401:
-            return resp.text.replace("q.10jqka.com.cn",request.host)
+            return resp.text.replace("q.10jqka.com.cn",apihost)
 
         print(path, request.headers)
 
