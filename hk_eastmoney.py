@@ -52,9 +52,14 @@ def get_timeline(code):
 
 def get_dayk(code):
     code = replace_market_code(code)
-    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=20200101&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid=%s&klt=101&fqt=1" %(code)
 
-    resp = requests.get(url)
+    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=20240101&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid=%s&klt=101&fqt=1" %(code)
+
+    try:
+        resp = requests.get(url,timeout=(5, 30))
+    except requests.exceptions.Timeout:
+        return get_dayk(code)
+
     data_json = resp.json()
     dayks = []
     for i in data_json["data"]['klines']:
@@ -62,6 +67,7 @@ def get_dayk(code):
         dayks.append({"day":d[0],"open":d[1],"close":d[2],"high":d[3],
                     "low":d[4],"volume":d[5],"rise":d[8]})
     data_json["data"]["dayks"] = dayks
+    del data_json['data']['klines']
     return data_json
 
 def get_stock_price_bylist(codelist):

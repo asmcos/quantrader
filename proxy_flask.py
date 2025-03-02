@@ -32,15 +32,17 @@ from common.framework import init_stock_list, getstockinfo
 code_list = {}
 
 apihost="api.klang.org.cn/v2"
-
+tdxserver = '202.100.166.12'
 def get_finance(code):
-    tdxapi.connect('119.147.212.81', 7709)
+    tdxapi.connect(tdxserver, 7709)
     zone,code = code[:2],code[2:]
     if zone == "sh":
         zone = 1
     else:
         zone = 0
     ret = tdxapi.get_finance_info(zone, code)
+    if ret is None:
+        ret = {}
     return json.dumps(dict(ret))
 
 
@@ -169,6 +171,11 @@ def listdata(codelist):
 
     # 使用 Response 对象返回 JSON 数据
     return Response(formatted_json, content_type='application/json')
+@app.route('/finance')
+def finance():
+    # 获取完整的股票代码（包括前缀）
+    stock_code = list(request.args.keys())[0] if request.args else None
+    return get_finance(stock_code)
 
 def handle_get_request(path):
     headers = dict(request.headers)
