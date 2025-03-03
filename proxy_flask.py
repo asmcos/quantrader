@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from flask import Flask, request, Response, send_from_directory
+from flask_cors import cross_origin
 import argparse
 import os
 import random
@@ -156,21 +157,26 @@ def proxy(path):
         return handle_post_request(path)
 
 @app.route('/tick/<code>', methods=['GET', 'POST'])
+@cross_origin()
 def tickdata(code):
     return get_timeline(code)
 
 @app.route('/day/<code>', methods=['GET', 'POST'])
+@cross_origin()
 def daydata(code):
     return get_dayk(code)
 
 @app.route('/list/<codelist>', methods=['GET', 'POST'])
+@cross_origin()
 def listdata(codelist):
     codelist = codelist.split(',')
     data = get_stock_price_bylist(codelist)
     formatted_json = json.dumps(data, ensure_ascii=False, indent=4)
     # 使用 Response 对象返回 JSON 数据
     return Response(formatted_json, content_type='application/json')
+
 @app.route('/finance')
+@cross_origin()
 def finance():
     # 获取完整的股票代码（包括前缀）
     stock_code = list(request.args.keys())[0] if request.args else None
