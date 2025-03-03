@@ -487,30 +487,8 @@
 		// code,name,close,rise
 		vue.$data.result[item[0]]=[item[1],item[2],item[3]]
 	    })
-
-	    
-            //var hq_str_sys_auth;
- 
-            //eval(response.data)
-
-            // 服务器返回错误，上面的定义就会在eval时候被赋值
-            //if (hq_str_sys_auth=="FAILED"){
-            //    return
-            //}
-            //console.log(response)
-        }
-     
-        //stocklist.forEach(function(item){
-
-          //        eval('window.'+item +'= hq_str_'+item)
-          //        var datas= window[item].split(',')
-
-          //        formatData(item,datas)
-
-          //      })
-
+	}
       }
-
 
 
 
@@ -525,50 +503,38 @@
     }
 
     async function getLineSinaData(code){
-        var close1 = ''
-        var lclose = 0 //low
-        var hclose = 0 //high
-        response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=1&ma=no&datalen='+linebar)
-    
-       //
-        data = response.data
-        var lastday = new Date(data[data.length-1].day).toDateString()
-        var lastday1 = new Date(data[data.length-1].day).toISOString().slice(0,10)
-       
+        var lastclose;  //昨天收盘价
+        var lprice=0, hprice=0; //今天最高价格和最低价格
+        response = await axios.get(apihost+"/tick/"+code)
+        try {
+        lastclose = parseFloat(response.data.data.preClose) 
+        data1 = response.data.data.trends[0].split(",")
+        lprice = parseFloat(data1[4])
+        hprice = parseFloat(data1[3])
+         
         var templist = [] 
-        response.data.forEach(function(item){
+        response.data.data.trends.forEach(function(item){
  
-            if (item.day.search('14:57:00') > 0 && item.day.search(lastday1) < 0){
-                close1 = parseFloat(item.close)
-            }
-            //有时候最后一个数据不是15:00:00,而是14:57:00
-            if (item.day.search('15:00:00') > 0 && item.day.search(lastday1) < 0){
-                close1 = parseFloat(item.close)
-            }
-            //如果实时数据是今天，则显示
-            if(new Date(item.day).toDateString() === lastday){
-                c = parseFloat(item.close)
-                if (close1 == ''){
-                    close1 = c
-                }
-                if(lclose > c|| lclose==0){
-                    lclose = c
-                }
-                if (hclose < c){
-                    hclose = c
-                }
+                l = item.split(",")
+                day = l[0] ; open = l[1];
+                close = l[2]; high = parseFloat(l[3]); low = parseFloat(l[4]);
+                volume = l[5];
+                if (low < lprice)  lprice = low;
+                if (high > hprice)  hprice = high;
+       
                 templist.push({
-                    open: parseFloat(item.open),
-                    close: parseFloat(item.close),
-                    high: parseFloat(item.high),
-                    low: parseFloat(item.low),
-                    volume: parseFloat(item.volume),
-                    timestamp:new Date(item.day).getTime(),
+                    open: parseFloat(open),
+                    close: parseFloat(close),
+                    high: parseFloat(high),
+                    low: parseFloat(low),
+                    volume: parseFloat(volume),
+                    timestamp:new Date(day).getTime(),
                 })
-            }
+            
         })
         datalinelist = templist
-        return [close1,hclose,lclose]
+        } catch {}
+        return [lastclose,hprice,lprice] 
     }
 
     async function getInfoData(code){
@@ -594,16 +560,8 @@
     async function getDaySinaData(code){
         var lastday1=""
         //日K数据结构不包含正在交易的日K数据
-        //response = await axios.get(apihost+'/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol='+code+'&scale=240&ma=no&datalen=500')
         response = await axios.get(apihost+'/day/'+code)
         response.data.data.dayks.forEach(function(item){
-                //if (lastday1 == "") { rise = 0; 
-                //} else {
-                //    close1 = parseFloat(item.close).toFixed(2)
-                //    close2 = lastday1.close
-                //    rise = (close1 - close2 ) / close2 * 100
-                //    rise = parseFloat(rise).toFixed(2)
-                //}
                 datadaylist.push({
                     open: parseFloat(item.open),
                     close: parseFloat(item.close),
@@ -615,40 +573,6 @@
                 })
                 lastday1 = item
         })
-        console.log(datadaylist) 
-        //用实时数据补齐当日的日K
-        /*response1 = await axios.get(apihost+"/?list="+code)
-        var lastday = response1.data.split(",")
-        if (lastday.length>30){
-            ldate = lastday[30]
-            close = lastday[3]
-            open = lastday[1]
-            high = lastday[4]
-            low = lastday[5]
-            if ( open == 0) {
-                high = lastday[2]
-                low = lastday[2]
-                open = lastday[2]
-                close = lastday[2]
-
-            }
-            if(ldate !=lastday1.day){
-                //如果不包含就补齐
-                close2 = parseFloat(lastday1.close).toFixed(2)
-                rise = (close - close2 ) / close2 * 100
-                rise = parseFloat(rise).toFixed(2)
-                datadaylist.push({
-                    open:parseFloat(open),
-                    close:parseFloat(close),//当前日期的实施数据为当今收盘价
-                    high:parseFloat(high),
-                    low:parseFloat(low),
-                    volume:parseFloat(lastday[8]),
-                    timestamp:new Date(ldate).getTime(),
-                    change:rise,
-                })
-                
-            }
-        }*/
         vue.$data.curprice = datadaylist[datadaylist.length-1].close 
     }
 

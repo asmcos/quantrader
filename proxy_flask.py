@@ -168,7 +168,6 @@ def listdata(codelist):
     codelist = codelist.split(',')
     data = get_stock_price_bylist(codelist)
     formatted_json = json.dumps(data, ensure_ascii=False, indent=4)
-
     # 使用 Response 对象返回 JSON 数据
     return Response(formatted_json, content_type='application/json')
 @app.route('/finance')

@@ -20,8 +20,10 @@ def replace_market_result(result):
     div = divisor(result['f13'])
     code  = maket(result['f13']) + result['f12']
     name  = result['f14'] 
-    price = result['f2'] / div
-    rise  = result['f3'] / div
+
+    price = f"{result['f2'] / div:.2f}"
+    rise = f"{result['f3'] / div:.2f}"
+
     return [code,name,price,rise]
 
 def remake_code(codes):
