@@ -8,8 +8,11 @@ t = str(time.time())
 def maket(mc):
     return {"1":"sh","0":"sz","116":"hk","128":"hk"}.get(str(mc))
 
-def divisor(mc):
+def divisor1(mc):
     return {"1":100,"0":100,"116":1000,"128":1000}.get(str(mc))
+
+def divisor(f1):
+    return {2:100,3:1000}.get(f1,100)
 
 def replace_market_code(code):
     code = code.lower()
@@ -17,7 +20,7 @@ def replace_market_code(code):
     return code
 
 def replace_market_result(result):
-    div = divisor(result['f13'])
+    div = divisor(result['f1'])
     code  = maket(result['f13']) + result['f12']
     name  = result['f14'] 
 
@@ -79,7 +82,7 @@ def get_stock_price_bylist(codelist):
     codelist = remake_code(codelist)
     params = {
      # 这里选择了一些常用字段，可根据需求调整
-     "fields": "f12,f13,f14,f2,f3",
+     "fields": "f12,f13,f14,f2,f3,f1",
      "secids": ",".join(codelist)
     }
 
