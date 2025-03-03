@@ -148,9 +148,18 @@ Object.defineProperty(document, 'cookie', {
             document.body.appendChild(script); // 将脚本添加到页面
         }
      function winiframecontent(content){
-	    href = "https://s.thsi.cn/js/chameleon/chameleon.min.1740817.js"
+       const timestamp = Date.now();
+       const timestampStr = timestamp.toString();
+       const firstSevenDigits = timestampStr.substring(0, 7);
+	   href = "https://s.thsi.cn/js/chameleon/chameleon.min."+firstSevenDigits+".js"
+       const regex = /<script\s+.*?src="([^"]+)"/;
+       const match = content.match(regex);
+       if (match && match[1]) {
+         href = match[1];
+       }
 	   loadScript(href);
 	   return 
+
 	   var iframe = $("#win2_iframe")[0]; // 或者使用 $("#win2_iframe").get(0)
 
                 // 获取 iframe 的文档对象
