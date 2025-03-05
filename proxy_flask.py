@@ -18,6 +18,7 @@ from pytdx.hq import TdxHq_API
 #from sendrequest import handle_task
 
 from hk_eastmoney import get_timeline,get_dayk,get_stock_price_bylist 
+import hk_qq as qq
 
 tdxapi = TdxHq_API()
 
@@ -170,10 +171,18 @@ def daydata(code):
 @cross_origin()
 def listdata(codelist):
     codelist = codelist.split(',')
-    data = get_stock_price_bylist(codelist)
+    # eastmoney
+    #data = get_stock_price_bylist(codelist)
+    data = qq.qqlist(codelist)
+
     formatted_json = json.dumps(data, ensure_ascii=False, indent=4)
     # 使用 Response 对象返回 JSON 数据
     return Response(formatted_json, content_type='application/json')
+
+@app.route('/search/<keyword>', methods=['GET', 'POST'])
+@cross_origin()
+def search(keyword):
+    return qq.search(keyword)
 
 @app.route('/finance')
 @cross_origin()

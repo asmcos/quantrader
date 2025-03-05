@@ -533,6 +533,7 @@
             
         })
         datalinelist = templist
+        vue.$data.stockname = response.data.data.name
         } catch {}
         return [lastclose,hprice,lprice] 
     }
@@ -675,10 +676,8 @@
 
                     getDatas(this)
 			
- 		    this.stockcode = code
-            	    if (this.result[code]){
-                	this.stockname = this.result[code][0]
-            	    }
+ 		            this.stockcode = code
+
                     if (loaddata == 1){
                         return
                     }
@@ -738,6 +737,8 @@
  
                     //获取昨天的收盘价
                     arrayclose1 = await getLineSinaData(code)
+                    this.stockcode = code
+
                     close1 = arrayclose1[0]
                     hclose = arrayclose1[1]
                     lclose = arrayclose1[2]
@@ -788,8 +789,6 @@
                     getDatas(this)
 
 
-                    this.stockcode = code
-                    this.stockname = this.result[code][0]
                     loaddata = 0
 
                 } ,//refresh
@@ -852,21 +851,25 @@
                     var that = this
                     t = new Date().getTime()
                     var recode = new RegExp(/(sh~\d{6})~(.*?)~|(sz~\d{6})~(.*?)~/,"g")
-                    response = await axios.get(apihost+"/s3/?v=2&q="+that.keyword+"&t=all&_=" + t)
-                    eval(response.data)
-                    result = v_hint.match(recode)
+                    //response = await axios.get(apihost+"/s3/?v=2&q="+that.keyword+"&t=all&_=" + t)
+                    //eval(response.data)
+                    //result = v_hint.match(recode)
+                    response = await axios.get(apihost+'/search/'+that.keyword)
                     searchlist = []
                     
-                    result.forEach(function(item){
-                        datas = item.split("~")
-                        name = datas[2].toLocaleString()
-                        searchlist.push({code:datas[0]+datas[1],name:name})
+                    response.data.forEach(function(item){
+                        //datas = item.split("~")
+                        name = item.name.toLocaleString()
+                        searchlist.push({code:item.code,name:name})
                     })
                     that.searchlist = searchlist
                     
                     console.log(searchlist)
 
                     $(".dropdown-menu").show()
+                    setTimeout(function () {
+                        $(".dropdown-menu").hide();
+                    }, 10000);
                 },
                 async clickresult(code){
                     this.keyword=""
