@@ -507,6 +507,7 @@
         var lprice=0, hprice=0; //今天最高价格和最低价格
         response = await axios.get(apihost+"/tick/"+code)
         try {
+        vue.$data.stockname = response.data.data.name
         lastclose = parseFloat(response.data.data.preClose) 
         data1 = response.data.data.trends[0].split(",")
         lprice = parseFloat(data1[4])
@@ -533,7 +534,6 @@
             
         })
         datalinelist = templist
-        vue.$data.stockname = response.data.data.name
         } catch {}
         return [lastclose,hprice,lprice] 
     }
