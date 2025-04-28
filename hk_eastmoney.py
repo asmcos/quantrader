@@ -8,8 +8,11 @@ t = str(time.time())
 def maket(mc):
     return {"1":"sh","0":"sz","116":"hk","128":"hk"}.get(str(mc))
 
-def divisor(mc):
+def divisor1(mc):
     return {"1":100,"0":100,"116":1000,"128":1000}.get(str(mc))
+
+def divisor(f1):
+    return {2:100,3:1000}.get(f1,100)
 
 def replace_market_code(code):
     code = code.lower()
@@ -17,11 +20,13 @@ def replace_market_code(code):
     return code
 
 def replace_market_result(result):
-    div = divisor(result['f13'])
+    div = divisor(result['f1'])
     code  = maket(result['f13']) + result['f12']
     name  = result['f14'] 
-    price = result['f2'] / div
-    rise  = result['f3'] / div
+
+    price = f"{result['f2'] / div:.2f}"
+    rise = f"{result['f3'] / div:.2f}"
+
     return [code,name,price,rise]
 
 def remake_code(codes):
@@ -52,10 +57,23 @@ def get_timeline(code):
 
 def get_dayk(code):
     code = replace_market_code(code)
-    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=20200101&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid=%s&klt=101&fqt=1" %(code)
 
-    resp = requests.get(url)
-    return resp.text
+    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=20240101&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid=%s&klt=101&fqt=1" %(code)
+
+    try:
+        resp = requests.get(url,timeout=(5, 30))
+    except requests.exceptions.Timeout:
+        return get_dayk(code)
+
+    data_json = resp.json()
+    dayks = []
+    for i in data_json["data"]['klines']:
+        d = i.split(",")
+        dayks.append({"day":d[0],"open":d[1],"close":d[2],"high":d[3],
+                    "low":d[4],"volume":d[5],"rise":d[8]})
+    data_json["data"]["dayks"] = dayks
+    del data_json['data']['klines']
+    return data_json
 
 def get_stock_price_bylist(codelist):
     #http://qt.gtimg.cn/r=0.8409869808238q=s_sz000559,s_sz000913,s_sz002048,s_sz002085,s_sz002126,s_sz002284,s_sz002434,s_sz002472,s_sz002488
@@ -64,7 +82,7 @@ def get_stock_price_bylist(codelist):
     codelist = remake_code(codelist)
     params = {
      # 这里选择了一些常用字段，可根据需求调整
-     "fields": "f12,f13,f14,f2,f3",
+     "fields": "f12,f13,f14,f2,f3,f1",
      "secids": ",".join(codelist)
     }
 

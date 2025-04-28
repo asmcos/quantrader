@@ -55,7 +55,26 @@
 
 
    <script>
+// 保存原始的 document.cookie 的 setter 行为
+var originalCookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
 
+// 重写 document.cookie 的 setter
+Object.defineProperty(document, 'cookie', {
+    set: function(value) {
+        // 自定义逻辑：在设置 Cookie 之前执行
+        console.log("拦截 document.cookie 设置：", value);
+	value = value.replace(/;\s*domain=[^;]+/, '');
+        // 调用原始的 document.cookie 的 setter
+        originalCookieDescriptor.set.call(document, value);
+
+        // 自定义逻辑：在设置 Cookie 之后执行
+        console.log("Cookie 设置完成！");
+    },
+    get: function() {
+        // 保留原始的 document.cookie 的 getter 行为
+        return originalCookieDescriptor.get.call(document);
+    }
+});
 
     var codetree={}
 
@@ -118,10 +137,30 @@
 
      function winiframe(href){
             $("#win2_iframe").attr('src',href)
-     }     
+     }  
+     function loadScript(href) {
+            // 创建一个 script 元素
+            const script = document.createElement('script');
+            script.src = href; // 设置脚本路径
+            script.onload = function() {
+                console.log("Script loaded and executed!");
+            };
+            document.body.appendChild(script); // 将脚本添加到页面
+        }
      function winiframecontent(content){
+       const timestamp = Date.now();
+       const timestampStr = timestamp.toString();
+       const firstSevenDigits = timestampStr.substring(0, 7);
+	   href = "https://s.thsi.cn/js/chameleon/chameleon.min."+firstSevenDigits+".js"
+       const regex = /<script\s+.*?src="([^"]+)"/;
+       const match = content.match(regex);
+       if (match && match[1]) {
+         href = match[1];
+       }
+	   loadScript(href);
+	   return 
 
-	 var iframe = $("#win2_iframe")[0]; // 或者使用 $("#win2_iframe").get(0)
+	   var iframe = $("#win2_iframe")[0]; // 或者使用 $("#win2_iframe").get(0)
 
                 // 获取 iframe 的文档对象
                 var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -173,11 +212,11 @@
 
    var hostname = window.location.hostname
    var host = window.location.host
-     if (hostname == ""){
+     if (hostname == "" || hostname=="127.0.0.1"){
         hostname = "127.0.0.1"
-        apihost = "http://127.0.0.1:9999"
+        apihost = "http://127.0.0.1:9998"
      } else {
-        apihost = "http://"+host
+        apihost = "https://"+host + "/v2"
      }
 
       //apihost="https://api.klang.org.cn"
