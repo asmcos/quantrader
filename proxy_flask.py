@@ -137,6 +137,12 @@ hexin_v = ""
 app = Flask(__name__)
 file_paths = ['/gn.html', '/gncookie.html', '/zx.html', '/klinebk.html', '/bk.json', '/etf.html', '/kline.html']
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
 # 定义根目录
 root_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -149,26 +155,40 @@ def browser_file(filename):
     else:
        return "File not found", 404
 
+def handle_list(codelist_str):
+    codelist = codelist_str.split(',')
+    # 调用QQ接口获取数据（复用原有逻辑）
+    print(codelist)
+    data = qq.qqlist(codelist)
+    # 格式化JSON并返回
+    formatted_json = json.dumps(data, ensure_ascii=False, indent=4)
+    return Response(formatted_json, content_type='application/json')
+
+
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def proxy(path):
     if request.method == 'GET':
+        codelist_str = request.args.get('list', '')  # 默认为空字符串
+        if codelist_str:
+            return handle_list(codelist_str)
+
         return handle_get_request(path)
     elif request.method == 'POST':
         return handle_post_request(path)
 
 @app.route('/tick/<code>', methods=['GET', 'POST'])
-@cross_origin()
+#@cross_origin()
 def tickdata(code):
     return get_timeline(code)
 
 @app.route('/day/<code>', methods=['GET', 'POST'])
-@cross_origin()
+#@cross_origin()
 def daydata(code):
     return get_dayk(code)
 
 @app.route('/list/<codelist>', methods=['GET', 'POST'])
-@cross_origin()
+#@cross_origin()
 def listdata(codelist):
     codelist = codelist.split(',')
     # eastmoney
@@ -180,7 +200,7 @@ def listdata(codelist):
     return Response(formatted_json, content_type='application/json')
 
 @app.route('/search/<keyword>', methods=['GET', 'POST'])
-@cross_origin()
+#@cross_origin()
 def search(keyword):
     return qq.search(keyword)
 
