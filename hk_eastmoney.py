@@ -3,6 +3,11 @@ import re
 import json
 import time
 
+chrome_headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+}
+
+
 t = str(time.time())
 
 def maket(mc):
@@ -51,7 +56,7 @@ def get_timeline(code):
     code = replace_market_code(code)
     url = "https://push2his.eastmoney.com/api/qt/stock/trends2/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58&ut=fa5fd1943c7b386f172d6893dbfba10b&iscr=0&ndays=1&secid=%s&_=%s26" % (code,t)
 
-    resp = requests.get(url)
+    resp = requests.get(url,headers=chrome_headers)
     return resp.text
 
 
@@ -61,7 +66,7 @@ def get_dayk(code):
     url = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=20240101&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid=%s&klt=101&fqt=1" %(code)
 
     try:
-        resp = requests.get(url,timeout=(5, 30))
+        resp = requests.get(url,timeout=(5, 30),headers=chrome_headers)
     except requests.exceptions.Timeout:
         return get_dayk(code)
 
@@ -86,7 +91,7 @@ def get_stock_price_bylist(codelist):
      "secids": ",".join(codelist)
     }
 
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params,headers=chrome_headers)
     try :
         ret = response.json()['data']['diff']
     except:
@@ -124,7 +129,7 @@ def get_stock_code_market(page=1,market=1):
         "wbp2u": "|0|0|0|web"
     }
 
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params,headers=chrome_headers)
     data = response.json()
     print(data)
 

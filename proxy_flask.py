@@ -22,7 +22,6 @@ import hk_qq as qq
 
 tdxapi = TdxHq_API()
 
-bridge = ["wss://bridge.duozhutuan.com/cacherelay", "wss://43.136.70.238/cacherelay"]
 
 
 block_list = tdxblock.block_list
