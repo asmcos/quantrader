@@ -578,7 +578,7 @@
         response.data.trends.forEach(function(item){
  
                 let l = item; 
-                day = l[time] ; open = l["open"];
+                day = l["time"] ; open = l["open"];
                 close = l["close"]; high = parseFloat(l["high"]); low = parseFloat(l["low"]);
                 volume = l["volume"];
                 if (low < lprice)  lprice = low;
