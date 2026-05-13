@@ -81,14 +81,26 @@ def get_minute_data(code):
                     date_str = stock_data.get('data', {}).get('date', '')
                     
                     minute_list = []
+                    close = 0;
                     for item in minute_raw:
                         parts = item.split(' ')
+                       
                         if len(parts) >= 4:
                             time = parts[0]
                             price = float(parts[1])
                             volume = float(parts[2])
                             amount = float(parts[3])
-                            minute_list.append([time, price, volume, amount])
+                            
+                            minute_list.append({
+                                'time': time,
+                                'open': price,
+                                'close': close,
+                                'high': price,
+                                'low': price,
+                                'volume': volume,
+                                'amount': amount
+                            })
+                            close = price
                     
                     # 构建返回结果
                     result = {
@@ -127,7 +139,7 @@ if __name__ == "__main__":
         print(f"分时数据条数: {len(data['trends'])}")
         print("前3条分时:")
         for item in data['trends'][:3]:
-            print(f"  时间: {item[0]}, 价格: {item[1]}, 成交量: {item[2]}")
+            print(f"  时间: {item['time']}, open: {item['open']}, close: {item['close']}, high: {item['high']}, low: {item['low']}, volume: {item['volume']}")
     
     print("\n=== 测试港股分时 ===")
     data = get_minute_data("hk00700")
@@ -144,4 +156,4 @@ if __name__ == "__main__":
         print(f"分时数据条数: {len(data['trends'])}")
         print("最后3条分时:")
         for item in data['trends'][-3:]:
-            print(f"  时间: {item[0]}, 价格: {item[1]}, 成交量: {item[2]}")
+            print(f"  时间: {item['time']}, open: {item['open']}, close: {item['close']}, high: {item['high']}, low: {item['low']}, volume: {item['volume']}")
