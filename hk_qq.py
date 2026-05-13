@@ -84,7 +84,7 @@ def get_minute_data(code):
                     date_str = stock_data.get('data', {}).get('date', '')
                     
                     minute_list = []
-                    close = 0;
+                    open = 0;
                     lastvolume = 0 ;
                     for item in minute_raw:
                         parts = item.split(' ')
@@ -97,14 +97,14 @@ def get_minute_data(code):
                             
                             minute_list.append({
                                 'time': time,
-                                'open': price,
-                                'close': close,
+                                'open': open,
+                                'close': price,
                                 'high': price,
                                 'low': price,
                                 'volume': volume,
                                 'amount': amount
                             })
-                            close = price
+                            open = price
                             lastvolume = float(parts[2]) ;
                     
                     # 构建返回结果
