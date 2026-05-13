@@ -179,7 +179,8 @@ def proxy(path):
 @app.route('/tick/<code>', methods=['GET', 'POST'])
 #@cross_origin()
 def tickdata(code):
-    return get_timeline(code)
+    return qq.get_minute_data(code)
+    #return get_timeline(code)
 
 @app.route('/day/<code>', methods=['GET', 'POST'])
 #@cross_origin()
