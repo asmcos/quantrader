@@ -321,8 +321,7 @@
     </div>
 
    </div> <!-- app -->
-    <!--script src="https://lib.baomitu.com/vue/3.2.31/vue.global.js"></script-->
-    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/3.2.31/vue.global.min.js" type="application/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.13/vue.global.min.js" type="application/javascript"></script>
     <script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.js"></script>
     <script  src="https://lib.baomitu.com/axios/0.27.2/axios.min.js"></script>
 
@@ -502,10 +501,10 @@
         code = 'sh601669'
     }
 
-    async function getLineSinaData(code){
+    async function getLineSinaData_easy(code){
         var lastclose;  //昨天收盘价
         var lprice=0, hprice=0; //今天最高价格和最低价格
-        response = await axios.get(apihost+"/tick/"+code)
+	response = await axios.get(apihost+"/tick/"+code)
         try {
         vue.$data.stockname = response.data.data.name
         lastclose = parseFloat(response.data.data.preClose) 
@@ -537,6 +536,69 @@
         } catch {}
         return [lastclose,hprice,lprice] 
     }
+
+    function formatTimeToTimestamp(timeStr, dateStr) {
+    // 如果没有传入日期，自动获取当前日期
+    if (!dateStr) {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = String(now.getMonth() + 1).padStart(2, '0');
+        var day = String(now.getDate()).padStart(2, '0');
+        dateStr = year + month + day;
+    }
+    
+    // 拆分日期：20260513 -> 2026-05-13
+    var year = dateStr.substring(0, 4);
+    var month = dateStr.substring(4, 6);
+    var day = dateStr.substring(6, 8);
+    
+    // 拆分时间：0930 -> 09:30
+    var hour = timeStr.substring(0, 2);
+    var minute = timeStr.substring(2, 4);
+    
+    // 拼接成 Date 可解析的格式
+    var datetimeStr = year + "-" + month + "-" + day + " " + hour + ":" + minute;
+    
+    // 返回 timestamp
+    return new Date(datetimeStr).getTime();
+}
+
+       async function getLineSinaData(code){
+        var lastclose;  //昨天收盘价
+        var lprice=0, hprice=0; //今天最高价格和最低价格
+	response = await axios.get(apihost+"/tick/"+code)
+        try {
+        vue.$data.stockname = response.data.name
+        lastclose = parseFloat(response.data.current_price) 
+       
+        lprice = parseFloat(response.data.low)
+        hprice = parseFloat(response.data.high)
+         
+        var templist = [] 
+        response.data.trends.forEach(function(item){
+ 
+                 
+                day = l[0] ; open = l[1];
+                close = l[1]; high = parseFloat(l[1]); low = parseFloat(l[1]);
+                volume = l[3];
+                if (low < lprice)  lprice = low;
+                if (high > hprice)  hprice = high;
+       
+                templist.push({
+                    open: parseFloat(open),
+                    close: parseFloat(close),
+                    high: parseFloat(high),
+                    low: parseFloat(low),
+                    volume: parseFloat(volume),
+                    timestamp:formatTimeToTimestamp(day),
+                })
+            
+        })
+        datalinelist = templist
+        } catch {}
+        return [lastclose,hprice,lprice] 
+    }
+
 
     async function getInfoData(code){
 
@@ -636,7 +698,7 @@
 
             that.stocktoplist = gettoplist()
             that.stockwatcherlist = getwatcherlist()
-            this.timer = setInterval(this.update, 3000);
+            //this.timer = setInterval(this.update, 3000);
             await getDatas(that)
 
 
