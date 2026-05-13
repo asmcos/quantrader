@@ -566,7 +566,7 @@
        async function getLineSinaData(code){
         var lastclose;  //昨天收盘价
         var lprice=0, hprice=0; //今天最高价格和最低价格
-	response = await axios.get(apihost+"/tick/"+code)
+	    response = await axios.get(apihost+"/tick/"+code)
         try {
         vue.$data.stockname = response.data.name
         lastclose = parseFloat(response.data.current_price) 
@@ -577,7 +577,7 @@
         var templist = [] 
         response.data.trends.forEach(function(item){
  
-                 
+                let l = item; 
                 day = l[0] ; open = l[1];
                 close = l[1]; high = parseFloat(l[1]); low = parseFloat(l[1]);
                 volume = l[3];
