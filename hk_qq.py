@@ -45,6 +45,9 @@ def qqlist(codelist):
     result = remake_result(resp.text)
     return result
 
+# https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=sz002129,day,,,320,qfq&r=0.48251696632573515
+#
+#
 def get_minute_data(code):
     """
     获取股票分时线数据（支持 A股、港股）
@@ -82,13 +85,14 @@ def get_minute_data(code):
                     
                     minute_list = []
                     close = 0;
+                    lastvolume = 0 ;
                     for item in minute_raw:
                         parts = item.split(' ')
                        
                         if len(parts) >= 4:
                             time = parts[0]
                             price = float(parts[1])
-                            volume = float(parts[2])
+                            volume = float(parts[2]) - lastvolume;
                             amount = float(parts[3])
                             
                             minute_list.append({
@@ -101,6 +105,7 @@ def get_minute_data(code):
                                 'amount': amount
                             })
                             close = price
+                            lastvolume = float(parts[2]) ;
                     
                     # 构建返回结果
                     result = {
