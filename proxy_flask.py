@@ -185,7 +185,7 @@ def tickdata(code):
 @app.route('/day/<code>', methods=['GET', 'POST'])
 #@cross_origin()
 def daydata(code):
-    return get_dayk(code)
+    return qq.get_dayk(code)
 
 @app.route('/list/<codelist>', methods=['GET', 'POST'])
 #@cross_origin()

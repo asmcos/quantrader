@@ -48,6 +48,83 @@ def qqlist(codelist):
 # https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=sz002129,day,,,320,qfq&r=0.48251696632573515
 #
 #
+def _qq_market_meta(code):
+    if code.startswith('sh'):
+        return 1, code[2:], 2
+    if code.startswith('sz'):
+        return 0, code[2:], 2
+    if code.startswith('hk'):
+        return 116, code[2:], 3
+    return 0, code, 2
+
+def get_dayk(code):
+    """
+    获取股票日K线数据（支持 A股、港股，A股为前复权 qfqday）
+
+    :param code: 股票代码，格式如 sh600000, sz000001, hk00700
+    :return: 与 hk_eastmoney.get_dayk 兼容的字典，data.dayks 为日K列表
+    """
+    code = remake_code(code)
+    url = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=%s,day,,,320,qfq&r=%s" % (code, random.random())
+    try:
+        resp = requests.get(url)
+        resp.encoding = 'utf-8'
+        match = re.search(r'kline_dayqfq\s*=\s*({.*})\s*$', resp.text, re.DOTALL)
+        if not match:
+            return None
+        data = json.loads(match.group(1))
+        if data.get('code') != 0 or not data.get('data'):
+            return None
+        stock_data = data['data'].get(code)
+        if not stock_data:
+            return None
+        raw_bars = stock_data.get('qfqday') or stock_data.get('day')
+        if not raw_bars:
+            return None
+        qt_data = stock_data.get('qt', {})
+        info_list = qt_data.get(code, [])
+        market, stock_code, decimal = _qq_market_meta(code)
+        pre_price = stock_data.get('prec') or 0
+        dayks = []
+        prev_close = None
+        for item in raw_bars:
+            if len(item) < 6:
+                continue
+            open_p = float(item[1])
+            close_p = float(item[2])
+            if prev_close:
+                rise = (close_p - prev_close) / prev_close * 100
+            elif open_p:
+                rise = (close_p - open_p) / open_p * 100
+            else:
+                rise = 0
+            vol = float(item[5]) if item[5] else 0
+            dayks.append({
+                "day": item[0],
+                "open": item[1],
+                "close": item[2],
+                "high": item[3],
+                "low": item[4],
+                "volume": str(int(vol)) if vol == int(vol) else str(vol),
+                "rise": f"{rise:.2f}",
+            })
+            prev_close = close_p
+        return {
+            "rc": 0,
+            "rt": 0,
+            "data": {
+                "code": stock_code,
+                "market": market,
+                "name": info_list[1] if len(info_list) > 1 else '',
+                "decimal": decimal,
+                "prePrice": pre_price,
+                "dayks": dayks,
+            },
+        }
+    except Exception as e:
+        print(f"获取日K数据失败: {e}")
+        return None
+
 def get_minute_data(code):
     """
     获取股票分时线数据（支持 A股、港股）
@@ -162,3 +239,34 @@ if __name__ == "__main__":
         print("最后3条分时:")
         for item in data['trends'][-3:]:
             print(f"  时间: {item['time']}, open: {item['open']}, close: {item['close']}, high: {item['high']}, low: {item['low']}, volume: {item['volume']}")
+
+    print("\n=== 测试深市日K ===")
+    data = get_dayk("sz.002129")
+    if data:
+        d = data['data']
+        print(f"代码: {d['code']}, 名字: {d['name']}, 昨收: {d['prePrice']}")
+        print(f"日K条数: {len(d['dayks'])}")
+        print("最早3根:")
+        for bar in d['dayks'][:3]:
+            print(f"  {bar['day']} O:{bar['open']} C:{bar['close']} rise:{bar['rise']}%")
+        print("最近3根:")
+        for bar in d['dayks'][-3:]:
+            print(f"  {bar['day']} O:{bar['open']} C:{bar['close']} rise:{bar['rise']}%")
+
+    print("\n=== 测试沪市日K ===")
+    data = get_dayk("sh600000")
+    if data:
+        d = data['data']
+        last = d['dayks'][-1]
+        print(f"代码: {d['code']}, 名字: {d['name']}, 日K条数: {len(d['dayks'])}")
+        print(f"最新: {last['day']} 收:{last['close']} 涨跌幅:{last['rise']}%")
+
+    print("\n=== 测试港股日K ===")
+    data = get_dayk("hk00700")
+    if data:
+        d = data['data']
+        print(f"代码: {d['code']}, 名字: {d['name']}, 昨收: {d['prePrice']}")
+        print(f"日K条数: {len(d['dayks'])}")
+        print("最近3根:")
+        for bar in d['dayks'][-3:]:
+            print(f"  {bar['day']} O:{bar['open']} C:{bar['close']} rise:{bar['rise']}%")
