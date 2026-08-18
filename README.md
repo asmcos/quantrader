@@ -117,7 +117,3 @@ qq = import_module("2_hk_qq")
 ```
 
 之后 `/tick/<code>`、`/day/<code>` 等路由无需其他改动。
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=asmcos/quantrader&type=Date)](https://star-history.com/#asmcos/quantrader&Date)
