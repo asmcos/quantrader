@@ -156,6 +156,7 @@ Object.defineProperty(document, 'cookie', {
        const match = content.match(regex);
        if (match && match[1]) {
          href = match[1];
+         console.log("match",href)
        }
 	   loadScript(href);
 	   return 

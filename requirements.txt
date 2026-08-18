@@ -1,4 +1,4 @@
-TA-Lib
+#TA-Lib
 baostock
 backtrader
 numpy
@@ -7,9 +7,9 @@ matplotlib
 tushare
 sh
 backtrader_plotting
-sklearn
-tensorflow
-yahoo_fin
+#sklearn
+#tensorflow
+#yahoo_fin
 demjson
 click
 pytdx

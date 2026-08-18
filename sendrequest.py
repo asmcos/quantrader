@@ -1,5 +1,5 @@
 import sys
-TaskQ5_ROOT= "/home/jsh/TaskQ5-py"
+TaskQ5_ROOT= "/home/jsh/duozhu/TaskQ5-py"
 sys.path.insert(0,TaskQ5_ROOT)
 from TaskQ5.do_requests import send_request
 from nostrclient.log import log 

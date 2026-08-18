@@ -146,7 +146,9 @@ def pattern_triple_bottom():
 pivots = calc_data(loaded_data['close'].values)
 pv_index = create_index(pivots)
 
-if pattern_triple_bottom() == 1:
+#if pattern_triple_bottom() == 1:
+if pattern_cup_handle() == 1:
+#if 1:
     plt.title( codename + "-" + Kl.cur_name + ' Prices - ZigZag trendline')
     plt.grid(True, linestyle='dashed')
     plt.savefig("images/" + codename + "_" + str(len(loaded_data['close'].values))+ "_zigzag.png",dpi=100,bbox_inches='tight')

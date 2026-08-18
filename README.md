@@ -89,3 +89,31 @@ python3 stock_prediction_lstmV1.py 600600
  * 交易框架使用backtrader
  * 采用聚宽获取数据接口，其中切换了几个其他的数据接口没有完整的中证500周数据
  * 在原始数据里增加了计算好的4周增长率数据
+
+# 行情接口修复（2_ 前缀文件）
+
+部分原有模块存在 bug，**不直接修改原文件**，修复版统一以 `2_` 开头命名，并配有说明文档。
+
+| 原文件 | 修复文件 | 说明文档 |
+|--------|----------|----------|
+| `hk_qq.py` | `2_hk_qq.py` | `2_说明_hk_qq.md` |
+
+## hk_qq 修复内容
+
+原 `hk_qq.py` 的 `get_minute_data` 中最高/最低价字段取错 qt 数组下标（`high` 用了当前价，`low` 用了最高价），导致 `high < low`。修复版见 `2_hk_qq.py`，详细说明见 `2_说明_hk_qq.md`。
+
+## 使用修复版
+
+```bash
+# 验证修复效果
+python3 2_hk_qq.py
+```
+
+在 `proxy_flask.py` 中切换为修复版：
+
+```python
+from importlib import import_module
+qq = import_module("2_hk_qq")
+```
+
+之后 `/tick/<code>`、`/day/<code>` 等路由无需其他改动。

@@ -17,7 +17,7 @@ UNDERLINE = '\033[4m'
 
 stocklist=[]
 
-bs.login()
+#bs.login()
 
 filename_sl = os.path.expanduser("~/.klang/klang_stock_list.csv")
 

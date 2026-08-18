@@ -150,6 +150,7 @@
 
     </head>
     <body class="bg" style="height: 100%;min-height:600px;">
+     
      <div id="app" style="height:100%;opacity:0;">
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="min-height:60px;">
         <div class="container-fluid">
@@ -563,41 +564,142 @@
     return new Date(datetimeStr).getTime();
 }
 
+
+
+
+
+    // 使用腾讯接口获取分时数据（支持跨域）
+    function getTencentMinuteData(code) {
+        return new Promise(function(resolve, reject) {
+            var callbackName = 'tencent_callback_' + Date.now();
+            
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                
+                if (data && data.code === 0 && data.data) {
+                    var stockData = data.data[code];
+                    if (stockData && stockData.data && stockData.data.data) {
+                        resolve({
+                            name: stockData.qt[code][1] || '',
+                            preClose: parseFloat(stockData.qt[code][4]) || 0,
+                            date: stockData.data.date || '',
+                            trends: stockData.data.data.map(function(item) {
+                                var parts = item.split(' ');
+                                return parts.join(',');
+                            })
+                        });
+                    } else {
+                        reject('数据格式不正确');
+                    }
+                } else {
+                    reject('获取数据失败');
+                }
+            };
+            
+            var url = 'https://web.ifzq.gtimg.cn/appstock/app/minute/query?' +
+                      '_var=min_data_' + code + '&code=' + code + '&r=' + Math.random() + '&callback=' + callbackName;
+            
+            var script = document.createElement('script');
+            script.src = url;
+            script.onerror = function() {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                reject('获取数据失败');
+            };
+            
+            setTimeout(function() {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject('获取数据超时');
+                }
+            }, 10000);
+            
+            document.body.appendChild(script);
+        });
+    }
+
+
        async function getLineSinaData(code){
-        var lastclose;  //昨天收盘价
-        var lprice=0, hprice=0; //今天最高价格和最低价格
-	    response = await axios.get(apihost+"/tick/"+code)
+        var lastclose;
+        var lprice=0, hprice=0;
+
         try {
-        vue.$data.stockname = response.data.name
-        lastclose = parseFloat(response.data.current_price) 
-       
-        lprice = parseFloat(response.data.low)
-        hprice = parseFloat(response.data.high)
-         
-        var templist = [] 
-        response.data.trends.forEach(function(item){
- 
-                let l = item; 
-                day = l["time"] ; open = l["open"];
-                close = l["close"]; high = parseFloat(l["high"]); low = parseFloat(l["low"]);
+            // 尝试使用东方财富接口获取分时数据
+            var tencentData = await getTencentMinuteData(code);
+            
+            if (tencentData && tencentData.name) {
+                vue.$data.stockname = tencentData.name;
+                lastclose = parseFloat(tencentData.preClose);
+                
+                var templist = [];
+                tencentData.trends.forEach(function(item) {
+                    var parts = item.split(',');
+                    var time = parts[0];
+                    var price = parseFloat(parts[1]);
+                    var volume = parseInt(parts[2]);
+                    
+                    if (price < lprice || lprice === 0) lprice = price;
+                    if (price > hprice) hprice = price;
+                    
+                    var timestamp = formatTimeToTimestamp(time, tencentData.date);
+                    
+                    templist.push({
+                        open: price,
+                        close: price,
+                        high: price,
+                        low: price,
+                        volume: volume,
+                        timestamp: timestamp
+                    });
+                });
+                
+                datalinelist = templist;
+                return [lastclose, hprice, lprice];
+            }
+        } catch (eastmoneyError) {
+            console.warn('东方财富接口调用失败，回退到默认接口:', eastmoneyError);
+        }
+
+        // 回退到原来的接口
+        try {
+            var response = await axios.get(apihost + "/tick/" + code);
+            vue.$data.stockname = response.data.name;
+            lastclose = parseFloat(response.data.current_price);
+            lprice = parseFloat(response.data.low);
+            hprice = parseFloat(response.data.high);
+            
+            var templist = [];
+            response.data.trends.forEach(function(item) {
+                let l = item;
+                day = l["time"];
+                open = l["open"];
+                close = l["close"];
+                high = parseFloat(l["high"]);
+                low = parseFloat(l["low"]);
                 volume = l["volume"];
-                if (low < lprice)  lprice = low;
-                if (high > hprice)  hprice = high;
-       
+                
+                if (low < lprice) lprice = low;
+                if (high > hprice) hprice = high;
+                
                 templist.push({
                     open: parseFloat(open),
                     close: parseFloat(close),
                     high: parseFloat(high),
                     low: parseFloat(low),
                     volume: parseFloat(volume),
-                    timestamp:formatTimeToTimestamp(day),
-                })
+                    timestamp: formatTimeToTimestamp(day)
+                });
+            });
             
-        })
-        datalinelist = templist
-        } catch {}
-        return [lastclose,hprice,lprice] 
-    }
+            datalinelist = templist;
+        } catch (error) {
+            console.error('getLineSinaData error:', error);
+        }
+        
+        return [lastclose, hprice, lprice];
+    }    
 
 
     async function getInfoData(code){
