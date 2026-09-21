@@ -23,7 +23,8 @@ pip3 install -r requirements.txt
 
 我使用的是python3，所以都选用pip3
 
-文档会记录在 http://www.zhanluejia.net.cn
+部分说明见 https://klang.org.cn
+
 ```
 .
 ├── README.md
