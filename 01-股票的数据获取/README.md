@@ -1,25 +1,49 @@
 # 01 — 股票的数据获取
 
-本课目标：先把**数据跑通**，再去做策略。
-
-| 文件 | 作用 | 运行 |
-|------|------|------|
-| `stock_list.py` | A 股列表（代码 + 名称） | `python3 stock_list.py` |
-| `boards.py` | 行业板块涨跌榜（东方财富） | `python3 boards.py` |
-| `day_k.py` | 日K 线（腾讯，前复权） | `python3 day_k.py` |
-| `minute.py` | 当日分时（腾讯，已修 high/low） | `python3 minute.py` |
+本课目标：先把**数据跑通**，再去做策略。同一能力可以有多种途径，按需选一种即可。
 
 ## 安装依赖
 
-本课只需 `requests`：
-
 ```bash
-# 方式一：脚本
+# 默认（东财 / 腾讯 HTTP）
 bash install.sh
+# 或: pip3 install -r requirements.txt
 
-# 方式二：手动
-pip3 install -r requirements.txt
+# 可选：通达信 eltdx / pytdx
+pip3 install -r requirements-extra.txt
 ```
+
+## 能力 × 途径
+
+### 股票列表（代码 + 名称）
+
+| 文件 | 途径 | 运行 |
+|------|------|------|
+| `stock_list.py` | 东方财富 HTTP（默认） | `python3 stock_list.py` |
+| `stock_list_eltdx.py` | 通达信 eltdx | `python3 stock_list_eltdx.py` |
+
+### 板块
+
+| 文件 | 途径 | 运行 |
+|------|------|------|
+| `boards.py` | 东方财富 HTTP | `python3 boards.py` |
+
+### 日 K
+
+| 文件 | 途径 | 运行 |
+|------|------|------|
+| `day_k_qq.py` | 腾讯 HTTP（推荐入门） | `python3 day_k_qq.py` |
+| `day_k_eltdx.py` | 通达信 eltdx（前复权） | `python3 day_k_eltdx.py sz000001` |
+| `day_k_pytdx.py` | 通达信 pytdx（老库，主站常失效） | `python3 day_k_pytdx.py sz000001` |
+
+### 分时
+
+| 文件 | 途径 | 运行 |
+|------|------|------|
+| `minute_qq.py` | 腾讯 HTTP（推荐入门） | `python3 minute_qq.py` |
+| `minute_eltdx.py` | 通达信 eltdx | `python3 minute_eltdx.py sz000001` |
+
+新手建议先跑 `stock_list.py` / `day_k_qq.py` / `minute_qq.py`；通达信站不稳定时改用腾讯/东财脚本即可。
 
 ## 代码格式约定
 

@@ -43,4 +43,4 @@ if __name__ == "__main__":
     for bar in dayks[-3:]:
         print(f"  {bar['day']} O:{bar['open']} C:{bar['close']} rise:{bar['rise']}%")
 
-    print("\n用法: python3 day_k.py sh600000")
+    print("\n用法: python3 day_k_qq.py sh600000")

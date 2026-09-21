@@ -2,6 +2,20 @@
 quantrader是基于backtrack框架的回测系统，包含常见的macd，二八动量等。
 希望收集各种常见的交易策略算法，供各网友学习，交流。
 
+## 新手上路（推荐）
+
+根目录旧脚本很多已年久、环境依赖重，**请先跑编号目录**（旧文件一律保留作对照）：
+
+```bash
+cd 01-股票的数据获取
+bash install.sh          # 或: pip3 install -r requirements.txt
+python3 stock_list.py
+python3 boards.py
+python3 day_k_qq.py
+python3 minute_qq.py
+```
+
+说明见 [`01-股票的数据获取/README.md`](01-股票的数据获取/README.md)（同一能力含东财/腾讯/eltdx/pytdx 多种途径）。后续会继续加 `02-…`。
 
 # 安装依赖库
 

@@ -55,4 +55,4 @@ if __name__ == "__main__":
             f"vol:{item['volume']}"
         )
 
-    print("\n用法: python3 minute.py hk00700")
+    print("\n用法: python3 minute_qq.py hk00700")
