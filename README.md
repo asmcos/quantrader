@@ -15,7 +15,16 @@ python3 day_k_qq.py
 python3 minute_qq.py
 ```
 
-说明见 [`01-股票的数据获取/README.md`](01-股票的数据获取/README.md)（同一能力含东财/腾讯/eltdx/pytdx 多种途径）。后续会继续加 `02-…`。
+说明见 [`01-股票的数据获取/README.md`](01-股票的数据获取/README.md)（同一能力含东财/腾讯/eltdx/pytdx 多种途径）。
+
+```bash
+cd ../02-用pandas装股票数据
+pip3 install pandas
+python3 dayk_to_df.py
+python3 analyze_examples.py
+```
+
+说明见 [`02-用pandas装股票数据/README.md`](02-用pandas装股票数据/README.md)。后续会继续加 `03-…`。
 
 # 安装依赖库
 
