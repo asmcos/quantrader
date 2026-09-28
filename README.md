@@ -24,7 +24,22 @@ python3 dayk_to_df.py
 python3 analyze_examples.py
 ```
 
-说明见 [`02-用pandas装股票数据/README.md`](02-用pandas装股票数据/README.md)。后续会继续加 `03-…`。
+说明见 [`02-用pandas装股票数据/README.md`](02-用pandas装股票数据/README.md)。
+
+```bash
+cd ../03-均线和MACD
+python3 ma.py
+python3 macd.py
+```
+
+均线公式、MACD 的 12/26/9 和柱状图见 [`03-均线和MACD/README.md`](03-均线和MACD/README.md)。
+
+```bash
+cd ../04-K线量能和指标
+python3 plot_kline.py
+```
+
+K 线、成交量、MA 和 MACD 见 [`04-K线量能和指标/README.md`](04-K线量能和指标/README.md)。
 
 # 安装依赖库
 
