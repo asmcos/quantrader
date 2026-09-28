@@ -11,6 +11,10 @@ python3 plot_kline.py sz002129 80
 
 图片写到本目录，文件名如 `sz002129_kline.png`。默认画最近 120 根；第二个参数可以改根数。
 
+下面是 `python3 plot_kline.py sz002129 80` 的结果：
+
+![TCL中环 sz002129 日K、成交量、MA、MACD](sz002129_kline.png)
+
 ## 图上有什么
 
 | 图层 | 内容 | 算法 |
