@@ -35,11 +35,21 @@ python3 macd.py
 均线公式、MACD 的 12/26/9 和柱状图见 [`03-均线和MACD/README.md`](03-均线和MACD/README.md)。
 
 ```bash
-cd ../04-K线量能和指标
+cd ../04-matplotlib画K线
 python3 plot_kline.py
+python3 plot_kline_mpf.py
 ```
 
-K 线、成交量、MA 和 MACD 见 [`04-K线量能和指标/README.md`](04-K线量能和指标/README.md)。
+matplotlib 和 mplfinance 两种画法见 [`04-matplotlib画K线/README.md`](04-matplotlib画K线/README.md)。
+
+```bash
+cd ../05-常用指标
+python3 rsi.py
+python3 kdj.py
+python3 boll.py
+```
+
+RSI、KDJ、布林带的公式和参数见 [`05-常用指标/README.md`](05-常用指标/README.md)。
 
 # 安装依赖库
 
