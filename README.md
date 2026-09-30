@@ -51,6 +51,13 @@ python3 boll.py
 
 RSI、KDJ、布林带的公式和参数见 [`05-常用指标/README.md`](05-常用指标/README.md)。
 
+```bash
+cd ../06-用MACD指标做简单交易系统
+python3 trade.py
+```
+
+金叉买入、死叉卖出见 [`06-用MACD指标做简单交易系统/README.md`](06-用MACD指标做简单交易系统/README.md)。
+
 # 安装依赖库
 
 pip3 install -r requirements.txt
