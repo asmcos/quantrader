@@ -58,6 +58,13 @@ python3 trade.py
 
 金叉买入、死叉卖出见 [`06-用MACD指标做简单交易系统/README.md`](06-用MACD指标做简单交易系统/README.md)。
 
+```bash
+cd ../07-用多只股票回测MACD交易系统
+python3 backtest.py
+```
+
+同一套规则在多只股票上的回测见 [`07-用多只股票回测MACD交易系统/README.md`](07-用多只股票回测MACD交易系统/README.md)。
+
 # 安装依赖库
 
 pip3 install -r requirements.txt
