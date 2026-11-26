@@ -65,6 +65,14 @@ python3 backtest.py
 
 同一套规则在多只股票上的回测见 [`07-用多只股票回测MACD交易系统/README.md`](07-用多只股票回测MACD交易系统/README.md)。
 
+```bash
+cd ../08-同涨同跌股票配对
+python3 similar.py
+python3 similar.py --codes sh.601398 sh.601939 sh.601288
+```
+
+用 Klang 本地日 K 找同涨同跌的 2–3 只股票，看相关、同向率、幅度和先后，见 [`08-同涨同跌股票配对/README.md`](08-同涨同跌股票配对/README.md)。
+
 # 安装依赖库
 
 pip3 install -r requirements.txt
